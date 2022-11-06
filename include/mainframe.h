@@ -21,9 +21,7 @@ class MainFrame: public wxFrame {
 
     private:
         void onExit(wxCloseEvent &event);
-        void closePreview(wxCloseEvent &event);
-        void showPreview(wxCommandEvent &event);
-        void createPreview(Magick::Image &img);
+        void updatePreview();
         void allocateMem();
         void setBindings();
         void overlayPanels();
