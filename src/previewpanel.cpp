@@ -4,9 +4,14 @@
 PreviewPanel::PreviewPanel(wxWindow *parent, wxWindowID id) : 
     wxScrolledWindow(parent, id) {
     Bind(wxEVT_PAINT, &PreviewPanel::paintImage, this);
+    bm = nullptr;
 }
 
 void PreviewPanel::paintImage(wxPaintEvent &event) {
+    if(!bm) {
+        event.Skip();
+        return;
+    }
     wxPaintDC previewDC(this);
     previewDC.DrawBitmap(*bm, 0, 0);
 }
