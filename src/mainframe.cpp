@@ -31,7 +31,6 @@ void MainFrame::overlayPanels() {
 
 void MainFrame::setBindings() {
     Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onExit, this);
-    //tools->Bind(wxEVT_BUTTON, &MainFrame::showPreview, this, SHOW_PREVIEW_BT);
     tools->Bind(wxEVT_CHECKBOX, &MainFrame::changeGrowState, this, 
             ict::GROW_CHECK_CB);
     tools->Bind(wxEVT_RADIOBOX, &MainFrame::changeGrowChoice, this, 
@@ -52,8 +51,12 @@ void MainFrame::onExit(wxCloseEvent &event) {
     if(preview) preview->Destroy();
     if(tools) tools->Destroy();
     if(canvas) canvas->Destroy();
+    if(sideSplitter) sideSplitter->Destroy();
     if(mainSplitter) mainSplitter->Destroy();
     if(imgTest) delete(imgTest);
     Destroy();
 }
 
+void MainFrame::updatePreview() {
+    //preview->updatePreview(*imgTest);
+}
