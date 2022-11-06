@@ -8,7 +8,7 @@ list(APPEND SRC_FILES
 	"composer.cpp"
 	"imgcropapp.cpp"
 	"mainframe.cpp"
-	"previewframe.cpp"
+	"previewpanel.cpp"
 	"toolspanel.cpp"
 	"canvaspanel.cpp"
 	"pixeltool.cpp"
