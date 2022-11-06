@@ -1,8 +1,10 @@
 # Image Cropping Tool
 
-Herramienta para recortar imagenes agregando la posibilidad de hacer "growing". Esto significa que, si el recorte queda por fuera de la imagen, la herramienta agregará los pixeles necesarios para no dejar el area vacía. Los pixeles que se agregan pueden ser elegidos por el usuario entre: "color" o "imagen".<br>
+Herramienta para recortar imagenes agregando la posibilidad de hacer "growing". Esto significa que, si el recorte queda por fuera de la imagen, la herramienta agregará los pixeles necesarios para no dejar areas vacías. Los pixeles que se agregan pueden ser elegidos por el usuario: "color" o "imagen".
 
 ## Build
+
+### Linux
 
 	mkdir build
 	cd build
@@ -11,7 +13,7 @@ Herramienta para recortar imagenes agregando la posibilidad de hacer "growing". 
 
 ## Funcionalidades importantes
 
-A continuacion se presentan las funcionalidades que deben ser reflejadas en el programa final:<br>
+A continuacion se presentan las funcionalidades que deben ser reflejadas en el programa final:
 
 - Elección de la relacion de aspecto: Libre o fija.
 - Forma de recorte: Cuadrilatero, circulo, triangulo, forma, etc.
@@ -20,6 +22,6 @@ A continuacion se presentan las funcionalidades que deben ser reflejadas en el p
 
 ## Diseño de GUI
 
-La interfaz grafica tendrá una barra de menu superior, panel de canvas a la izquierda y panel de controles junto con la vista previa a la derecha.<br>
+La interfaz grafica tendrá una barra de menu superior, panel de canvas a la izquierda y panel de controles junto con la vista previa a la derecha. Los paneles deben estar separados por "splitters", permitiendo redimensionarlos.
 
 ![gui](/images/screenshot.png)
