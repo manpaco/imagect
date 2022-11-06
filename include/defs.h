@@ -23,7 +23,7 @@ enum ControlID {
 enum PanelID {
     CANVAS = wxID_HIGHEST + 100,
     TOOLS,
-    SPLITTER
+    PREVIEW,
 };
 
 enum CollPaneID {
@@ -34,7 +34,11 @@ enum CollPaneID {
 
 enum FrameID {
     MAIN = wxID_HIGHEST + 300,
-    PREVIEW
+};
+
+enum SplitterID {
+    MAIN_SPLITTER = wxID_HIGHEST +400,
+    SIDE_SPLITTER
 };
 
 enum GrowChoice {
