@@ -25,3 +25,10 @@ void PreviewPanel::updatePreview(Magick::Image &img) {
     box->SetMinSize(wxSize(img.columns(), img.rows()));
     box->SetBackgroundBitmap(*bm);
 }
+
+PreviewPanel::~PreviewPanel() {
+    if(bm) delete(bm);
+    if(box) box->Destroy();
+    if(sz) delete(sz);
+    Destroy();
+}

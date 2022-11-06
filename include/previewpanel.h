@@ -15,6 +15,7 @@ class PreviewPanel: public wxScrolledWindow {
     public:
         PreviewPanel(wxWindow *parent, wxWindowID id);
         void updatePreview(Magick::Image &img);
+        ~PreviewPanel();
 
     private:
         void paintImage(wxPaintEvent &event); 
