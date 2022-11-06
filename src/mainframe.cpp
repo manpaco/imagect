@@ -2,8 +2,7 @@
 #include "Magick++.h"
 #include "canvaspanel.h"
 #include "defs.h"
-#include "previewframe.h"
-#include "toolspanel.h"
+#include "previewpanel.h"
 #include "wx/splitter.h"
 
 using Magick::Quantum;
@@ -16,14 +15,16 @@ MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Croping Tool") {
 
 void MainFrame::allocateMem() {
     mainSplitter = new wxSplitterWindow(this, ict::SPLITTER);
+    sideSplitter = new wxSplitterWindow(mainSplitter);
     canvas = new CanvasPanel(mainSplitter, ict::CANVAS);
-    tools = new ToolsPanel(mainSplitter, ict::TOOLS);
-    preview = nullptr;
+    tools = new ToolsPanel(sideSplitter, ict::TOOLS);
+    preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxHORIZONTAL);
 }
 
 void MainFrame::overlayPanels() {
-    mainSplitter->SplitVertically(canvas, tools);
+    sideSplitter->SplitHorizontally(tools, preview);
+    mainSplitter->SplitVertically(canvas, sideSplitter);
     mainSizer->Add(mainSplitter, 1, wxEXPAND);
     SetSizerAndFit(mainSizer);
 }
@@ -54,28 +55,5 @@ void MainFrame::onExit(wxCloseEvent &event) {
     if(mainSplitter) mainSplitter->Destroy();
     if(imgTest) delete(imgTest);
     Destroy();
-}
-
-void MainFrame::closePreview(wxCloseEvent &event) {
-    preview->Destroy();
-    preview = nullptr;
-}
-
-void MainFrame::showPreview(wxCommandEvent &event) {
-    if(preview){
-        if(preview->IsShown()) {
-            preview->Raise();
-            return;
-        }
-    } else {
-        if(imgTest) createPreview(*imgTest);
-        else return;
-    }
-    preview->Show();
-}
-
-void MainFrame::createPreview(Magick::Image &img) {
-    preview = new PreviewFrame(this, ict::PREVIEW, "Preview", img);
-    preview->Bind(wxEVT_CLOSE_WINDOW, &MainFrame::closePreview, this);
 }
 

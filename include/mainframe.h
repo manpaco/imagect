@@ -12,7 +12,7 @@
 
 #include "canvaspanel.h"
 #include "toolspanel.h"
-#include "previewframe.h"
+#include "previewpanel.h"
 
 class MainFrame: public wxFrame {
     
@@ -34,7 +34,7 @@ class MainFrame: public wxFrame {
         ToolsPanel *tools;
         wxSplitterWindow *mainSplitter;
         wxSplitterWindow *sideSplitter;
-        PreviewFrame *preview;
+        PreviewPanel *preview;
         wxBoxSizer *mainSizer;
         Magick::Image *imgTest;
 
