@@ -8,6 +8,8 @@
     #include <wx/wx.h>
 #endif
 
+#include "wx/custombgwin.h"
+
 class PreviewPanel: public wxScrolledWindow {
 
     public:
@@ -19,6 +21,8 @@ class PreviewPanel: public wxScrolledWindow {
         void createBitmap(Magick::Image &img);
 
         wxBitmap *bm;
+        wxCustomBackgroundWindow<wxPanel> *box;
+        wxBoxSizer *sz;
 };
 
 #endif // PREVIEWPANEL_H

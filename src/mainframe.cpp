@@ -14,12 +14,13 @@ MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Croping Tool") {
 }
 
 void MainFrame::allocateMem() {
-    mainSplitter = new wxSplitterWindow(this, ict::SPLITTER);
-    sideSplitter = new wxSplitterWindow(mainSplitter);
+    mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
+    sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
     canvas = new CanvasPanel(mainSplitter, ict::CANVAS);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxHORIZONTAL);
+    //updatePreview();
 }
 
 void MainFrame::overlayPanels() {
@@ -58,5 +59,5 @@ void MainFrame::onExit(wxCloseEvent &event) {
 }
 
 void MainFrame::updatePreview() {
-    //preview->updatePreview(*imgTest);
+    preview->updatePreview(*imgTest);
 }

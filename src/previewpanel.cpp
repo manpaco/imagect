@@ -3,27 +3,25 @@
 
 PreviewPanel::PreviewPanel(wxWindow *parent, wxWindowID id) : 
     wxScrolledWindow(parent, id) {
-    Bind(wxEVT_PAINT, &PreviewPanel::paintImage, this);
-    bm = nullptr;
-}
 
-void PreviewPanel::paintImage(wxPaintEvent &event) {
-    if(!bm) {
-        event.Skip();
-        return;
-    }
-    wxPaintDC previewDC(this);
-    previewDC.DrawBitmap(*bm, 0, 0);
+    bm = nullptr;
+    box = new wxCustomBackgroundWindow<wxPanel>();
+    box->Create(this);
+    sz = new wxBoxSizer(wxVERTICAL);
+    sz->Add(box);
+    SetSizer(sz);
+    SetScrollRate(5, 5);
 }
 
 void PreviewPanel::createBitmap(Magick::Image &img) {
     if(bm) delete(bm);
     PixelTool extractor;
     bm = new wxBitmap(wxImage(img.columns(), img.rows(), 
-            extractor.extractRgb(img), extractor.extractAlpha(img), true));
+            extractor.extractRgb(img), extractor.extractAlpha(img)));
 }
 
 void PreviewPanel::updatePreview(Magick::Image &img) {
     createBitmap(img);
-    Update();
+    box->SetMinSize(wxSize(img.columns(), img.rows()));
+    box->SetBackgroundBitmap(*bm);
 }
