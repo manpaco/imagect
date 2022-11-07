@@ -67,6 +67,7 @@ class ToolsPanel: public wxScrolledWindow {
         wxChoice *shapeSelector;
         wxString shapeChoices[ict::SHAPE_CHOICE_SIZE];
 
+        wxButton *apply;
         wxBoxSizer *toolsSizer;
 
         unsigned int width, height;
