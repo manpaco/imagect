@@ -18,7 +18,9 @@ enum ControlID {
 
     SHAPE_CH,
 
-    APPLY_BT
+    APPLY_BT,
+
+    CROP_RECT
 
 };
 
