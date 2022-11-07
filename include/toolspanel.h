@@ -3,7 +3,6 @@
 
 #include "defs.h"
 #include <wx/wxprec.h>
-#include <wx/collpane.h>
 
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
@@ -14,6 +13,9 @@
 #endif
 #if wxUSE_FILEPICKERCTRL
     #include <wx/filepicker.h>
+#endif
+#if wxUSE_COLLPANE
+    #include <wx/collpane.h>
 #endif
 
 class ToolsPanel: public wxScrolledWindow {
@@ -36,7 +38,9 @@ class ToolsPanel: public wxScrolledWindow {
         void showPresetRatioTools(wxCommandEvent &event);
         void createAspectBlock();
         void createGrowBlock();
+        void createShapeBlock();
         void initGrowChoices();
+        void initShapeChoices();
         void growChoiceState(bool state, int choice);
         void updateBlock(ict::CollPaneID block);
         
@@ -60,6 +64,8 @@ class ToolsPanel: public wxScrolledWindow {
 
         wxCollapsiblePane *shapeBlock;
         wxBoxSizer *shapeSizer;
+        wxChoice *shapeSelector;
+        wxString shapeChoices[ict::SHAPE_CHOICE_SIZE];
 
         wxBoxSizer *toolsSizer;
 
