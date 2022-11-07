@@ -49,7 +49,7 @@ enum GrowChoice {
 
 enum ShapeChoice {
     SQUARE = 0,
-    CIRCULE,
+    CIRCLE,
     TRIANGLE,
     SHAPE_CHOICE_SIZE
 };
