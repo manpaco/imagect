@@ -1,5 +1,5 @@
-#ifndef FRAMEBORDER_H
-#define FRAMEBORDER_H
+#ifndef RECTSASH_H
+#define RECTSASH_H
 
 #include <wx/wxprec.h>
 
@@ -7,18 +7,23 @@
     #include <wx/wx.h>
 #endif
 
-class FrameBorder : public wxControl {
+enum Zone {
+    Edge,
+    Inner
+};
+
+class RectSash : public wxControl {
     public:
-        FrameBorder();
+        RectSash();
 
     protected:
         void Init();
         void OnPaint(wxPaintEvent &);
 
     private:
-        wxDECLARE_DYNAMIC_CLASS(FrameBorder);
+        wxDECLARE_DYNAMIC_CLASS(RectSash);
         wxSize area;
 
 };
 
-#endif // FRAMEBORDER_H
+#endif // RECTSASH_H
