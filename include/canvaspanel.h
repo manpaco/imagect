@@ -7,7 +7,7 @@
     #include <wx/wx.h>
 #endif
 
-class CanvasPanel: public wxPanel {
+class CanvasPanel: public wxScrolledWindow {
     public:
         CanvasPanel(wxWindow *parent, wxWindowID id);
 };
