@@ -76,11 +76,11 @@ unsigned char * extractAlpha(Magick::Image &img) {
     return pExt;
 }
 
-unsigned char convertValue(unsigned short value_16d) {
-    value_16d = value_16d / 255;
-    if(value_16d > 255) {
+unsigned char convertValue(unsigned short value) {
+    value = value / 255;
+    if(value > 255) {
         return 255;
     } else {
-        return value_16d;
+        return value;
     }
 }

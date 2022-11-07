@@ -3,11 +3,11 @@
 
 #include <Magick++.h>
 
-void overlap(const Magick::Image &overlay, Magick::Image &background);
-Magick::Image extractArea(const Magick::Geometry area, const Magick::Image target);
-bool isContained(const Magick::Geometry &area, const Magick::Image &image);
-unsigned char * extractRgb(Magick::Image &img);
-unsigned char * extractAlpha(Magick::Image &img);
-unsigned char convertValue(unsigned short value);
+void overlap(const Magick::Image &, Magick::Image &, bool, bool);
+Magick::Image extractArea(const Magick::Geometry, const Magick::Image);
+bool isContained(const Magick::Geometry &, const Magick::Image &);
+unsigned char * extractRgb(Magick::Image &);
+unsigned char * extractAlpha(Magick::Image &);
+unsigned char convertValue(unsigned short);
 
 #endif // IMGTOOLS_H
