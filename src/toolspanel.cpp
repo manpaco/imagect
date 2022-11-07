@@ -16,6 +16,12 @@ ToolsPanel::~ToolsPanel() {
 
 void ToolsPanel::setBindings() {
     Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, &ToolsPanel::updateVirtualSize, this);
+    Bind(wxEVT_CHECKBOX, 
+            [=](wxCommandEvent &event) { growState(event.IsChecked()); }, 
+            ict::GROW_CHECK_CB);
+    Bind(wxEVT_RADIOBOX, 
+            [=](wxCommandEvent &event) { growChoice(event.GetSelection()); }, 
+            ict::GROW_SELECTOR_RB);
 }
 
 void ToolsPanel::updateVirtualSize(wxCollapsiblePaneEvent &event) {
