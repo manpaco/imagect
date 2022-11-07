@@ -11,6 +11,7 @@ list(APPEND SRC_FILES
 	"toolspanel.cpp"
 	"canvaspanel.cpp"
 	"imgtools.cpp"
+	"croprectangle.cpp"
 )
 list(TRANSFORM SRC_FILES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 add_executable(imgcrop ${SRC_FILES})
