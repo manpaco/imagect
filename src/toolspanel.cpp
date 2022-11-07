@@ -131,6 +131,10 @@ void ToolsPanel::updateBlock(ict::CollPaneID block) {
         aspectBlock->Collapse();
         aspectBlock->Expand();
         break;
+    case ict::SHAPE:
+        shapeBlock->Collapse();
+        shapeBlock->Expand();
+        break;
     }
 }
 
