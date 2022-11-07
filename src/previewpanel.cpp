@@ -29,6 +29,4 @@ void PreviewPanel::updatePreview(Magick::Image &img) {
 PreviewPanel::~PreviewPanel() {
     if(bm) delete(bm);
     if(box) box->Destroy();
-    if(sz) delete(sz);
-    Destroy();
 }
