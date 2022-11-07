@@ -25,8 +25,6 @@ class MainFrame: public wxFrame {
         void allocateMem();
         void setBindings();
         void overlayPanels();
-        void changeGrowState(wxCommandEvent &event);
-        void changeGrowChoice(wxCommandEvent &event);
 
         CanvasPanel *canvas;
         ToolsPanel *tools;

@@ -32,20 +32,6 @@ void MainFrame::overlayPanels() {
 
 void MainFrame::setBindings() {
     Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onExit, this);
-    tools->Bind(wxEVT_CHECKBOX, &MainFrame::changeGrowState, this, 
-            ict::GROW_CHECK_CB);
-    tools->Bind(wxEVT_RADIOBOX, &MainFrame::changeGrowChoice, this, 
-            ict::GROW_SELECTOR_RB);
-}
-
-void MainFrame::changeGrowState(wxCommandEvent &event) {
-    tools->growState(event.IsChecked());
-    // change grow option in canvas
-}
-
-void MainFrame::changeGrowChoice(wxCommandEvent &event) {
-    tools->growChoice(event.GetSelection());
-    // set grow background
 }
 
 void MainFrame::onExit(wxCloseEvent &event) {
