@@ -2,7 +2,6 @@
 #define MAINFRAME_H
 
 #include "Magick++/Image.h"
-#include "composer.h"
 #include <wx/wxprec.h>
 #include "wx/splitter.h"
 
@@ -25,6 +24,7 @@ class MainFrame: public wxFrame {
         void allocateMem();
         void setBindings();
         void overlayPanels();
+        void applyChanges(wxCommandEvent &);
 
         CanvasPanel *canvas;
         ToolsPanel *tools;

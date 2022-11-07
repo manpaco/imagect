@@ -32,6 +32,11 @@ void MainFrame::overlayPanels() {
 
 void MainFrame::setBindings() {
     Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onExit, this);
+    tools->Bind(wxEVT_BUTTON, &MainFrame::applyChanges, ict::APPLY_BT);
+}
+
+void MainFrame::applyChanges(wxCommandEvent &event) {
+    // update preview and/or update crop rectangle
 }
 
 void MainFrame::onExit(wxCloseEvent &event) {
