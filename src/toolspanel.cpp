@@ -30,7 +30,6 @@ void ToolsPanel::updateVirtualSize(wxCollapsiblePaneEvent &event) {
 void ToolsPanel::createTools() {
     createAspectBlock();
     createGrowBlock();
-    showPreview = new wxButton(this, ict::SHOW_PREVIEW_BT, "Show preview");
 }
 
 void ToolsPanel::createAspectBlock() {
@@ -83,11 +82,17 @@ void ToolsPanel::createGrowBlock() {
     colorPicker = new wxColourPickerCtrl(winGrow, ict::COLOR_PICKER_BT, 
             *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_USE_TEXTCTRL);
     colorPicker->Show(false);
+    backPicker = new wxFilePickerCtrl(winGrow, ict::PICK_BACK_FP);
+    backPicker->Show(false);
+    backBlur = new wxSlider(winGrow, ict::BACK_BLUR_SL, 0, 0, 100);
+    backBlur->Show(false);
 
     growSizer = new wxBoxSizer(wxVERTICAL);
     growSizer->Add(growCheck);
     growSizer->Add(growSelector);
     growSizer->Add(colorPicker);
+    growSizer->Add(backPicker);
+    growSizer->Add(backBlur);
     winGrow->SetSizerAndFit(growSizer);
 }
 
@@ -122,11 +127,11 @@ void ToolsPanel::updateBlock(ict::CollPaneID block) {
 void ToolsPanel::growChoiceState(bool state, int choice) {
     switch (choice) {
     case ict::COLOR:
-        // HIDE/SHOW COLOR SIZER
         colorPicker->Show(state);
         break;
     case ict::IMAGE:
-        // HIDE/SHOW IMAGE SIZER
+        backPicker->Show(state);
+        backBlur->Show(state);
         break;
     }
 }
@@ -143,7 +148,6 @@ void ToolsPanel::overlayTools() {
     toolsSizer->Add(aspectBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->Add(growBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->AddSpacer(10);
-    toolsSizer->Add(showPreview, 0, wxCENTER);
     SetSizerAndFit(toolsSizer);
     SetScrollRate(5, 5);
 }
