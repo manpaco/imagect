@@ -58,6 +58,18 @@ enum ShapeChoice {
     SHAPE_CHOICE_SIZE
 };
 
+enum CardinalPoint {
+    NONE = -1,
+    N,
+    NE,
+    NW,
+    S,
+    SE,
+    SW,
+    E,
+    W
+};
+
 };
 
 #endif // DEFS_H
