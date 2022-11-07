@@ -12,6 +12,9 @@
 #if wxUSE_COLOURPICKERCTRL
     #include <wx/clrpicker.h>
 #endif
+#if wxUSE_FILEPICKERCTRL
+    #include <wx/filepicker.h>
+#endif
 
 class ToolsPanel: public wxScrolledWindow {
     public:
@@ -49,6 +52,7 @@ class ToolsPanel: public wxScrolledWindow {
         wxCheckBox *growCheck;
         wxRadioBox *growSelector;
         wxSlider *backBlur;
+        wxFilePickerCtrl *backPicker;
         wxColourPickerCtrl *colorPicker;
         wxBoxSizer *growSizer;
         wxString growChoices[ict::GROW_CHOICE_SIZE];
@@ -57,7 +61,6 @@ class ToolsPanel: public wxScrolledWindow {
         wxCollapsiblePane *shapeBlock;
         wxBoxSizer *shapeSizer;
 
-        wxButton *showPreview;
         wxBoxSizer *toolsSizer;
 
         unsigned int width, height;
