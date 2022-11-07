@@ -12,12 +12,12 @@ enum ControlID {
 
     GROW_CHECK_CB,
     GROW_SELECTOR_RB,
-    BACK_BLUR_SL,
     COLOR_PICKER_BT,
+    BACK_BLUR_SL,
+    PICK_BACK_FP,
 
-    SHAPE_CH,
+    SHAPE_CH
 
-    SHOW_PREVIEW_BT
 };
 
 enum PanelID {
