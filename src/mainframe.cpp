@@ -32,7 +32,7 @@ void MainFrame::overlayPanels() {
 
 void MainFrame::setBindings() {
     Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onExit, this);
-    tools->Bind(wxEVT_BUTTON, &MainFrame::applyChanges, ict::APPLY_BT);
+    tools->Bind(wxEVT_BUTTON, &MainFrame::applyChanges, this, ict::APPLY_BT);
 }
 
 void MainFrame::applyChanges(wxCommandEvent &event) {
