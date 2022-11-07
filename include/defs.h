@@ -16,7 +16,9 @@ enum ControlID {
     BACK_BLUR_SL,
     PICK_BACK_FP,
 
-    SHAPE_CH
+    SHAPE_CH,
+
+    APPLY_BT
 
 };
 
