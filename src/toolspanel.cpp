@@ -26,6 +26,7 @@ void ToolsPanel::createTools() {
     createAspectBlock();
     createGrowBlock();
     createShapeBlock();
+    apply = new wxButton(this, ict::APPLY_BT, "Apply");
 }
 
 void ToolsPanel::createAspectBlock() {
@@ -167,6 +168,7 @@ void ToolsPanel::overlayTools() {
     toolsSizer->Add(aspectBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->Add(shapeBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->Add(growBlock, 0, wxGROW | wxALL, 5);
+    toolsSizer->Add(apply);
     toolsSizer->AddSpacer(10);
     SetSizerAndFit(toolsSizer);
     SetScrollRate(5, 5);
