@@ -1,11 +1,6 @@
 #include "toolspanel.h"
 #include "defs.h"
 #include <string>
-#include <wx/arrstr.h>
-#include <wx/defs.h>
-#include <wx/gdicmn.h>
-#include <wx/sizer.h>
-#include "wx/statline.h"
 #include "wx/valnum.h"
 
 ToolsPanel::ToolsPanel(wxWindow *parent, wxWindowID id) : wxScrolledWindow() {
@@ -30,6 +25,7 @@ void ToolsPanel::updateVirtualSize(wxCollapsiblePaneEvent &event) {
 void ToolsPanel::createTools() {
     createAspectBlock();
     createGrowBlock();
+    createShapeBlock();
 }
 
 void ToolsPanel::createAspectBlock() {
@@ -96,6 +92,20 @@ void ToolsPanel::createGrowBlock() {
     winGrow->SetSizerAndFit(growSizer);
 }
 
+void ToolsPanel::createShapeBlock() {
+    shapeBlock = new wxCollapsiblePane(this, ict::SHAPE, "Shape",
+            wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
+    wxWindow *winShape = shapeBlock->GetPane();
+    initShapeChoices();
+    shapeSelector = new wxChoice(winShape, ict::SHAPE_CH, wxDefaultPosition, 
+            wxDefaultSize, 
+            wxArrayString(ict::SHAPE_CHOICE_SIZE, shapeChoices));
+    
+    shapeSizer = new wxBoxSizer(wxVERTICAL);
+    shapeSizer->Add(shapeSelector);
+    winShape->SetSizerAndFit(shapeSizer);
+}
+
 void ToolsPanel::growState(bool state) {
     if(growCheck->IsChecked() != state) return;
     growSelector->Enable(state);
@@ -139,13 +149,19 @@ void ToolsPanel::growChoiceState(bool state, int choice) {
 void ToolsPanel::initGrowChoices() {
     growChoices[ict::COLOR] = wxString("Color");
     growChoices[ict::IMAGE] = wxString("Image");
-    // INIT GROW CHOICE SIZERS
     showedGrowChoice = 0;
+}
+
+void ToolsPanel::initShapeChoices() {
+    shapeChoices[ict::SQUARE] = wxString("Square");
+    shapeChoices[ict::CIRCLE] = wxString("Circle");
+    shapeChoices[ict::TRIANGLE] = wxString("Triangle");
 }
 
 void ToolsPanel::overlayTools() {
     toolsSizer = new wxBoxSizer(wxVERTICAL);
     toolsSizer->Add(aspectBlock, 0, wxGROW | wxALL, 5);
+    toolsSizer->Add(shapeBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->Add(growBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->AddSpacer(10);
     SetSizerAndFit(toolsSizer);
