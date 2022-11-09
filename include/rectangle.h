@@ -9,12 +9,17 @@
 
 #include "defs.h"
 
+const int borderWidth = 4;
+const int corner = borderWidth * 2;
+const int resizeLimit = corner * 3;
+
+
 class Rectangle : public wxControl {
     public:
         Rectangle();
         Rectangle(wxWindow *parent, wxWindowID id, 
                 const wxPoint &pos=wxDefaultPosition, 
-                const wxSize &size=wxDefaultSize, long style=0, 
+                const wxSize &size=wxDefaultSize, long style=wxBORDER_NONE, 
                 const wxValidator &validator=wxDefaultValidator, 
                 const wxString &name=wxControlNameStr);    
         ~Rectangle();
@@ -26,17 +31,20 @@ class Rectangle : public wxControl {
         void mousePress(wxMouseEvent &);
         void mouseRelease(wxMouseEvent &);
         void resetCursor(wxMouseEvent &);
+        void updateSizes(wxSizeEvent &);
 
     private:
-        bool innerZone(const wxPoint);
-        ict::CardinalPoint edgeZone(const wxPoint);
+        ict::Zone getLocation(const wxPoint);
         bool isContained(wxRect area, wxPoint point);
-        void changeCursor(ict::CardinalPoint type);
+        void changeCursor(ict::Zone type);
+        void resizeUsing(ict::Zone);
 
-        wxDECLARE_DYNAMIC_CLASS(RectSash);
-        wxSize area;
-        bool drag = false;
-        ict::CardinalPoint resize;
+        wxDECLARE_DYNAMIC_CLASS(Rectangle);
+        wxPoint clientPressPoint;
+        wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
+
+        ict::Zone zonePressed = ict::NONE;
+        long ratio;
 };
 
 #endif // RECTANGLE_H
