@@ -2,6 +2,7 @@
 #include <iterator>
 #include <wx/defs.h>
 #include <wx/gdicmn.h>
+#include <wx/geometry.h>
 #include <wx/graphics.h>
 
 wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
@@ -36,8 +37,9 @@ void Rectangle::enterWinHandler(wxMouseEvent &event) {
 void Rectangle::updateSizes(wxSizeEvent &event) {
     ratio = (float)event.GetSize().GetWidth() / 
             (float)event.GetSize().GetHeight();
-    iz = wxRect(corner, corner, event.GetSize().GetWidth() - (corner*2), 
-            event.GetSize().GetHeight() - (corner*2));
+    iz = wxRect((GetSize().GetWidth() / 2) - (dragWidth / 2), 
+            (GetSize().GetHeight() / 2) - (dragWidth / 2), 
+            dragWidth, dragWidth);
     nz = wxRect(corner, 0, event.GetSize().GetWidth() - (corner * 2), corner);
     sz = wxRect(corner, event.GetSize().GetHeight() - corner, 
             event.GetSize().GetWidth() - (corner * 2), corner);
@@ -270,16 +272,24 @@ void Rectangle::onPaint(wxPaintEvent &) {
     wxPaintDC device(this);
     wxGraphicsContext *gcd = wxGraphicsContext::Create(device);
     if(gcd) {
-        gcd->SetPen(wxPen(wxColor("red"), penWidth / 3));
+        wxPen outline(wxColour("red"), bestWidth / 3);
+        gcd->SetPen(outline);
         gcd->SetBrush(wxBrush(wxColour(0, 0, 0, 0)));
-        gcd->DrawRectangle(penWidth, penWidth, GetSize().GetWidth() - corner,
+        gcd->DrawRectangle(bestWidth, bestWidth, GetSize().GetWidth() - corner,
                 GetSize().GetHeight() - corner);
-        gcd->SetPen(wxPen(wxColor(0, 0, 0, 0)));
-        gcd->SetBrush(wxBrush(wxColour("red")));
-        gcd->DrawRectangle(nwz.GetX(), nwz.GetY(), nwz.GetWidth(), nwz.GetHeight());
-        gcd->DrawRectangle(swz.GetX(), swz.GetY(), swz.GetWidth(), swz.GetHeight());
-        gcd->DrawRectangle(nez.GetX(), nez.GetY(), nez.GetWidth(), nez.GetHeight());
-        gcd->DrawRectangle(sez.GetX(), sez.GetY(), sez.GetWidth(), sez.GetHeight());
+        device.SetPen(outline);
+        wxPoint north(GetSize().GetWidth() / 2, (GetSize().GetHeight() / 2) - (dragWidth / 2));
+        wxPoint south(GetSize().GetWidth() / 2, (GetSize().GetHeight() / 2) + (dragWidth / 2));
+        wxPoint east((GetSize().GetWidth() / 2) + (dragWidth / 2), GetSize().GetHeight() / 2);
+        wxPoint west((GetSize().GetWidth() / 2) - (dragWidth / 2), GetSize().GetHeight() / 2);
+        device.DrawLine(north, south);
+        device.DrawLine(east, west);
+        device.SetPen(wxPen("red", 1));
+        device.SetBrush(wxBrush(wxColour("red")));
+        device.DrawRectangle(nwz.GetX(), nwz.GetY(), nwz.GetWidth(), nwz.GetHeight());
+        device.DrawRectangle(swz.GetX(), swz.GetY(), swz.GetWidth(), swz.GetHeight());
+        device.DrawRectangle(nez.GetX(), nez.GetY(), nez.GetWidth(), nez.GetHeight());
+        device.DrawRectangle(sez.GetX(), sez.GetY(), sez.GetWidth(), sez.GetHeight());
     }
 }
 

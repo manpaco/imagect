@@ -9,9 +9,10 @@
 
 #include "defs.h"
 
-const int penWidth = 6;
-const int corner = penWidth * 2;
-const int resizeLimit = corner * 3;
+const int bestWidth = 6;
+const int corner = bestWidth * 2;
+const int dragWidth = corner * 4;
+const int resizeLimit = (corner * 2) + dragWidth;
 
 
 class Rectangle : public wxControl {
