@@ -10,16 +10,18 @@
 #include "wx/custombgwin.h"
 #include "rectangle.h"
 
+const int canvasOffset = 100;
+
 class CanvasPanel: public wxScrolledWindow {
     public:
         CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &);
 
     private:
-        void createImg(const wxBitmap &bm);
+        void createObjects(const wxBitmap &bm);
+        void onPaint(wxPaintEvent &event);
 
-        wxBoxSizer *sz;
         Rectangle *cropArea;
-        wxCustomBackgroundWindow<wxPanel> *img;
+        wxBitmap *img;
 
 };
 

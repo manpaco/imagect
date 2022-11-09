@@ -5,19 +5,25 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &bm) :
         wxScrolledWindow() {
 
     Create(parent, id);
-    createImg(bm);
-    sz = new wxBoxSizer(wxVERTICAL);
-    cropArea = new Rectangle(this, ict::CROP_AREA);
-    cropArea->SetSize(wxSize(200, 200));
-    sz->Add(img);
-    SetSizer(sz);
+    createObjects(bm);
     SetScrollRate(5, 5);
-    FitInside();
+    Bind(wxEVT_PAINT, &CanvasPanel::onPaint, this);
 }
 
-void CanvasPanel::createImg(const wxBitmap &bm) {
-    img = new wxCustomBackgroundWindow<wxPanel>();
-    img->Create(this, wxID_ANY);
-    img->SetMinSize(wxSize(bm.GetWidth(), bm.GetHeight()));
-    img->SetBackgroundBitmap(bm);
+void CanvasPanel::createObjects(const wxBitmap &bm) {
+    if(bm.IsOk()) {
+        img = new wxBitmap(bm);
+        cropArea = new Rectangle(this, ict::CROP_AREA);
+        cropArea->SetSize(canvasOffset, canvasOffset, img->GetWidth(), img->GetHeight());
+        SetVirtualSize((canvasOffset * 2) + img->GetWidth(), (canvasOffset * 2) + img->GetHeight());
+    } else {
+        img = nullptr;
+        cropArea = nullptr;
+    }
+}
+
+void CanvasPanel::onPaint(wxPaintEvent &event) {
+    wxPaintDC dev(this);
+    DoPrepareDC(dev);
+    if(img) dev.DrawBitmap(*img, wxPoint(canvasOffset, canvasOffset));
 }
