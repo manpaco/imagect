@@ -20,7 +20,7 @@ enum ControlID {
 
     APPLY_BT,
 
-    CROP_RECT
+    CROP_AREA
 
 };
 
