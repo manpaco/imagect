@@ -2,6 +2,7 @@
 #include <iterator>
 #include <wx/defs.h>
 #include <wx/gdicmn.h>
+#include <wx/graphics.h>
 
 wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
 
@@ -124,7 +125,7 @@ void Rectangle::resizeUsing(ict::Zone zone){
         deltaX++;
         deltaY--;
         deltaX += mousePosition.x - 
-            (positionOnScreen.x + GetSize().GetWidth());
+                (positionOnScreen.x + GetSize().GetWidth());
         deltaY += mousePosition.y - positionOnScreen.y;
         if(mousePosition.x < limitPosX && mousePosition.y > limitPosY) return;
         if(mousePosition.x < limitPosX) {
@@ -182,7 +183,7 @@ void Rectangle::resizeUsing(ict::Zone zone){
         limitPosY = positionOnScreen.y + resizeLimit;
         deltaY++;
         deltaY += mousePosition.y - 
-            (positionOnScreen.y + GetSize().GetHeight());
+                (positionOnScreen.y + GetSize().GetHeight());
         if(mousePosition.y < limitPosY) return;
         SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
                 GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING);
@@ -201,7 +202,8 @@ void Rectangle::resizeUsing(ict::Zone zone){
     if(zone == ict::E) {
         limitPosX = positionOnScreen.x + resizeLimit;
         deltaX++;
-        deltaX += mousePosition.x - (positionOnScreen.x + GetSize().GetWidth());
+        deltaX += mousePosition.x - 
+                (positionOnScreen.x + GetSize().GetWidth());
         if(mousePosition.x < limitPosX) return;
         SetSize(wxDefaultCoord, wxDefaultCoord, 
                 GetSize().GetWidth() + deltaX, wxDefaultCoord, 
@@ -261,9 +263,19 @@ bool Rectangle::isContained(wxRect area, wxPoint point) {
 
 void Rectangle::OnPaint(wxPaintEvent &) {
     wxPaintDC device(this);
-    device.SetPen(wxPen(wxColor("red"), borderWidth));
-    device.DrawRectangle(1, 1, GetSize().GetWidth()-1, 
-            GetSize().GetHeight()-1);
+    wxGraphicsContext *gcd = wxGraphicsContext::Create(device);
+    if(gcd) {
+        gcd->SetPen(wxPen(wxColor("red"), penWidth / 3, wxPENSTYLE_SHORT_DASH));
+        gcd->SetBrush(wxBrush(wxColour(0, 0, 0, 0)));
+        gcd->DrawRectangle(penWidth / 2, penWidth / 2, GetSize().GetWidth() - penWidth,
+                GetSize().GetHeight() - penWidth);
+        gcd->SetPen(wxPen(wxColor(0, 0, 0, 0)));
+        gcd->SetBrush(wxBrush(wxColour("red")));
+        gcd->DrawRectangle(nwz.GetX(), nwz.GetY(), nwz.GetWidth(), nwz.GetHeight());
+        gcd->DrawRectangle(swz.GetX(), swz.GetY(), swz.GetWidth(), swz.GetHeight());
+        gcd->DrawRectangle(nez.GetX(), nez.GetY(), nez.GetWidth(), nez.GetHeight());
+        gcd->DrawRectangle(sez.GetX(), sez.GetY(), sez.GetWidth(), sez.GetHeight());
+    }
 }
 
 Rectangle::~Rectangle() {
