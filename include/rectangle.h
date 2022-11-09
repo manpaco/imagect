@@ -9,8 +9,8 @@
 
 #include "defs.h"
 
-const int borderWidth = 4;
-const int corner = borderWidth * 2;
+const int penWidth = 6;
+const int corner = penWidth * 2;
 const int resizeLimit = corner * 3;
 
 
