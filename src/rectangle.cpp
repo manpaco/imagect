@@ -7,7 +7,7 @@
 wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
 
 Rectangle::Rectangle() {
-    Init();
+    init();
 }
 
 Rectangle::Rectangle(wxWindow *parent, wxWindowID id, 
@@ -15,17 +15,22 @@ Rectangle::Rectangle(wxWindow *parent, wxWindowID id,
                 const wxSize &size, long style, 
                 const wxValidator &validator, 
                 const wxString &name) {
-    Init();
+    init();
     Create(parent, id, pos, size, style, validator, name);
 }
 
-void Rectangle::Init() {
+void Rectangle::init() {
     Bind(wxEVT_MOTION, &Rectangle::mouseMotion, this);
     Bind(wxEVT_LEFT_DOWN, &Rectangle::mousePress, this);
     Bind(wxEVT_LEFT_UP, &Rectangle::mouseRelease, this);
-    Bind(wxEVT_LEAVE_WINDOW, &Rectangle::resetCursor, this);
-    Bind(wxEVT_PAINT, &Rectangle::OnPaint, this);
+    Bind(wxEVT_LEAVE_WINDOW, &Rectangle::leaveWinHandler, this);
+    Bind(wxEVT_ENTER_WINDOW, &Rectangle::enterWinHandler, this);
+    Bind(wxEVT_PAINT, &Rectangle::onPaint, this);
     Bind(wxEVT_SIZE, &Rectangle::updateSizes, this);
+}
+
+void Rectangle::enterWinHandler(wxMouseEvent &event) {
+    mouseLeftWin = false;
 }
 
 void Rectangle::updateSizes(wxSizeEvent &event) {
@@ -47,7 +52,7 @@ void Rectangle::updateSizes(wxSizeEvent &event) {
     event.Skip();
 }
 
-void Rectangle::resetCursor(wxMouseEvent &event) {
+void Rectangle::leaveWinHandler(wxMouseEvent &event) {
     if(!zonePressed) changeCursor(ict::NONE);
     mouseLeftWin = true;
 }
@@ -73,8 +78,8 @@ void Rectangle::resizeUsing(ict::Zone zone){
     if(zone == ict::SE) {
         limitPosX = positionOnScreen.x + resizeLimit;
         limitPosY = positionOnScreen.y + resizeLimit;
-        deltaX++;
-        deltaY++;
+        deltaX = corner / 2;
+        deltaY = corner / 2;
         deltaX += mousePosition.x - 
                 (positionOnScreen.x + GetSize().GetWidth());
         deltaY += mousePosition.y - 
@@ -98,8 +103,8 @@ void Rectangle::resizeUsing(ict::Zone zone){
     if(zone == ict::NW) {
         limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
         limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
-        deltaX--;
-        deltaY--;
+        deltaX = -corner / 2;
+        deltaY = -corner / 2;
         deltaX += mousePosition.x - positionOnScreen.x;
         deltaY += mousePosition.y - positionOnScreen.y;
         if(mousePosition.x > limitPosX && mousePosition.y > limitPosY) return;
@@ -122,8 +127,8 @@ void Rectangle::resizeUsing(ict::Zone zone){
     if(zone == ict::NE) {
         limitPosX = positionOnScreen.x + resizeLimit;
         limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
-        deltaX++;
-        deltaY--;
+        deltaX = corner / 2;
+        deltaY = -corner / 2;
         deltaX += mousePosition.x - 
                 (positionOnScreen.x + GetSize().GetWidth());
         deltaY += mousePosition.y - positionOnScreen.y;
@@ -148,8 +153,8 @@ void Rectangle::resizeUsing(ict::Zone zone){
     if(zone == ict::SW) {
         limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
         limitPosY = positionOnScreen.y + resizeLimit;
-        deltaX--;
-        deltaY++;
+        deltaX = -corner / 2;
+        deltaY = corner / 2;
         deltaX += mousePosition.x - positionOnScreen.x;
         deltaY += mousePosition.y - 
                 (positionOnScreen.y + GetSize().GetHeight());
@@ -172,7 +177,7 @@ void Rectangle::resizeUsing(ict::Zone zone){
     }
     if(zone == ict::N) {
         limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
-        deltaY--;
+        deltaY = -corner / 2;
         deltaY += mousePosition.y - positionOnScreen.y;
         if(mousePosition.y > limitPosY) return;
         SetSize(wxDefaultCoord, positionOnParent.y + deltaY, wxDefaultCoord, 
@@ -181,7 +186,7 @@ void Rectangle::resizeUsing(ict::Zone zone){
     }
     if(zone == ict::S) {
         limitPosY = positionOnScreen.y + resizeLimit;
-        deltaY++;
+        deltaY = corner / 2;
         deltaY += mousePosition.y - 
                 (positionOnScreen.y + GetSize().GetHeight());
         if(mousePosition.y < limitPosY) return;
@@ -191,7 +196,7 @@ void Rectangle::resizeUsing(ict::Zone zone){
     }
     if(zone == ict::W) {
         limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
-        deltaX--;
+        deltaX = -corner / 2;
         deltaX += mousePosition.x - positionOnScreen.x;
         if(mousePosition.x > limitPosX) return;
         SetSize(positionOnScreen.x + deltaX, wxDefaultCoord, 
@@ -201,7 +206,7 @@ void Rectangle::resizeUsing(ict::Zone zone){
     }
     if(zone == ict::E) {
         limitPosX = positionOnScreen.x + resizeLimit;
-        deltaX++;
+        deltaX = corner / 2;
         deltaX += mousePosition.x - 
                 (positionOnScreen.x + GetSize().GetWidth());
         if(mousePosition.x < limitPosX) return;
@@ -231,13 +236,13 @@ void Rectangle::mousePress(wxMouseEvent &event) {
     CaptureMouse();
     clientPressPoint = event.GetPosition();
     zonePressed = getLocation(event.GetPosition());
-    mouseLeftWin = false;
 }
 
 void Rectangle::mouseRelease(wxMouseEvent &event) {
     ReleaseMouse();
     zonePressed = ict::NONE;
     if(mouseLeftWin) changeCursor(ict::NONE);
+    else changeCursor(getLocation(event.GetPosition()));
 }
 
 ict::Zone Rectangle::getLocation(const wxPoint p) {
@@ -261,14 +266,14 @@ bool Rectangle::isContained(wxRect area, wxPoint point) {
     return false;
 }
 
-void Rectangle::OnPaint(wxPaintEvent &) {
+void Rectangle::onPaint(wxPaintEvent &) {
     wxPaintDC device(this);
     wxGraphicsContext *gcd = wxGraphicsContext::Create(device);
     if(gcd) {
-        gcd->SetPen(wxPen(wxColor("red"), penWidth / 3, wxPENSTYLE_SHORT_DASH));
+        gcd->SetPen(wxPen(wxColor("red"), penWidth / 3));
         gcd->SetBrush(wxBrush(wxColour(0, 0, 0, 0)));
-        gcd->DrawRectangle(penWidth / 2, penWidth / 2, GetSize().GetWidth() - penWidth,
-                GetSize().GetHeight() - penWidth);
+        gcd->DrawRectangle(penWidth, penWidth, GetSize().GetWidth() - corner,
+                GetSize().GetHeight() - corner);
         gcd->SetPen(wxPen(wxColor(0, 0, 0, 0)));
         gcd->SetBrush(wxBrush(wxColour("red")));
         gcd->DrawRectangle(nwz.GetX(), nwz.GetY(), nwz.GetWidth(), nwz.GetHeight());
