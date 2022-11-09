@@ -42,9 +42,10 @@ class Rectangle : public wxControl {
         wxDECLARE_DYNAMIC_CLASS(Rectangle);
         wxPoint clientPressPoint;
         wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
+        bool mouseLeftWin = true;
 
         ict::Zone zonePressed = ict::NONE;
-        long ratio;
+        float ratio;
 };
 
 #endif // RECTANGLE_H
