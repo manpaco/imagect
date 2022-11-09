@@ -58,8 +58,9 @@ enum ShapeChoice {
     SHAPE_CHOICE_SIZE
 };
 
-enum CardinalPoint {
-    NONE = -1,
+enum Zone {
+    NONE = 0,
+    INNER,
     N,
     NE,
     NW,
