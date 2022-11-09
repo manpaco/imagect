@@ -1,5 +1,7 @@
 #include "rectangle.h"
 #include <iterator>
+#include <wx/defs.h>
+#include <wx/gdicmn.h>
 
 wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
 
@@ -26,7 +28,8 @@ void Rectangle::Init() {
 }
 
 void Rectangle::updateSizes(wxSizeEvent &event) {
-    ratio = event.GetSize().GetWidth() / event.GetSize().GetHeight();
+    ratio = (float)event.GetSize().GetWidth() / 
+            (float)event.GetSize().GetHeight();
     iz = wxRect(corner, corner, event.GetSize().GetWidth() - (corner*2), 
             event.GetSize().GetHeight() - (corner*2));
     nz = wxRect(corner, 0, event.GetSize().GetWidth() - (corner * 2), corner);
@@ -45,6 +48,7 @@ void Rectangle::updateSizes(wxSizeEvent &event) {
 
 void Rectangle::resetCursor(wxMouseEvent &event) {
     if(!zonePressed) changeCursor(ict::NONE);
+    mouseLeftWin = true;
 }
 
 void Rectangle::mouseMotion(wxMouseEvent &event) {
@@ -60,25 +64,149 @@ void Rectangle::mouseMotion(wxMouseEvent &event) {
 
 void Rectangle::resizeUsing(ict::Zone zone){
     wxPoint mousePosition(wxGetMousePosition());
-    wxPoint thisPosition(GetScreenPosition());
-    int limitPosX = thisPosition.x + resizeLimit;
-    int limitPosY = thisPosition.y + resizeLimit;
+    wxPoint positionOnScreen(GetScreenPosition());
+    wxPoint positionOnParent(GetPosition());
+    int limitPosX = 0;
+    int limitPosY = 0;
     int deltaX = 0, deltaY = 0;
     if(zone == ict::SE) {
-        deltaX = mousePosition.x - (thisPosition.x + GetSize().GetWidth());
-        deltaY = mousePosition.y - (thisPosition.y + GetSize().GetHeight());
+        limitPosX = positionOnScreen.x + resizeLimit;
+        limitPosY = positionOnScreen.y + resizeLimit;
         deltaX++;
         deltaY++;
+        deltaX += mousePosition.x - 
+                (positionOnScreen.x + GetSize().GetWidth());
+        deltaY += mousePosition.y - 
+                (positionOnScreen.y + GetSize().GetHeight());
         if(mousePosition.x < limitPosX && mousePosition.y < limitPosY) return;
         if(mousePosition.x < limitPosX) {
-            SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING); 
+            SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
+                    GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING); 
             return;
         }
         if(mousePosition.y < limitPosY) {
-            SetSize(wxDefaultCoord, wxDefaultCoord, GetSize().GetWidth() + deltaX, wxDefaultCoord, wxSIZE_USE_EXISTING); 
+            SetSize(wxDefaultCoord, wxDefaultCoord, 
+                    GetSize().GetWidth() + deltaX, wxDefaultCoord, 
+                    wxSIZE_USE_EXISTING); 
             return;
         }
-        SetSize(wxDefaultCoord, wxDefaultCoord, GetSize().GetWidth() + deltaX, GetSize().GetHeight() + deltaY);
+        SetSize(wxDefaultCoord, wxDefaultCoord, GetSize().GetWidth() + deltaX, 
+                GetSize().GetHeight() + deltaY);
+        return;
+    }
+    if(zone == ict::NW) {
+        limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
+        limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
+        deltaX--;
+        deltaY--;
+        deltaX += mousePosition.x - positionOnScreen.x;
+        deltaY += mousePosition.y - positionOnScreen.y;
+        if(mousePosition.x > limitPosX && mousePosition.y > limitPosY) return;
+        if(mousePosition.x > limitPosX) {
+            SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
+                    wxDefaultCoord, GetSize().GetHeight() - deltaY, 
+                    wxSIZE_USE_EXISTING);
+            return;
+        }
+        if(mousePosition.y > limitPosY) {
+            SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
+                    GetSize().GetWidth() - deltaX, wxDefaultCoord, 
+                    wxSIZE_USE_EXISTING);
+            return;
+        }
+        SetSize(positionOnParent.x + deltaX, positionOnParent.y + deltaY, 
+                GetSize().GetWidth() - deltaX, GetSize().GetHeight() - deltaY);
+        return;
+    }
+    if(zone == ict::NE) {
+        limitPosX = positionOnScreen.x + resizeLimit;
+        limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
+        deltaX++;
+        deltaY--;
+        deltaX += mousePosition.x - 
+            (positionOnScreen.x + GetSize().GetWidth());
+        deltaY += mousePosition.y - positionOnScreen.y;
+        if(mousePosition.x < limitPosX && mousePosition.y > limitPosY) return;
+        if(mousePosition.x < limitPosX) {
+            SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
+                    wxDefaultCoord, GetSize().GetHeight() - deltaY, 
+                    wxSIZE_USE_EXISTING);
+            return;
+        }
+        if(mousePosition.y > limitPosY) {
+            SetSize(wxDefaultCoord, wxDefaultCoord, 
+                    GetSize().GetWidth() + deltaX, wxDefaultCoord, 
+                    wxSIZE_USE_EXISTING);
+            return;
+        }
+        SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
+                GetSize().GetWidth() + deltaX, 
+                GetSize().GetHeight() - deltaY, wxSIZE_USE_EXISTING);
+        return;
+    }
+    if(zone == ict::SW) {
+        limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
+        limitPosY = positionOnScreen.y + resizeLimit;
+        deltaX--;
+        deltaY++;
+        deltaX += mousePosition.x - positionOnScreen.x;
+        deltaY += mousePosition.y - 
+                (positionOnScreen.y + GetSize().GetHeight());
+        if(mousePosition.x > limitPosX && mousePosition.y < limitPosY) return;
+        if(mousePosition.x > limitPosX) {
+            SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
+                    GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING);
+            return;
+        }
+        if(mousePosition.y < limitPosY) {
+            SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
+                    GetSize().GetWidth() - deltaX, wxDefaultCoord, 
+                    wxSIZE_USE_EXISTING);
+            return;
+        }
+        SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
+                GetSize().GetWidth() - deltaX, GetSize().GetHeight() + deltaY, 
+                wxSIZE_USE_EXISTING);
+        return;
+    }
+    if(zone == ict::N) {
+        limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
+        deltaY--;
+        deltaY += mousePosition.y - positionOnScreen.y;
+        if(mousePosition.y > limitPosY) return;
+        SetSize(wxDefaultCoord, positionOnParent.y + deltaY, wxDefaultCoord, 
+                GetSize().GetHeight() - deltaY, wxSIZE_USE_EXISTING);
+        return;
+    }
+    if(zone == ict::S) {
+        limitPosY = positionOnScreen.y + resizeLimit;
+        deltaY++;
+        deltaY += mousePosition.y - 
+            (positionOnScreen.y + GetSize().GetHeight());
+        if(mousePosition.y < limitPosY) return;
+        SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
+                GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING);
+        return;
+    }
+    if(zone == ict::W) {
+        limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
+        deltaX--;
+        deltaX += mousePosition.x - positionOnScreen.x;
+        if(mousePosition.x > limitPosX) return;
+        SetSize(positionOnScreen.x + deltaX, wxDefaultCoord, 
+                GetSize().GetWidth() - deltaX, wxDefaultCoord, 
+                wxSIZE_USE_EXISTING);
+        return;
+    }
+    if(zone == ict::E) {
+        limitPosX = positionOnScreen.x + resizeLimit;
+        deltaX++;
+        deltaX += mousePosition.x - (positionOnScreen.x + GetSize().GetWidth());
+        if(mousePosition.x < limitPosX) return;
+        SetSize(wxDefaultCoord, wxDefaultCoord, 
+                GetSize().GetWidth() + deltaX, wxDefaultCoord, 
+                wxSIZE_USE_EXISTING);
+        return;
     }
 }
 
@@ -101,11 +229,13 @@ void Rectangle::mousePress(wxMouseEvent &event) {
     CaptureMouse();
     clientPressPoint = event.GetPosition();
     zonePressed = getLocation(event.GetPosition());
+    mouseLeftWin = false;
 }
 
 void Rectangle::mouseRelease(wxMouseEvent &event) {
     ReleaseMouse();
     zonePressed = ict::NONE;
+    if(mouseLeftWin) changeCursor(ict::NONE);
 }
 
 ict::Zone Rectangle::getLocation(const wxPoint p) {
