@@ -9,8 +9,8 @@
 
 #include "defs.h"
 
-const int bestWidth = 6;
-const int corner = bestWidth * 2;
+const int bestWidth = 2;
+const int corner = bestWidth * 4;
 const int dragWidth = corner * 4;
 const int resizeLimit = (corner * 2) + dragWidth;
 
