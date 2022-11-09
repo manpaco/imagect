@@ -25,11 +25,13 @@ class Rectangle : public wxControl {
         void mouseMotion(wxMouseEvent &);
         void mousePress(wxMouseEvent &);
         void mouseRelease(wxMouseEvent &);
+        void resetCursor(wxMouseEvent &);
 
     private:
         bool innerZone(const wxPoint);
         ict::CardinalPoint edgeZone(const wxPoint);
         bool isContained(wxRect area, wxPoint point);
+        void changeCursor(ict::CardinalPoint type);
 
         wxDECLARE_DYNAMIC_CLASS(RectSash);
         wxSize area;

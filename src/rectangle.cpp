@@ -19,21 +19,18 @@ void Rectangle::Init() {
     Bind(wxEVT_MOTION, &Rectangle::mouseMotion, this);
     Bind(wxEVT_LEFT_DOWN, &Rectangle::mousePress, this);
     Bind(wxEVT_LEFT_UP, &Rectangle::mouseRelease, this);
+    Bind(wxEVT_LEAVE_WINDOW, &Rectangle::resetCursor, this);
+}
+
+void Rectangle::resetCursor(wxMouseEvent &event) {
+    wxSetCursor(wxNullCursor);
 }
 
 void Rectangle::mouseMotion(wxMouseEvent &event) {
     if(innerZone(event.GetPosition())) {
-        // change cursor pointer to cross pointer
+        wxSetCursor(wxCursor(wxCURSOR_CROSS));
     } else {
-        // change cursor pointer to arrow pointer
-        switch (edgeZone(event.GetPosition())) {
-            case ict::N:
-                // set nort arrow cursor pointer
-                break;
-            case ict::S:
-                // set south arrow cursor pointer
-                break;
-        }
+        changeCursor(edgeZone(event.GetPosition()));
     }
     if(drag) {
         // move
@@ -41,6 +38,19 @@ void Rectangle::mouseMotion(wxMouseEvent &event) {
         // resize
     }
     event.Skip();
+}
+
+void Rectangle::changeCursor(ict::CardinalPoint type) {
+    switch (type) {
+        case ict::N | ict::S:
+            // set nort-south arrow cursor
+            wxSetCursor(wxCursor(wxCURSOR_SIZENS));
+            break;
+        case ict::W | ict::E:
+            // set west-east arrow cursor
+            wxSetCursor(wxCursor(wxCURSOR_SIZEWE));
+            break;
+    }
 }
 
 void Rectangle::mousePress(wxMouseEvent &event) {
@@ -63,10 +73,12 @@ ict::CardinalPoint Rectangle::edgeZone(const wxPoint p) {
     if(innerZone(p)) return ict::NONE;
     wxRect nz(0, 0, 50, 50);
     if(isContained(nz, p)) return ict::N;
+    return ict::NONE;
 }
 
 bool Rectangle::isContained(wxRect area, wxPoint point) {
-    if((area.GetX() <= point.x && area.GetWidth() >= point.x)) return true;
+    if((area.GetX() <= point.x && point.x <= area.GetWidth()) &&
+        (area.GetY() <= point.y && point.y <= area.GetHeight())) return true;
     return false;
 }
 
