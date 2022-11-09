@@ -7,15 +7,19 @@
     #include <wx/wx.h>
 #endif
 
+#include "wx/custombgwin.h"
 #include "rectangle.h"
 
 class CanvasPanel: public wxScrolledWindow {
     public:
-        CanvasPanel(wxWindow *parent, wxWindowID id);
+        CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &);
 
     private:
+        void createImg(const wxBitmap &bm);
+
         wxBoxSizer *sz;
         Rectangle *cropArea;
+        wxCustomBackgroundWindow<wxPanel> *img;
 
 };
 
