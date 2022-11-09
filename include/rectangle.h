@@ -24,20 +24,19 @@ class Rectangle : public wxControl {
                 const wxString &name=wxControlNameStr);    
         ~Rectangle();
 
-    protected:
-        void Init();
-        void OnPaint(wxPaintEvent &);
-        void mouseMotion(wxMouseEvent &);
-        void mousePress(wxMouseEvent &);
-        void mouseRelease(wxMouseEvent &);
-        void resetCursor(wxMouseEvent &);
-        void updateSizes(wxSizeEvent &);
-
     private:
         ict::Zone getLocation(const wxPoint);
         bool isContained(wxRect area, wxPoint point);
         void changeCursor(ict::Zone type);
         void resizeUsing(ict::Zone);
+        void init();
+        void onPaint(wxPaintEvent &);
+        void mouseMotion(wxMouseEvent &);
+        void mousePress(wxMouseEvent &);
+        void mouseRelease(wxMouseEvent &);
+        void leaveWinHandler(wxMouseEvent &);
+        void enterWinHandler(wxMouseEvent &);
+        void updateSizes(wxSizeEvent &);
 
         wxDECLARE_DYNAMIC_CLASS(Rectangle);
         wxPoint clientPressPoint;
