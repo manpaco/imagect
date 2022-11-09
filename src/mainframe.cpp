@@ -4,6 +4,7 @@
 #include "defs.h"
 #include "previewpanel.h"
 #include "wx/splitter.h"
+#include "imgtools.h"
 
 using Magick::Quantum;
 
@@ -14,13 +15,20 @@ MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Croping Tool") {
 }
 
 void MainFrame::allocateMem() {
+    imgTest = nullptr;
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
-    canvas = new CanvasPanel(mainSplitter, ict::CANVAS);
+    canvas = new CanvasPanel(mainSplitter, ict::CANVAS, createBitmap(imgTest));
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxHORIZONTAL);
     //updatePreview();
+}
+
+wxBitmap MainFrame::createBitmap(Magick::Image *img) {
+    if(!img) return wxBitmap();
+    return wxBitmap(wxImage(img->columns(), img->rows(), 
+            extractRgb(*img), extractAlpha(*img)));
 }
 
 void MainFrame::overlayPanels() {

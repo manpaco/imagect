@@ -25,6 +25,7 @@ class MainFrame: public wxFrame {
         void setBindings();
         void overlayPanels();
         void applyChanges(wxCommandEvent &);
+        wxBitmap createBitmap(Magick::Image *img);
 
         CanvasPanel *canvas;
         ToolsPanel *tools;
