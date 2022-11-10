@@ -10,18 +10,27 @@
 #include "wx/custombgwin.h"
 #include "rectangle.h"
 
-const int canvasOffset = 100;
+const int virtualOffset = 100;
 
-class CanvasPanel: public wxScrolledWindow {
+class CanvasPanel: public wxScrolledCanvas {
     public:
         CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &);
 
     private:
         void createObjects(const wxBitmap &bm);
+        void initObjects();
         void onPaint(wxPaintEvent &event);
+        void updatePositions(wxSizeEvent &event);
+        void updateScrollValues(wxScrollWinEvent &);
 
         Rectangle *cropArea;
         wxBitmap *img;
+
+        wxPoint imgPosition;
+        wxPoint oldScrollPosition;
+        wxSize virtualSize;
+        wxSize oldSize;
+        bool glitchX, glitchY;
 
 };
 
