@@ -201,7 +201,7 @@ void Rectangle::resizeUsing(ict::Zone zone){
         deltaX = -bestWidth;
         deltaX += mousePosition.x - positionOnScreen.x;
         if(mousePosition.x > limitPosX) return;
-        SetSize(positionOnScreen.x + deltaX, wxDefaultCoord, 
+        SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
                 GetSize().GetWidth() - deltaX, wxDefaultCoord, 
                 wxSIZE_USE_EXISTING);
         return;
