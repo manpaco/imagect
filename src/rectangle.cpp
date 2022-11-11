@@ -3,6 +3,7 @@
 #include <wx/graphics.h>
 
 wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
+wxDEFINE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);
 
 Rectangle::Rectangle() {
     init();
@@ -66,6 +67,11 @@ void Rectangle::mouseMotion(wxMouseEvent &event) {
         if(zonePressed != ict::NONE) {
             resizeUsing(zonePressed);
         }
+    }
+    if(zonePressed) {
+        wxCommandEvent toSend(EVT_RECTANGLE_CHANGE, GetId());
+        toSend.SetEventObject(this);
+        ProcessWindowEvent(toSend);
     }
 }
 

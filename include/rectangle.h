@@ -14,7 +14,6 @@ const int corner = bestWidth * 4;
 const int dragWidth = corner * 4;
 const int resizeLimit = (corner * 2) + dragWidth;
 
-
 class Rectangle : public wxControl {
     public:
         Rectangle();
@@ -24,6 +23,8 @@ class Rectangle : public wxControl {
                 const wxValidator &validator=wxDefaultValidator, 
                 const wxString &name=wxControlNameStr);    
         ~Rectangle();
+        
+        wxDECLARE_DYNAMIC_CLASS(Rectangle);
 
     private:
         ict::Zone getLocation(const wxPoint);
@@ -39,7 +40,6 @@ class Rectangle : public wxControl {
         void enterWinHandler(wxMouseEvent &);
         void updateSizes(wxSizeEvent &);
 
-        wxDECLARE_DYNAMIC_CLASS(Rectangle);
         wxPoint clientPressPoint;
         wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
         bool mouseLeftWin = true;
@@ -47,5 +47,7 @@ class Rectangle : public wxControl {
         ict::Zone zonePressed = ict::NONE;
         float ratio;
 };
+
+wxDECLARE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);
 
 #endif // RECTANGLE_H
