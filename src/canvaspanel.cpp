@@ -158,7 +158,6 @@ void CanvasPanel::onPaint(wxPaintEvent &event) {
         wxRect imgShadow(imgPosition.x, imgPosition.y, img->GetWidth(), img->GetHeight());
         paintSquareShadow(imgShadow, gcd);
         dev.DrawBitmap(*img, wxPoint(imgPosition.x, imgPosition.y));
-        paintSquareShadow(cropShadow, gcd);
         delete gcd;
     }
 }
