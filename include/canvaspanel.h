@@ -15,7 +15,8 @@ const int virtualOffset = 100;
 class CanvasPanel: public wxScrolledCanvas {
     public:
         CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &);
-        wxPoint transformRelativeToImg(const wxPoint &) const;
+        wxPoint relativeCoords(const wxPoint &) const;
+        wxPoint absoluteCoords(const wxPoint &) const;
 
     private:
         void createObjects(const wxBitmap &bm);
@@ -29,7 +30,7 @@ class CanvasPanel: public wxScrolledCanvas {
         wxBitmap *img;
 
         wxPoint imgPosition;
-        wxPoint oldScrollPosition;
+        wxPoint scrollPosition;
         wxSize virtualSize;
         wxSize oldSize;
         bool glitchX, glitchY;

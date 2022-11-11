@@ -2,6 +2,7 @@
 #include "defs.h"
 #include "rectangle.h"
 #include "cropevent.h"
+#include <wx/graphics.h>
 
 CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &bm) :
         wxScrolledCanvas() {
@@ -15,18 +16,23 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &bm) :
     Bind(EVT_RECTANGLE_CHANGE, &CanvasPanel::reportCropChange, this);
 }
 
-wxPoint CanvasPanel::transformRelativeToImg(const wxPoint &clientPosition) const {
-    wxPoint offset(clientPosition);
-    if(!glitchX) offset.x += oldScrollPosition.x * ppuX;
-    if(!glitchY) offset.y += oldScrollPosition.y * ppuY;
-    offset.x -= imgPosition.x;
-    offset.y -= imgPosition.y;
-    return offset;
+wxPoint CanvasPanel::relativeCoords(const wxPoint &clientPoint) const {
+    wxPoint relative(clientPoint);
+    relative.x -= imgPosition.x;
+    relative.y -= imgPosition.y;
+    return relative;
+}
+
+wxPoint CanvasPanel::absoluteCoords(const wxPoint &clientPoint) const {
+    wxPoint absolute(clientPoint);
+    if(!glitchX) absolute.x += scrollPosition.x * ppuX;
+    if(!glitchY) absolute.y += scrollPosition.y * ppuY;
+    return absolute;
 }
 
 void CanvasPanel::reportCropChange(wxCommandEvent &event) {
     wxSize size(cropArea->GetSize());
-    wxPoint offset = transformRelativeToImg(cropArea->GetPosition());
+    wxPoint offset = relativeCoords(cropArea->GetPosition());
     CropEvent toSend(EVT_CROP_CHANGE, GetId(), size, offset);
     toSend.SetEventObject(this);
     ProcessWindowEvent(toSend);
@@ -35,10 +41,10 @@ void CanvasPanel::reportCropChange(wxCommandEvent &event) {
 void CanvasPanel::updateScrollValues(wxScrollWinEvent &event) {
     if(event.GetOrientation() == wxHORIZONTAL) {
         glitchX = GetSize().GetWidth() > virtualSize.GetWidth();
-        oldScrollPosition.x = event.GetPosition();
+        scrollPosition.x = event.GetPosition();
     } else {
         glitchY = GetSize().GetHeight() > virtualSize.GetHeight();
-        oldScrollPosition.y = event.GetPosition();
+        scrollPosition.y = event.GetPosition();
     }
     event.Skip();
 }
@@ -81,17 +87,17 @@ void CanvasPanel::updatePositions(wxSizeEvent &event) {
     wxPoint target(cropArea->GetPosition());
     GetScrollPixelsPerUnit(&ppuX, &ppuY);
     if(crossVirtualX && toRight) {
-        target.x += oldScrollPosition.x * ppuX;
-        oldScrollPosition.x = 0;
+        target.x += scrollPosition.x * ppuX;
+        scrollPosition.x = 0;
     }
     if(crossVirtualY && toBottom) {
-        target.y += oldScrollPosition.y * ppuY;
-        oldScrollPosition.y = 0;
+        target.y += scrollPosition.y * ppuY;
+        scrollPosition.y = 0;
     }
-    if(glitchX) target.x += oldScrollPosition.x * ppuX;
-    if(glitchY) target.y += oldScrollPosition.y * ppuY;
-    if(!defaultX) oldScrollPosition.x = 0;
-    if(!defaultY) oldScrollPosition.y = 0;
+    if(glitchX) target.x += scrollPosition.x * ppuX;
+    if(glitchY) target.y += scrollPosition.y * ppuY;
+    if(!defaultX) scrollPosition.x = 0;
+    if(!defaultY) scrollPosition.y = 0;
     target.x += deltaX / 2;
     target.y += deltaY / 2;
     cropArea->Move(target);
@@ -133,7 +139,11 @@ void CanvasPanel::initObjects() {
 void CanvasPanel::onPaint(wxPaintEvent &event) {
     wxPaintDC dev(this);
     DoPrepareDC(dev);
-    if(img) {
+    wxGraphicsContext *gcd = wxGraphicsContext::Create(dev);
+    if(img && gcd) {
         dev.DrawBitmap(*img, wxPoint(imgPosition.x, imgPosition.y));
+        wxColour blk(0, 0, 0, 100);
+        gcd->SetBrush(wxBrush(blk));
+        gcd->DrawRectangle(0, 0, 200, 200);
     }
 }
