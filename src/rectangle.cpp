@@ -1,8 +1,5 @@
 #include "rectangle.h"
 #include <iterator>
-#include <wx/defs.h>
-#include <wx/gdicmn.h>
-#include <wx/geometry.h>
 #include <wx/graphics.h>
 
 wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
@@ -66,7 +63,9 @@ void Rectangle::mouseMotion(wxMouseEvent &event) {
         screenPoint = screenPoint - clientPressPoint;
         Move(GetParent()->ScreenToClient(screenPoint));
     } else {
-        resizeUsing(zonePressed);
+        if(zonePressed != ict::NONE) {
+            resizeUsing(zonePressed);
+        }
     }
 }
 
