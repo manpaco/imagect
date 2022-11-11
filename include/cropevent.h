@@ -9,15 +9,16 @@
 
 class CropEvent : public wxEvent {
     public:
-        CropEvent(wxEventType, int, const wxSize &);
+        CropEvent(wxEventType, int, const wxSize &, wxPoint &o);
         wxSize getSize() const;
-        wxPoint getPosition() const;
+        wxPoint getOffset() const;
 
         virtual wxEvent * Clone() const;
         wxDECLARE_DYNAMIC_CLASS(CropEvent);
 
     private:
         wxSize size;
+        wxPoint offset;
 
 };
 
