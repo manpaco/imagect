@@ -23,7 +23,7 @@ class CanvasPanel: public wxScrolledCanvas {
         void onPaint(wxPaintEvent &event);
         void updatePositions(wxSizeEvent &event);
         void updateScrollValues(wxScrollWinEvent &);
-        void reportChange(ict::Action);
+        void reportCropChange(wxCommandEvent &);
 
         Rectangle *cropArea;
         wxBitmap *img;
@@ -33,6 +33,7 @@ class CanvasPanel: public wxScrolledCanvas {
         wxSize virtualSize;
         wxSize oldSize;
         bool glitchX, glitchY;
+        int ppuX, ppuY;
 
 };
 
