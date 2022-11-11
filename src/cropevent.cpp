@@ -1,9 +1,9 @@
 #include "cropevent.h"
 
-wxDEFINE_EVENT(EVT_CROP_MOVE, CropEvent);
-wxDEFINE_EVENT(EVT_CROP_RESIZE, CropEvent);
+wxIMPLEMENT_ABSTRACT_CLASS(CropEvent, wxEvent);
+wxDEFINE_EVENT(EVT_CROP_CHANGE, CropEvent);
 
-CropEvent::CropEvent(wxEventType eventType, int winId, const wxSize &s) : wxEvent(eventType, winId), size(s) {
+CropEvent::CropEvent(wxEventType eventType, int winId, const wxSize &s) : wxEvent(winId, eventType), size(s) {
 
 }
 

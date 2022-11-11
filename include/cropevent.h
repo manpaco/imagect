@@ -1,7 +1,6 @@
 #ifndef CROPEVENT_H
 #define CROPEVENT_H
 
-#include <wx/event.h>
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP
@@ -15,13 +14,13 @@ class CropEvent : public wxEvent {
         wxPoint getPosition() const;
 
         virtual wxEvent * Clone() const;
+        wxDECLARE_DYNAMIC_CLASS(CropEvent);
 
     private:
         wxSize size;
 
 };
 
-wxDECLARE_EVENT(EVT_CROP_MOVE, CropEvent);
-wxDECLARE_EVENT(EVT_CROP_RESIZE, CropEvent);
+wxDECLARE_EVENT(EVT_CROP_CHANGE, CropEvent);
 
 #endif // RECTANGLEEVENT_H
