@@ -4,7 +4,7 @@
 #include "cropevent.h"
 #include <wx/graphics.h>
 
-CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &bm) :
+CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap *bm) :
         wxScrolledCanvas() {
 
     Create(parent, id);
@@ -51,6 +51,7 @@ void CanvasPanel::updateScrollValues(wxScrollWinEvent &event) {
 }
 
 void CanvasPanel::updatePositions(wxSizeEvent &event) {
+    if(!img) return;
     wxSize panelSize = event.GetSize();
     if(oldSize == panelSize) {
         event.Skip();
@@ -111,9 +112,9 @@ void CanvasPanel::updatePositions(wxSizeEvent &event) {
     event.Skip();
 }
 
-void CanvasPanel::createObjects(const wxBitmap &bm) {
-    if(bm.IsOk()) {
-        img = new wxBitmap(bm);
+void CanvasPanel::createObjects(wxBitmap *bm) {
+    if(bm) {
+        img = bm;
         cropArea = new Rectangle(this, ict::CROP_AREA);
     } else {
         img = nullptr;
@@ -136,7 +137,8 @@ void CanvasPanel::initObjects() {
     }
 }
 
-void CanvasPanel::paintSquareShadow(const wxRect &frame, wxGraphicsContext *gc) {
+void CanvasPanel::paintShadow(const wxRect &frame, wxGraphicsContext *gc) {
+    if(!gc) return;
     wxColour bc(0, 0, 0, 80);
     wxColour tc(0, 0, 0, 0);
     gc->SetPen(wxPen(bc, 4));
@@ -156,8 +158,12 @@ void CanvasPanel::onPaint(wxPaintEvent &event) {
         wxPoint sCorner(cropArea->GetSize().GetWidth(), cropArea->GetSize().GetHeight());
         wxRect cropShadow(fCorner.x, fCorner.y, sCorner.x, sCorner.y);
         wxRect imgShadow(imgPosition.x, imgPosition.y, img->GetWidth(), img->GetHeight());
-        paintSquareShadow(imgShadow, gcd);
+        paintShadow(imgShadow, gcd);
         dev.DrawBitmap(*img, wxPoint(imgPosition.x, imgPosition.y));
         delete gcd;
     }
+}
+
+CanvasPanel::~CanvasPanel() {
+    if(cropArea) cropArea-Destroy();
 }
