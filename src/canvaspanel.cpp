@@ -1,6 +1,7 @@
 #include "canvaspanel.h"
 #include "defs.h"
 #include "rectangle.h"
+#include "cropevent.h"
 
 CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &bm) :
         wxScrolledCanvas() {
@@ -11,6 +12,33 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &bm) :
     Bind(wxEVT_PAINT, &CanvasPanel::onPaint, this);
     Bind(wxEVT_SIZE, &CanvasPanel::updatePositions, this);
     Bind(wxEVT_SCROLLWIN_THUMBTRACK, &CanvasPanel::updateScrollValues, this);
+}
+
+wxPoint CanvasPanel::transformRelativeToImg(const wxPoint &clientPosition) const {
+    wxPoint offset(clientPosition);
+    if(!glitchX) offset.x += oldScrollPosition.x;
+    if(!glitchY) offset.y += oldScrollPosition.y;
+    offset.x -= imgPosition.x;
+    offset.y -= imgPosition.y;
+}
+
+void CanvasPanel::reportChange(ict::Action done) {
+    wxSize size(GetSize());
+    switch (done) {
+        case ict::MOVE: {
+            wxPoint offset = transformRelativeToImg(cropArea->GetPosition());
+            size.Set(offset.x, offset.y);
+            CropEvent toSend(EVT_CROP_MOVE, GetId(), size);
+            toSend.SetEventObject(this);
+            ProcessWindowEvent(toSend);
+            break;
+        }
+        case ict::RESIZE: {
+            CropEvent toSend(EVT_CROP_MOVE, GetId(), size);
+            toSend.SetEventObject(this);
+            ProcessWindowEvent(toSend);
+        }
+    }
 }
 
 void CanvasPanel::updateScrollValues(wxScrollWinEvent &event) {

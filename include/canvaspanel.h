@@ -15,6 +15,7 @@ const int virtualOffset = 100;
 class CanvasPanel: public wxScrolledCanvas {
     public:
         CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &);
+        wxPoint transformRelativeToImg(const wxPoint &) const;
 
     private:
         void createObjects(const wxBitmap &bm);
@@ -22,6 +23,7 @@ class CanvasPanel: public wxScrolledCanvas {
         void onPaint(wxPaintEvent &event);
         void updatePositions(wxSizeEvent &event);
         void updateScrollValues(wxScrollWinEvent &);
+        void reportChange(ict::Action);
 
         Rectangle *cropArea;
         wxBitmap *img;
