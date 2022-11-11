@@ -1,6 +1,7 @@
 #include "mainframe.h"
 #include "Magick++.h"
 #include "canvaspanel.h"
+#include "cropevent.h"
 #include "defs.h"
 #include "previewpanel.h"
 #include "wx/splitter.h"
@@ -14,20 +15,31 @@ MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Croping Tool") {
     setBindings();
 }
 
+MainFrame::~MainFrame() {
+    if(preview) preview->Destroy();
+    if(tools) tools->Destroy();
+    if(canvas) canvas->Destroy();
+    if(sideSplitter) sideSplitter->Destroy();
+    if(mainSplitter) mainSplitter->Destroy();
+    if(highResImg) delete(highResImg);
+    if(lowResImg) delete(lowResImg);
+    if(lowResBitmap) delete(lowResBitmap);
+}
+
 void MainFrame::allocateMem() {
-    imgTest = nullptr;
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
-    canvas = new CanvasPanel(mainSplitter, ict::CANVAS, createBitmap(imgTest));
+    lowResBitmap = createBitmap(lowResImg);
+    canvas = new CanvasPanel(mainSplitter, ict::CANVAS, lowResBitmap);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxHORIZONTAL);
     //updatePreview();
 }
 
-wxBitmap MainFrame::createBitmap(Magick::Image *img) {
-    if(!img) return wxBitmap();
-    return wxBitmap(wxImage(img->columns(), img->rows(), 
+wxBitmap * MainFrame::createBitmap(Magick::Image *img) {
+    if(!img) return nullptr;
+    return new wxBitmap(wxImage(img->columns(), img->rows(), 
             extractRgb(*img), extractAlpha(*img)));
 }
 
@@ -39,24 +51,18 @@ void MainFrame::overlayPanels() {
 }
 
 void MainFrame::setBindings() {
-    Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onExit, this);
     tools->Bind(wxEVT_BUTTON, &MainFrame::applyChanges, this, ict::APPLY_BT);
+    canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
+}
+
+void MainFrame::onCropChange(CropEvent &event) {
+    // update preview
 }
 
 void MainFrame::applyChanges(wxCommandEvent &event) {
     // update preview and/or update crop rectangle
 }
 
-void MainFrame::onExit(wxCloseEvent &event) {
-    if(preview) preview->Destroy();
-    if(tools) tools->Destroy();
-    if(canvas) canvas->Destroy();
-    if(sideSplitter) sideSplitter->Destroy();
-    if(mainSplitter) mainSplitter->Destroy();
-    if(imgTest) delete(imgTest);
-    Destroy();
-}
-
 void MainFrame::updatePreview() {
-    preview->updatePreview(*imgTest);
+    preview->updatePreview(*lowResImg);
 }

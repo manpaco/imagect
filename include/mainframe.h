@@ -12,20 +12,22 @@
 #include "canvaspanel.h"
 #include "toolspanel.h"
 #include "previewpanel.h"
+#include "cropevent.h"
 
 class MainFrame: public wxFrame {
     
     public:
         MainFrame();
+        ~MainFrame();
 
     private:
-        void onExit(wxCloseEvent &event);
         void updatePreview();
         void allocateMem();
         void setBindings();
         void overlayPanels();
         void applyChanges(wxCommandEvent &);
-        wxBitmap createBitmap(Magick::Image *img);
+        wxBitmap * createBitmap(Magick::Image *img);
+        void onCropChange(CropEvent &);
 
         CanvasPanel *canvas;
         ToolsPanel *tools;
@@ -33,7 +35,9 @@ class MainFrame: public wxFrame {
         wxSplitterWindow *sideSplitter;
         PreviewPanel *preview;
         wxBoxSizer *mainSizer;
-        Magick::Image *imgTest;
+        Magick::Image *highResImg;
+        Magick::Image *lowResImg;
+        wxBitmap *lowResBitmap;
 
 };
 
