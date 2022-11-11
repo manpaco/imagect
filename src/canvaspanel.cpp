@@ -165,5 +165,5 @@ void CanvasPanel::onPaint(wxPaintEvent &event) {
 }
 
 CanvasPanel::~CanvasPanel() {
-    if(cropArea) cropArea-Destroy();
+
 }
