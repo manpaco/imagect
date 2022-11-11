@@ -12,33 +12,24 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &bm) :
     Bind(wxEVT_PAINT, &CanvasPanel::onPaint, this);
     Bind(wxEVT_SIZE, &CanvasPanel::updatePositions, this);
     Bind(wxEVT_SCROLLWIN_THUMBTRACK, &CanvasPanel::updateScrollValues, this);
+    Bind(EVT_RECTANGLE_CHANGE, &CanvasPanel::reportCropChange, this);
 }
 
 wxPoint CanvasPanel::transformRelativeToImg(const wxPoint &clientPosition) const {
     wxPoint offset(clientPosition);
-    if(!glitchX) offset.x += oldScrollPosition.x;
-    if(!glitchY) offset.y += oldScrollPosition.y;
+    if(!glitchX) offset.x += oldScrollPosition.x * ppuX;
+    if(!glitchY) offset.y += oldScrollPosition.y * ppuY;
     offset.x -= imgPosition.x;
     offset.y -= imgPosition.y;
+    return offset;
 }
 
-void CanvasPanel::reportChange(ict::Action done) {
-    wxSize size(GetSize());
-    switch (done) {
-        case ict::MOVE: {
-            wxPoint offset = transformRelativeToImg(cropArea->GetPosition());
-            size.Set(offset.x, offset.y);
-            CropEvent toSend(EVT_CROP_MOVE, GetId(), size);
-            toSend.SetEventObject(this);
-            ProcessWindowEvent(toSend);
-            break;
-        }
-        case ict::RESIZE: {
-            CropEvent toSend(EVT_CROP_MOVE, GetId(), size);
-            toSend.SetEventObject(this);
-            ProcessWindowEvent(toSend);
-        }
-    }
+void CanvasPanel::reportCropChange(wxCommandEvent &event) {
+    wxSize size(cropArea->GetSize());
+    wxPoint offset = transformRelativeToImg(cropArea->GetPosition());
+    CropEvent toSend(EVT_CROP_CHANGE, GetId(), size, offset);
+    toSend.SetEventObject(this);
+    ProcessWindowEvent(toSend);
 }
 
 void CanvasPanel::updateScrollValues(wxScrollWinEvent &event) {
@@ -88,7 +79,6 @@ void CanvasPanel::updatePositions(wxSizeEvent &event) {
     }
 
     wxPoint target(cropArea->GetPosition());
-    int ppuX, ppuY;
     GetScrollPixelsPerUnit(&ppuX, &ppuY);
     if(crossVirtualX && toRight) {
         target.x += oldScrollPosition.x * ppuX;
@@ -128,7 +118,8 @@ void CanvasPanel::createObjects(const wxBitmap &bm) {
 void CanvasPanel::initObjects() {
     if(img) {
         SetMinSize(wxSize(200, 200));
-        SetScrollRate(5, 5);
+        ppuX = 5; ppuY = 5;
+        SetScrollRate(ppuX, ppuY);
         virtualSize.SetWidth((virtualOffset * 2) + img->GetWidth()); 
         virtualSize.SetHeight((virtualOffset * 2) + img->GetHeight());
         SetVirtualSize(virtualSize);
