@@ -71,6 +71,11 @@ enum Zone {
     W
 };
 
+enum Action {
+    MOVE = 0,
+    RESIZE
+};
+
 };
 
 #endif // DEFS_H
