@@ -9,10 +9,9 @@
 
 #include "defs.h"
 
-const int bestWidth = 2;
-const int corner = bestWidth * 4;
-const int dragWidth = corner * 4;
-const int resizeLimit = (corner * 2) + dragWidth;
+const int bestWidth = 1;
+const int corner = 10;
+const int resizeLimit = corner * 3;
 
 class Rectangle : public wxControl {
     public:
@@ -39,6 +38,7 @@ class Rectangle : public wxControl {
         void leaveWinHandler(wxMouseEvent &);
         void enterWinHandler(wxMouseEvent &);
         void updateSizes(wxSizeEvent &);
+        void paintSpecialFrame(const wxRect &, wxGraphicsContext *, bool);
 
         wxPoint clientPressPoint;
         wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;

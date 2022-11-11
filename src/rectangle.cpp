@@ -1,6 +1,7 @@
 #include "rectangle.h"
 #include <iterator>
 #include <wx/graphics.h>
+#include <wx/gtk/colour.h>
 
 wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
 wxDEFINE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);
@@ -35,15 +36,11 @@ void Rectangle::enterWinHandler(wxMouseEvent &event) {
 void Rectangle::updateSizes(wxSizeEvent &event) {
     ratio = (float)event.GetSize().GetWidth() / 
             (float)event.GetSize().GetHeight();
-    iz = wxRect((GetSize().GetWidth() / 2) - (dragWidth / 2), 
-            (GetSize().GetHeight() / 2) - (dragWidth / 2), 
-            dragWidth, dragWidth);
-    nz = wxRect(corner, 0, event.GetSize().GetWidth() - (corner * 2), corner);
-    sz = wxRect(corner, event.GetSize().GetHeight() - corner, 
-            event.GetSize().GetWidth() - (corner * 2), corner);
-    ez = wxRect(event.GetSize().GetWidth() - corner, corner, corner, 
-            event.GetSize().GetHeight() - (corner * 2));
-    wz = wxRect(0, corner, corner, event.GetSize().GetHeight() - (corner * 2));
+    iz = wxRect(0, 0, event.GetSize().GetWidth(), event.GetSize().GetHeight());
+    nz = wxRect(0, 0, event.GetSize().GetWidth(), corner);
+    sz = wxRect(0, event.GetSize().GetHeight() - corner, event.GetSize().GetWidth(), corner);
+    ez = wxRect(event.GetSize().GetWidth() - corner, 0, corner, event.GetSize().GetHeight());
+    wz = wxRect(0, 0, corner, event.GetSize().GetHeight());
     nez = wxRect(event.GetSize().GetWidth() - corner, 0, corner, corner);
     nwz = wxRect(0, 0, corner, corner);
     sez = wxRect(event.GetSize().GetWidth() - corner, 
@@ -253,14 +250,14 @@ void Rectangle::mouseRelease(wxMouseEvent &event) {
 }
 
 ict::Zone Rectangle::getLocation(const wxPoint p) {
-    if(isContained(nz, p)) return ict::N;
-    if(isContained(sz, p)) return ict::S;
-    if(isContained(ez, p)) return ict::E;
-    if(isContained(wz, p)) return ict::W;
     if(isContained(nez, p)) return ict::NE;
     if(isContained(nwz, p)) return ict::NW;
     if(isContained(sez, p)) return ict::SE;
     if(isContained(swz, p)) return ict::SW;
+    if(isContained(nz, p)) return ict::N;
+    if(isContained(sz, p)) return ict::S;
+    if(isContained(ez, p)) return ict::E;
+    if(isContained(wz, p)) return ict::W;
     if(isContained(iz, p)) return ict::INNER;
     return ict::NONE;
 }
@@ -273,21 +270,28 @@ bool Rectangle::isContained(wxRect area, wxPoint point) {
     return false;
 }
 
+void Rectangle::paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill) {
+    wxPen wLine(wxColour(*wxWHITE), 1);
+    wxPen bLine(wxColour(*wxBLACK), 1);
+    gc->SetBrush(wxBrush(wxColour(0, 0, 0, 0)));
+    gc->SetPen(bLine);
+    gc->DrawRectangle(paint.GetX(), paint.GetY(), paint.GetWidth() - 1, paint.GetHeight() - 1);
+    gc->SetPen(wLine);
+    gc->DrawRectangle(paint.GetX() + 1, paint.GetY() + 1, paint.GetWidth() - 3, paint.GetHeight() - 3);
+    gc->SetPen(bLine);
+    if(fill) gc->SetBrush(wxBrush(wxColour(*wxWHITE)));
+    gc->DrawRectangle(paint.GetX() + 2, paint.GetY() + 2, paint.GetWidth() - 5, paint.GetHeight() - 5);
+}
+
 void Rectangle::onPaint(wxPaintEvent &) {
     wxPaintDC device(this);
     wxGraphicsContext *gcd = wxGraphicsContext::Create(device);
     if(gcd) {
-        wxPen outline(wxColour("red"), bestWidth);
-        gcd->SetPen(outline);
-        gcd->SetBrush(wxBrush(wxColour(0, 0, 0, 0)));
-        gcd->DrawRectangle(bestWidth / 2, bestWidth / 2, GetSize().GetWidth() - bestWidth,
-                GetSize().GetHeight() - bestWidth);
-        device.SetPen(wxPen("red", 1));
-        device.SetBrush(wxBrush(wxColour("red")));
-        device.DrawRectangle(nwz.GetX(), nwz.GetY(), nwz.GetWidth(), nwz.GetHeight());
-        device.DrawRectangle(swz.GetX(), swz.GetY(), swz.GetWidth(), swz.GetHeight());
-        device.DrawRectangle(nez.GetX(), nez.GetY(), nez.GetWidth(), nez.GetHeight());
-        device.DrawRectangle(sez.GetX(), sez.GetY(), sez.GetWidth(), sez.GetHeight());
+        paintSpecialFrame(wxRect(0, 0, GetSize().GetWidth(), GetSize().GetHeight()), gcd, false);
+        paintSpecialFrame(nwz, gcd, true);
+        paintSpecialFrame(nez, gcd, true);
+        paintSpecialFrame(sez, gcd, true);
+        paintSpecialFrame(swz, gcd, true);
         delete gcd;
     }
 }
