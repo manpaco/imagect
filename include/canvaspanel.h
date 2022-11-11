@@ -25,6 +25,7 @@ class CanvasPanel: public wxScrolledCanvas {
         void updatePositions(wxSizeEvent &event);
         void updateScrollValues(wxScrollWinEvent &);
         void reportCropChange(wxCommandEvent &);
+        void paintSquareShadow(const wxRect &, wxGraphicsContext *);
 
         Rectangle *cropArea;
         wxBitmap *img;

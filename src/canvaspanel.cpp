@@ -17,7 +17,8 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, const wxBitmap &bm) :
 }
 
 wxPoint CanvasPanel::relativeCoords(const wxPoint &clientPoint) const {
-    wxPoint relative(clientPoint);
+    wxPoint relative;
+    relative = absoluteCoords(clientPoint);
     relative.x -= imgPosition.x;
     relative.y -= imgPosition.y;
     return relative;
@@ -107,7 +108,6 @@ void CanvasPanel::updatePositions(wxSizeEvent &event) {
 
     oldSize = panelSize;
 
-    Update();
     event.Skip();
 }
 
@@ -136,14 +136,29 @@ void CanvasPanel::initObjects() {
     }
 }
 
+void CanvasPanel::paintSquareShadow(const wxRect &frame, wxGraphicsContext *gc) {
+    wxColour bc(0, 0, 0, 80);
+    wxColour tc(0, 0, 0, 0);
+    gc->SetPen(wxPen(bc, 4));
+    gc->SetBrush(wxBrush(tc));
+    wxGraphicsPath shadow = gc->CreatePath();
+    shadow.AddRoundedRectangle(frame.GetX() + 4, frame.GetY() + 4, 
+                frame.GetWidth() - 2, frame.GetHeight() - 2, 2);
+    gc->DrawPath(shadow);
+}
+
 void CanvasPanel::onPaint(wxPaintEvent &event) {
     wxPaintDC dev(this);
     DoPrepareDC(dev);
     wxGraphicsContext *gcd = wxGraphicsContext::Create(dev);
     if(img && gcd) {
+        wxPoint fCorner(absoluteCoords(cropArea->GetPosition()));
+        wxPoint sCorner(cropArea->GetSize().GetWidth(), cropArea->GetSize().GetHeight());
+        wxRect cropShadow(fCorner.x, fCorner.y, sCorner.x, sCorner.y);
+        wxRect imgShadow(imgPosition.x, imgPosition.y, img->GetWidth(), img->GetHeight());
+        paintSquareShadow(imgShadow, gcd);
         dev.DrawBitmap(*img, wxPoint(imgPosition.x, imgPosition.y));
-        wxColour blk(0, 0, 0, 100);
-        gcd->SetBrush(wxBrush(blk));
-        gcd->DrawRectangle(0, 0, 200, 200);
+        paintSquareShadow(cropShadow, gcd);
+        delete gcd;
     }
 }
