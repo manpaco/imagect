@@ -27,6 +27,11 @@ MainFrame::~MainFrame() {
 }
 
 void MainFrame::allocateMem() {
+    highResImg = new Magick::Image("/usr/share/icons/Adwaita/512x512/devices/computer.png");
+    lowResImg = new Magick::Image(*highResImg);
+    Magick::Geometry newRes(lowResImg->columns() * 0.3, lowResImg->rows() * 0.3);
+    lowResImg->zoom(newRes);
+    lowResBitmap = createBitmap(lowResImg);
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
     lowResBitmap = createBitmap(lowResImg);
@@ -34,7 +39,7 @@ void MainFrame::allocateMem() {
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxHORIZONTAL);
-    //updatePreview();
+    updatePreview();
 }
 
 wxBitmap * MainFrame::createBitmap(Magick::Image *img) {
@@ -64,5 +69,5 @@ void MainFrame::applyChanges(wxCommandEvent &event) {
 }
 
 void MainFrame::updatePreview() {
-    preview->updatePreview(*lowResImg);
+    preview->updatePreview(lowResBitmap);
 }
