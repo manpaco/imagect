@@ -14,6 +14,12 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap *bm) :
     Bind(wxEVT_SIZE, &CanvasPanel::updatePositions, this);
     Bind(wxEVT_SCROLLWIN_THUMBTRACK, &CanvasPanel::updateScrollValues, this);
     Bind(EVT_RECTANGLE_CHANGE, &CanvasPanel::reportCropChange, this);
+    Bind(wxEVT_SCROLLWIN_LINEUP, &CanvasPanel::virtualLineUp, this);
+}
+
+void CanvasPanel::virtualLineUp(wxScrollWinEvent &event) {
+    scrollPosition.y = event.GetPosition();
+    event.Skip();
 }
 
 wxPoint CanvasPanel::relativeCoords(const wxPoint &clientPoint) const {
@@ -57,6 +63,7 @@ void CanvasPanel::updatePositions(wxSizeEvent &event) {
         event.Skip();
         return;
     }
+    std::cout << oldSize.GetHeight() << " - " << panelSize.GetHeight() << std::endl;
     bool defaultX = false, defaultY = false;
     defaultX = (oldSize.GetWidth() <= virtualSize.GetWidth()) && (panelSize.GetWidth() <= virtualSize.GetWidth());
     defaultY = (oldSize.GetHeight() <= virtualSize.GetHeight()) && (panelSize.GetHeight() <= virtualSize.GetHeight());
@@ -85,9 +92,26 @@ void CanvasPanel::updatePositions(wxSizeEvent &event) {
     if(!crossVirtualY && !defaultY) {
         deltaY = panelSize.GetHeight() - oldSize.GetHeight();
     }
+    
+    if(!defaultY) accumY += deltaY;
+    int steps = 2 * ppuY;
+    if(accumY >= steps) {
+        deltaY = 0;
+        while(accumY >= steps) {
+            deltaY += steps / 2;
+            accumY -= steps;
+        }
+    } else { 
+        if(accumY <= -steps) {
+            deltaY = 0;
+            while(accumY <= -steps) {
+                deltaY -= steps / 2;
+                accumY += steps;
+            }
+        }
+    }
 
     wxPoint target(cropArea->GetPosition());
-    GetScrollPixelsPerUnit(&ppuX, &ppuY);
     if(crossVirtualX && toRight) {
         target.x += scrollPosition.x * ppuX;
         scrollPosition.x = 0;
@@ -124,7 +148,7 @@ void CanvasPanel::createObjects(wxBitmap *bm) {
 
 void CanvasPanel::initObjects() {
     if(img) {
-        SetMinSize(wxSize(200, 200));
+        SetMinSize(wxSize(100, 100));
         ppuX = 5; ppuY = 5;
         SetScrollRate(ppuX, ppuY);
         virtualSize.SetWidth((virtualOffset * 2) + img->GetWidth()); 
@@ -134,6 +158,7 @@ void CanvasPanel::initObjects() {
         imgPosition.y = virtualOffset;
         oldSize = GetSize();
         cropArea->SetSize(imgPosition.x, imgPosition.y, img->GetWidth(), img->GetHeight());
+        accumY = 0;
     }
 }
 
@@ -141,11 +166,11 @@ void CanvasPanel::paintShadow(const wxRect &frame, wxGraphicsContext *gc) {
     if(!gc) return;
     wxColour bc(0, 0, 0, 80);
     wxColour tc(0, 0, 0, 0);
-    gc->SetPen(wxPen(bc, 4));
+    gc->SetPen(wxPen(bc, 2));
     gc->SetBrush(wxBrush(tc));
     wxGraphicsPath shadow = gc->CreatePath();
-    shadow.AddRoundedRectangle(frame.GetX() + 4, frame.GetY() + 4, 
-                frame.GetWidth() - 2, frame.GetHeight() - 2, 2);
+    shadow.AddRoundedRectangle(frame.GetX() - 2, frame.GetY() - 2, 
+                frame.GetWidth() + 4, frame.GetHeight() + 4, 2);
     gc->DrawPath(shadow);
 }
 
