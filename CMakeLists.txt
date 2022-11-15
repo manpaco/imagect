@@ -13,6 +13,7 @@ list(APPEND SRC_FILES
 	"imgtools.cpp"
 	"rectangle.cpp"
 	"cropevent.cpp"
+	"imagewindow.cpp"
 )
 list(TRANSFORM SRC_FILES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 add_executable(imgcrop ${SRC_FILES})
