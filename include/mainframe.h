@@ -37,7 +37,8 @@ class MainFrame: public wxFrame {
         wxBoxSizer *mainSizer;
         Magick::Image *highResImg;
         Magick::Image *lowResImg;
-        wxBitmap *lowResBitmap;
+        wxBitmap *canvasBitmap;
+        wxBitmap *previewBitmap;
 
 };
 

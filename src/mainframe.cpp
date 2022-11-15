@@ -23,7 +23,8 @@ MainFrame::~MainFrame() {
     if(mainSplitter) mainSplitter->Destroy();
     if(highResImg) delete(highResImg);
     if(lowResImg) delete(lowResImg);
-    if(lowResBitmap) delete(lowResBitmap);
+    if(canvasBitmap) delete(canvasBitmap);
+    if(previewBitmap) delete(previewBitmap);
 }
 
 void MainFrame::allocateMem() {
@@ -31,11 +32,11 @@ void MainFrame::allocateMem() {
     lowResImg = new Magick::Image(*highResImg);
     Magick::Geometry newRes(lowResImg->columns() * 0.3, lowResImg->rows() * 0.3);
     lowResImg->zoom(newRes);
-    lowResBitmap = createBitmap(lowResImg);
+    canvasBitmap = createBitmap(lowResImg);
+    previewBitmap = new wxBitmap(*canvasBitmap);
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
-    lowResBitmap = createBitmap(lowResImg);
-    canvas = new CanvasPanel(mainSplitter, ict::CANVAS, lowResBitmap);
+    canvas = new CanvasPanel(mainSplitter, ict::CANVAS, canvasBitmap);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -69,5 +70,5 @@ void MainFrame::applyChanges(wxCommandEvent &event) {
 }
 
 void MainFrame::updatePreview() {
-    preview->updatePreview(lowResBitmap);
+    preview->updatePreview(previewBitmap);
 }
