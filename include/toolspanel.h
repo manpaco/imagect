@@ -1,7 +1,6 @@
 #ifndef TOOLSPANEL_H
 #define TOOLSPANEL_H
 
-#include "defs.h"
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP
@@ -17,6 +16,8 @@
 #if wxUSE_COLLPANE
     #include <wx/collpane.h>
 #endif
+
+#include "identifiersdef.h"
 
 class ToolsPanel: public wxScrolledWindow {
     public:

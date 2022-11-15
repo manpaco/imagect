@@ -1,5 +1,4 @@
 #include "toolspanel.h"
-#include "defs.h"
 #include <string>
 #include "wx/valnum.h"
 

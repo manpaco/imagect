@@ -2,7 +2,7 @@
 #include "Magick++.h"
 #include "canvaspanel.h"
 #include "cropevent.h"
-#include "defs.h"
+#include "identifiersdef.h"
 #include "previewpanel.h"
 #include "wx/splitter.h"
 #include "imgtools.h"
