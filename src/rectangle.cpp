@@ -1,4 +1,5 @@
 #include "rectangle.h"
+#include "exceptionsdef.h"
 #include <iterator>
 #include <wx/graphics.h>
 #include <wx/gtk/colour.h>
@@ -237,13 +238,23 @@ void Rectangle::changeCursor(ict::Zone type) {
 }
 
 void Rectangle::mousePress(wxMouseEvent &event) {
-    CaptureMouse();
+    try {
+        if(!HasCapture()) CaptureMouse();
+        else throw std::runtime_error("Error code: ");
+    } catch (std::runtime_error &e) {
+        std::cout << e.what() << MOUSE_ALREDY_CAPTURED << std::endl;
+    }
     clientPressPoint = event.GetPosition();
     zonePressed = getLocation(event.GetPosition());
 }
 
 void Rectangle::mouseRelease(wxMouseEvent &event) {
-    ReleaseMouse();
+    try {
+        if(HasCapture()) ReleaseMouse();
+        else throw std::runtime_error("Error code: ");
+    } catch (std::runtime_error &e) {
+        std::cout << e.what() << MOUSE_NEVER_CAPTURED << std::endl;
+    }
     zonePressed = ict::NONE;
     if(mouseLeftWin) changeCursor(ict::NONE);
     else changeCursor(getLocation(event.GetPosition()));
