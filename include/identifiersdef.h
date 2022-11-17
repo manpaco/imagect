@@ -19,6 +19,7 @@ enum ControlID {
     SHAPE_CH,
 
     APPLY_BT,
+    EXPORT_BT,
 
     CROP_AREA
 
@@ -27,7 +28,7 @@ enum ControlID {
 enum PanelID {
     CANVAS = wxID_HIGHEST + 100,
     TOOLS,
-    PREVIEW,
+    PREVIEW
 };
 
 enum CollPaneID {
