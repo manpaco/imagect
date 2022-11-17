@@ -3,17 +3,20 @@
 #include "cropevent.h"
 #include <wx/graphics.h>
 
-CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap *bm) :
-        wxScrolledCanvas() {
-
+CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm) {
     Create(parent, id);
     createElements(bm);
-    initElements();
+    initParams();
+    setBindings();
+}
+
+CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id) {
+    Create(parent, id);
+    initParams();
     setBindings();
 }
 
 void CanvasPanel::setBindings() {
-
     img->Bind(wxEVT_SIZE, &CanvasPanel::updateCropPosition, this);
     Bind(EVT_RECTANGLE_CHANGE, &CanvasPanel::sendCropChange, this);
     Bind(wxEVT_SCROLLWIN_THUMBTRACK, &CanvasPanel::saveCropPosition, this);
@@ -41,38 +44,49 @@ void CanvasPanel::updateCropPosition(wxSizeEvent &event) {
     event.Skip();
 }
 
-void CanvasPanel::createElements(wxBitmap *bm) {
-    if(bm) {
-        shadow = new wxWindow(this, wxID_ANY);
-        sz = new wxGridSizer(1, 0, 0);
-        img = new ImageWindow(this, wxID_ANY, bm);
-        cropArea = new Rectangle(this, ict::CROP_AREA);
-    } else {
-        img = nullptr;
-        cropArea = nullptr;
-        sz = nullptr;
-        shadow = nullptr;
-    }
+void CanvasPanel::updateCanvas(wxBitmap &bm) {
+    createElements(bm);
 }
 
-void CanvasPanel::initElements() {
-    if(img) {
-        wxColour bc(0, 0, 0, 80);
-        wxSize shsz(img->GetSize());
-        shsz += wxSize(4, 4);
-        shadow->SetSize(shsz);
-        shadow->SetMinSize(shsz);
-        shadow->SetBackgroundColour(bc);
-        SetMinSize(wxSize(100, 100));
-        ppuX = 2; ppuY = 2;
-        SetScrollRate(ppuX, ppuY);
-        SetVirtualSize(150, 150);
-        sz->Add(img, 0, wxALIGN_CENTER | wxALL, 100);
-        SetSizer(sz);
-        oldCropPosition = img->GetPosition();
-        cropOffset = wxPoint(0, 0);
-        cropArea->SetSize(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
+void CanvasPanel::createElements(wxBitmap &bm) {
+    if(!bm.IsOk()) return;
+    if(!shadow) shadow = new wxWindow(this, wxID_ANY);
+    if(!img) img = new ImageWindow(this, wxID_ANY, bm);
+    else img->updateImage(bm);
+    initShadow();
+    if(!sz) {
+        sz = new wxGridSizer(1, 0, 0);
+        initSizer();
     }
+    if(!cropArea) cropArea = new Rectangle(this, ict::CROP_AREA);
+    initCrop();
+}
+
+void CanvasPanel::initSizer() {
+    sz->Add(img, 0, wxALIGN_CENTER | wxALL, 100);
+    SetSizer(sz);
+}
+
+void CanvasPanel::initShadow() {
+    wxColour bc(0, 0, 0, 80);
+    wxSize shsz(img->GetSize());
+    shsz += wxSize(4, 4);
+    shadow->SetSize(shsz);
+    shadow->SetMinSize(shsz);
+    shadow->SetBackgroundColour(bc);
+}
+
+void CanvasPanel::initCrop() {
+    oldCropPosition = img->GetPosition();
+    cropOffset = wxPoint(0, 0);
+    cropArea->SetSize(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
+}
+
+void CanvasPanel::initParams() {
+    SetMinSize(wxSize(100, 100));
+    ppuX = 2; ppuY = 2;
+    SetScrollRate(ppuX, ppuY);
+    SetVirtualSize(150, 150);
 }
 
 CanvasPanel::~CanvasPanel() {

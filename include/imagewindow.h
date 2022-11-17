@@ -9,14 +9,18 @@
 
 class ImageWindow: public wxWindow {
     public:
-        ImageWindow(wxWindow *parent, wxWindowID id, wxBitmap *bm, 
+        ImageWindow(wxWindow *parent, wxWindowID id, wxBitmap &bm, 
                 const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize);
+        ImageWindow(wxWindow *parent, wxWindowID id, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize);
+        void updateImage(wxBitmap &bm);
         ~ImageWindow();
 
     private:
         void onPaint(wxPaintEvent &);
+        void setImage(wxBitmap &);
+        void setBindings();
 
-        wxBitmap *bm;
+        wxBitmap *img = nullptr;
 };
 
 #endif // IMAGEWINDOW_H

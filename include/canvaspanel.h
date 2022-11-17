@@ -15,24 +15,28 @@ const int virtualOffset = 100;
 
 class CanvasPanel: public wxScrolledCanvas {
     public:
-        CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap *);
-        wxPoint relativeCoords(const wxPoint &) const;
-        wxPoint absoluteCoords(const wxPoint &) const;
+        CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &);
+        CanvasPanel(wxWindow *parent, wxWindowID id);
+        void updateCanvas(wxBitmap &);
         ~CanvasPanel();
 
     private:
-        void createElements(wxBitmap *bm);
+        void createElements(wxBitmap &bm);
         void initElements();
         void updateCropPosition(wxSizeEvent &event);
         void sendCropChange(wxCommandEvent &);
         void paintShadow(const wxRect &, wxGraphicsContext *);
         void setBindings(); 
         void saveCropPosition(wxScrollWinEvent &event);
+        void initSizer();
+        void initShadow();
+        void initCrop();
+        void initParams();
 
-        Rectangle *cropArea;
-        ImageWindow *img;
-        wxGridSizer *sz;
-        wxWindow *shadow;
+        Rectangle *cropArea = nullptr;
+        ImageWindow *img = nullptr;
+        wxGridSizer *sz = nullptr;
+        wxWindow *shadow = nullptr;
 
         wxPoint oldCropPosition;
         wxPoint cropOffset;

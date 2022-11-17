@@ -16,42 +16,35 @@ MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Croping Tool") {
 }
 
 MainFrame::~MainFrame() {
-    if(preview) preview->Destroy();
-    if(tools) tools->Destroy();
-    if(canvas) canvas->Destroy();
-    if(sideSplitter) sideSplitter->Destroy();
-    if(mainSplitter) mainSplitter->Destroy();
-    if(highResImg) delete(highResImg);
+    if(sourceImg) delete(sourceImg);
     if(lowResImg) delete(lowResImg);
-    if(canvasBitmap) delete(canvasBitmap);
-    if(previewBitmap) delete(previewBitmap);
+    if(dumpBitmap) delete(dumpBitmap);
 }
 
 void MainFrame::allocateMem() {
-    highResImg = new Magick::Image("/usr/share/icons/Adwaita/512x512/devices/computer.png");
-    lowResImg = new Magick::Image(*highResImg);
+    sourceImg = new Magick::Image("/usr/share/icons/Adwaita/512x512/devices/computer.png");
+    lowResImg = new Magick::Image(*sourceImg);
     Magick::Geometry newRes(lowResImg->columns() * 0.3, lowResImg->rows() * 0.3);
     lowResImg->zoom(newRes);
-    canvasBitmap = createBitmap(lowResImg);
-    previewBitmap = new wxBitmap(*canvasBitmap);
+    dumpBitmap = createBitmap(*lowResImg);
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
-    canvas = new CanvasPanel(mainSplitter, ict::CANVAS, canvasBitmap);
+    canvas = new CanvasPanel(mainSplitter, ict::CANVAS, *dumpBitmap);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxHORIZONTAL);
     updatePreview();
 }
 
-wxBitmap * MainFrame::createBitmap(Magick::Image *img) {
-    if(!img) return nullptr;
-    return new wxBitmap(wxImage(img->columns(), img->rows(), 
-            extractRgb(*img), extractAlpha(*img)));
+wxBitmap * MainFrame::createBitmap(Magick::Image &img) {
+    return new wxBitmap(wxImage(img.columns(), img.rows(), 
+            extractRgb(img), extractAlpha(img)));
 }
 
 void MainFrame::overlayPanels() {
     sideSplitter->SplitHorizontally(tools, preview);
     mainSplitter->SplitVertically(canvas, sideSplitter);
+    mainSplitter->SetMinimumPaneSize(150);
     mainSizer->Add(mainSplitter, 1, wxEXPAND);
     SetSizerAndFit(mainSizer);
 }
@@ -70,5 +63,5 @@ void MainFrame::applyChanges(wxCommandEvent &event) {
 }
 
 void MainFrame::updatePreview() {
-    preview->updatePreview(previewBitmap);
+    preview->updatePreview(*dumpBitmap);
 }

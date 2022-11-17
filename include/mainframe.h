@@ -26,19 +26,18 @@ class MainFrame: public wxFrame {
         void setBindings();
         void overlayPanels();
         void applyChanges(wxCommandEvent &);
-        wxBitmap * createBitmap(Magick::Image *img);
+        wxBitmap * createBitmap(Magick::Image &img);
         void onCropChange(CropEvent &);
 
-        CanvasPanel *canvas;
-        ToolsPanel *tools;
-        wxSplitterWindow *mainSplitter;
-        wxSplitterWindow *sideSplitter;
-        PreviewPanel *preview;
-        wxBoxSizer *mainSizer;
-        Magick::Image *highResImg;
-        Magick::Image *lowResImg;
-        wxBitmap *canvasBitmap;
-        wxBitmap *previewBitmap;
+        CanvasPanel *canvas = nullptr;
+        ToolsPanel *tools = nullptr;
+        wxSplitterWindow *mainSplitter = nullptr;
+        wxSplitterWindow *sideSplitter = nullptr;
+        PreviewPanel *preview = nullptr;
+        wxBoxSizer *mainSizer = nullptr;
+        Magick::Image *sourceImg = nullptr;
+        Magick::Image *lowResImg = nullptr;
+        wxBitmap *dumpBitmap = nullptr;
 
 };
 

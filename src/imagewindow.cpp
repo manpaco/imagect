@@ -1,20 +1,39 @@
 #include "imagewindow.h"
 
-ImageWindow::ImageWindow(wxWindow *parent, wxWindowID id, wxBitmap *bm, const wxPoint &pos, const wxSize &size) {
+ImageWindow::ImageWindow(wxWindow *parent, wxWindowID id, wxBitmap &bm, const wxPoint &pos, const wxSize &size) {
     Create(parent, id, pos, size);
-    this->bm = bm;
-    SetMinSize(wxSize(bm->GetSize().GetWidth(), bm->GetSize().GetHeight()));
-    SetSize(wxSize(bm->GetSize().GetWidth(), bm->GetSize().GetHeight()));
+    setImage(bm);
+    setBindings();
+}
+
+ImageWindow::ImageWindow(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wxSize &size) {
+    Create(parent, id, pos, size);
+    setBindings();
+}
+
+void ImageWindow::setImage(wxBitmap &bm) {
+    if(!bm.IsOk()) return;
+    if(img) delete img;
+    img = new wxBitmap(bm);
+    SetMinSize(wxSize(img->GetSize().GetWidth(), img->GetSize().GetHeight()));
+    SetSize(wxSize(img->GetSize().GetWidth(), img->GetSize().GetHeight()));
+}
+
+void ImageWindow::setBindings() {
     Bind(wxEVT_PAINT, &ImageWindow::onPaint, this);
 }
 
+void ImageWindow::updateImage(wxBitmap &bm) {
+    setImage(bm);
+}
+
 void ImageWindow::onPaint(wxPaintEvent &event) {
-    if(bm) {
+    if(img) {
         wxPaintDC dev(this);
-        dev.DrawBitmap(*bm, 0, 0);
+        dev.DrawBitmap(*img, 0, 0);
     }
 }
 
 ImageWindow::~ImageWindow() {
-
+    if(img) delete img;
 }

@@ -8,20 +8,27 @@
 #endif
 
 #include "wx/custombgwin.h"
+#include "imagewindow.h"
 
-class PreviewPanel: public wxScrolledCanvas {
+class PreviewPanel: public wxPanel {
 
     public:
         PreviewPanel(wxWindow *parent, wxWindowID id);
-        void updatePreview(wxBitmap *);
+        PreviewPanel(wxWindow *parent, wxWindowID id, wxBitmap &);
+        void updatePreview(wxBitmap &);
         ~PreviewPanel();
 
     private:
+        void createElements(wxBitmap &bm);
         void paintImage(wxPaintEvent &event); 
+        void setBindings();
+        void init();
+        void initDimensions();
+        void setPreview(wxBitmap &bm);
 
-        wxBitmap *preview;
-        wxCustomBackgroundWindow<wxWindow> *frame;
-        wxBoxSizer *sz;
+        wxBoxSizer *sz = nullptr;
+        ImageWindow *preview = nullptr;
+        wxStaticText *title = nullptr;
 };
 
 #endif // PREVIEWPANEL_H
