@@ -187,3 +187,7 @@ void ToolsPanel::heightCrop(unsigned int hegight) {
 int ToolsPanel::growChoice() const {
     return showedGrowChoice;
 }
+
+OptionsContainer ToolsPanel::currentStatus() const {
+    return status;
+}
