@@ -19,6 +19,33 @@
 
 #include "identifiersdef.h"
 
+struct OptionsContainer {
+    unsigned int width, height;
+    bool fixRatio;
+    ict::ShapeChoice shape;
+    unsigned int strokeWidth;
+    wxColour strokeColour;
+    int strokePos;
+    bool allowGrow;
+    ict::GrowChoice growChoice;
+    wxColour backColour;
+    wxString backImage;
+
+    //bool operator==(const OptionsContainer &oc) const {
+    //    return width == oc.width &&
+    //        height == oc.height &&
+    //        fixRatio == oc.fixRatio &&
+    //        shape == oc.shape &&
+    //        strokeWidth == oc.strokeWidth &&
+    //        strokeColour == oc.strokeColour &&
+    //        strokePos == oc.strokePos &&
+    //        allowGrow == oc.allowGrow &&
+    //        growChoice == oc.growChoice &&
+    //        backColour == oc.backColour &&
+    //        backImage == oc.backImage;
+    //}
+};
+
 class ToolsPanel: public wxScrolledCanvas {
     public:
         ToolsPanel(wxWindow *parent, wxWindowID id);
@@ -27,6 +54,7 @@ class ToolsPanel: public wxScrolledCanvas {
         void widthCrop(unsigned int width);
         void heightCrop(unsigned int height);
         int growChoice() const;
+        OptionsContainer currentStatus() const;
         ~ToolsPanel();
 
     private:
@@ -72,6 +100,7 @@ class ToolsPanel: public wxScrolledCanvas {
         wxBoxSizer *toolsSizer;
 
         unsigned int width, height;
+        OptionsContainer status;
 
 };
 
