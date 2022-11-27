@@ -2,7 +2,7 @@
 #include <string>
 #include "wx/valnum.h"
 
-ToolsPanel::ToolsPanel(wxWindow *parent, wxWindowID id) : wxScrolledWindow() {
+ToolsPanel::ToolsPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
     createTools();
     overlayTools();
@@ -25,6 +25,7 @@ void ToolsPanel::setBindings() {
 
 void ToolsPanel::updateVirtualSize(wxCollapsiblePaneEvent &event) {
     FitInside();
+    event.Skip();
 }
 
 void ToolsPanel::createTools() {
@@ -116,7 +117,7 @@ void ToolsPanel::growState(bool state) {
     if(growCheck->IsChecked() != state) return;
     growSelector->Enable(state);
     growChoiceState(state, showedGrowChoice);
-    updateBlock(ict::GROW);
+    updateGrowBlock();
 }
 
 void ToolsPanel::growChoice(int choice) {
@@ -124,24 +125,12 @@ void ToolsPanel::growChoice(int choice) {
     growChoiceState(false, showedGrowChoice);
     growChoiceState(true, choice);
     showedGrowChoice = choice;
-    updateBlock(ict::GROW);
+    updateGrowBlock();
 }
 
-void ToolsPanel::updateBlock(ict::CollPaneID block) {
-    switch (block) {
-    case ict::GROW:
-        growBlock->Collapse();
-        growBlock->Expand();
-        break;
-    case ict::ASPECT_RATIO:
-        aspectBlock->Collapse();
-        aspectBlock->Expand();
-        break;
-    case ict::SHAPE:
-        shapeBlock->Collapse();
-        shapeBlock->Expand();
-        break;
-    }
+void ToolsPanel::updateGrowBlock() {
+    growBlock->Collapse();
+    growBlock->Expand();
 }
 
 void ToolsPanel::growChoiceState(bool state, int choice) {
@@ -173,8 +162,8 @@ void ToolsPanel::overlayTools() {
     toolsSizer->Add(aspectBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->Add(shapeBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->Add(growBlock, 0, wxGROW | wxALL, 5);
-    toolsSizer->Add(apply);
     toolsSizer->AddSpacer(10);
+    toolsSizer->Add(apply, 0, wxALIGN_CENTER);
     SetSizerAndFit(toolsSizer);
     SetScrollRate(5, 5);
 }

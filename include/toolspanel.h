@@ -19,15 +19,13 @@
 
 #include "identifiersdef.h"
 
-class ToolsPanel: public wxScrolledWindow {
+class ToolsPanel: public wxScrolledCanvas {
     public:
         ToolsPanel(wxWindow *parent, wxWindowID id);
         unsigned int widthCrop() const;
         unsigned int hegihtCrop() const;
         void widthCrop(unsigned int width);
         void heightCrop(unsigned int height);
-        void growState(bool state);
-        void growChoice(int choice);
         int growChoice() const;
         ~ToolsPanel();
 
@@ -43,7 +41,9 @@ class ToolsPanel: public wxScrolledWindow {
         void initGrowChoices();
         void initShapeChoices();
         void growChoiceState(bool state, int choice);
-        void updateBlock(ict::CollPaneID block);
+        void growChoice(int choice);
+        void growState(bool state);
+        void updateGrowBlock();
         
         wxCollapsiblePane *aspectBlock;
         wxTextCtrl *widthRatio;
