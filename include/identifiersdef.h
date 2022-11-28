@@ -12,9 +12,9 @@ enum ControlID {
 
     GROW_CHECK_CB,
     GROW_SELECTOR_RB,
-    COLOR_PICKER_BT,
+    PICK_COLOUR_BT,
     BACK_BLUR_SL,
-    PICK_BACK_FP,
+    PICK_IMG_FP,
 
     SHAPE_CH,
 
@@ -70,11 +70,6 @@ enum Zone {
     SW,
     E,
     W
-};
-
-enum Action {
-    MOVE = 0,
-    RESIZE
 };
 
 };
