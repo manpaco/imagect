@@ -15,12 +15,61 @@ ToolsPanel::~ToolsPanel() {
 
 void ToolsPanel::setBindings() {
     Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, &ToolsPanel::updateVirtualSize, this);
-    Bind(wxEVT_CHECKBOX, 
-            [=](wxCommandEvent &event) { growState(event.IsChecked()); }, 
+    Bind(wxEVT_CHECKBOX, &ToolsPanel::growStateChange, this, 
             ict::GROW_CHECK_CB);
-    Bind(wxEVT_RADIOBOX, 
-            [=](wxCommandEvent &event) { growChoice(event.GetSelection()); }, 
+    Bind(wxEVT_RADIOBOX, &ToolsPanel::growChoiceChange, this, 
             ict::GROW_SELECTOR_RB);
+    Bind(wxEVT_TEXT, &ToolsPanel::widthChange, this, ict::WIDTH_TC);
+    Bind(wxEVT_TEXT, &ToolsPanel::heightChange, this, ict::HEIGHT_TC);
+    Bind(wxEVT_CHECKBOX, &ToolsPanel::fixRatioChange, this, ict::FIX_RATIO_CB);
+    Bind(wxEVT_CHOICE, &ToolsPanel::shapeChange, this, ict::SHAPE_CH);
+    Bind(wxEVT_COLOURPICKER_CHANGED, &ToolsPanel::colourChange, this, ict::PICK_COLOUR_BT);
+    Bind(wxEVT_FILEPICKER_CHANGED, &ToolsPanel::imageChange, this, ict::PICK_IMG_FP);
+    Bind(wxEVT_SCROLL_THUMBRELEASE, &ToolsPanel::blurChange, this, ict::BACK_BLUR_SL);
+}
+
+void ToolsPanel::widthChange(wxCommandEvent &event) {
+    status.width = std::stoi(event.GetString().ToStdString());
+}
+
+void ToolsPanel::heightChange(wxCommandEvent &event) {
+    status.height = std::stoi(event.GetString().ToStdString());
+}
+
+void ToolsPanel::fixRatioChange(wxCommandEvent &event) {
+    status.fixRatio = event.IsChecked();
+}
+
+void ToolsPanel::shapeChange(wxCommandEvent &event) {
+    status.shapeChoice = event.GetInt();
+}
+
+void ToolsPanel::colourChange(wxColourPickerEvent &event) {
+    status.backColour = event.GetColour();
+}
+
+void ToolsPanel::imageChange(wxFileDirPickerEvent &event) {
+    status.backImage = event.GetPath();
+}
+
+void ToolsPanel::blurChange(wxScrollEvent &event) {
+    status.backBlur = event.GetPosition();
+}
+
+void ToolsPanel::growChoiceChange(wxCommandEvent &event) {
+    if(showedGrowChoice == event.GetInt()) return;
+    growChoiceState(false, showedGrowChoice);
+    growChoiceState(true, event.GetInt());
+    status.growChoice = event.GetInt();
+    showedGrowChoice = event.GetInt();
+    updateGrowBlock();
+}
+
+void ToolsPanel::growStateChange(wxCommandEvent &event) {
+    growSelector->Enable(event.IsChecked());
+    growChoiceState(event.IsChecked(), showedGrowChoice);
+    status.allowGrow = event.IsChecked();
+    updateGrowBlock();
 }
 
 void ToolsPanel::updateVirtualSize(wxCollapsiblePaneEvent &event) {
@@ -41,25 +90,25 @@ void ToolsPanel::createAspectBlock() {
             wxCP_NO_TLW_RESIZE);
     wxWindow *winAspect = aspectBlock->GetPane();
 
-    widthRatio = new wxTextCtrl(winAspect, ict::WIDTH_TC, wxEmptyString, 
+    widthCtrl = new wxTextCtrl(winAspect, ict::WIDTH_TC, wxEmptyString, 
             wxDefaultPosition, wxDefaultSize, 0,
-            wxIntegerValidator<unsigned int>(&width));
-    heightRatio = new wxTextCtrl(winAspect, ict::HEIGHT_TC, wxEmptyString, 
+            wxIntegerValidator<unsigned int>());
+    heightCtrl = new wxTextCtrl(winAspect, ict::HEIGHT_TC, wxEmptyString, 
             wxDefaultPosition, wxDefaultSize, 0,
-            wxIntegerValidator<unsigned int>(&height));
+            wxIntegerValidator<unsigned int>());
     fixRatio = new wxCheckBox(winAspect, ict::FIX_RATIO_CB, "Fix ratio");
 
     widthSizer = new wxBoxSizer(wxHORIZONTAL);
     widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Width:"), 0, 
             wxALIGN_CENTER_VERTICAL);
     widthSizer->AddSpacer(10);
-    widthSizer->Add(widthRatio);
+    widthSizer->Add(widthCtrl);
 
     heightSizer = new wxBoxSizer(wxHORIZONTAL);
     heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Height:"), 0, 
             wxALIGN_CENTER_VERTICAL);
     heightSizer->AddSpacer(10);
-    heightSizer->Add(heightRatio);
+    heightSizer->Add(heightCtrl);
 
     aspectSizer = new wxBoxSizer(wxVERTICAL);
     aspectSizer->AddSpacer(5);
@@ -82,11 +131,11 @@ void ToolsPanel::createGrowBlock() {
             "Options", wxDefaultPosition, wxDefaultSize, 
             wxArrayString(ict::GROW_CHOICE_SIZE, growChoices));
     growSelector->Enable(false);
-    colorPicker = new wxColourPickerCtrl(winGrow, ict::COLOR_PICKER_BT, 
+    colorPicker = new wxColourPickerCtrl(winGrow, ict::PICK_COLOUR_BT, 
             *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_USE_TEXTCTRL);
     colorPicker->Show(false);
-    backPicker = new wxFilePickerCtrl(winGrow, ict::PICK_BACK_FP);
-    backPicker->Show(false);
+    imagePicker = new wxFilePickerCtrl(winGrow, ict::PICK_IMG_FP);
+    imagePicker->Show(false);
     backBlur = new wxSlider(winGrow, ict::BACK_BLUR_SL, 0, 0, 100);
     backBlur->Show(false);
 
@@ -94,7 +143,7 @@ void ToolsPanel::createGrowBlock() {
     growSizer->Add(growCheck);
     growSizer->Add(growSelector);
     growSizer->Add(colorPicker);
-    growSizer->Add(backPicker);
+    growSizer->Add(imagePicker);
     growSizer->Add(backBlur);
     winGrow->SetSizerAndFit(growSizer);
 }
@@ -107,25 +156,11 @@ void ToolsPanel::createShapeBlock() {
     shapeSelector = new wxChoice(winShape, ict::SHAPE_CH, wxDefaultPosition, 
             wxDefaultSize, 
             wxArrayString(ict::SHAPE_CHOICE_SIZE, shapeChoices));
+    shapeSelector->SetSelection(0);
     
     shapeSizer = new wxBoxSizer(wxVERTICAL);
     shapeSizer->Add(shapeSelector);
     winShape->SetSizerAndFit(shapeSizer);
-}
-
-void ToolsPanel::growState(bool state) {
-    if(growCheck->IsChecked() != state) return;
-    growSelector->Enable(state);
-    growChoiceState(state, showedGrowChoice);
-    updateGrowBlock();
-}
-
-void ToolsPanel::growChoice(int choice) {
-    if(showedGrowChoice == choice) return;
-    growChoiceState(false, showedGrowChoice);
-    growChoiceState(true, choice);
-    showedGrowChoice = choice;
-    updateGrowBlock();
 }
 
 void ToolsPanel::updateGrowBlock() {
@@ -139,7 +174,7 @@ void ToolsPanel::growChoiceState(bool state, int choice) {
         colorPicker->Show(state);
         break;
     case ict::IMAGE:
-        backPicker->Show(state);
+        imagePicker->Show(state);
         backBlur->Show(state);
         break;
     }
@@ -168,24 +203,12 @@ void ToolsPanel::overlayTools() {
     SetScrollRate(5, 5);
 }
 
-unsigned int ToolsPanel::widthCrop() const {
-    return width;
-}
-
-unsigned int ToolsPanel::hegihtCrop() const {
-    return height;
-}
-
 void ToolsPanel::widthCrop(unsigned int width) {
-    widthRatio->ChangeValue(wxString(std::to_string(width)));
+    widthCtrl->ChangeValue(wxString(std::to_string(width)));
 }
 
-void ToolsPanel::heightCrop(unsigned int hegight) {
-    widthRatio->ChangeValue(wxString(std::to_string(height)));
-}
-
-int ToolsPanel::growChoice() const {
-    return showedGrowChoice;
+void ToolsPanel::heightCrop(unsigned int height) {
+    heightCtrl->ChangeValue(wxString(std::to_string(height)));
 }
 
 OptionsContainer ToolsPanel::currentStatus() const {
