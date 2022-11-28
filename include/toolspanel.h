@@ -22,14 +22,15 @@
 struct OptionsContainer {
     unsigned int width, height;
     bool fixRatio;
-    ict::ShapeChoice shape;
+    int shapeChoice;
     unsigned int strokeWidth;
     wxColour strokeColour;
     int strokePos;
     bool allowGrow;
-    ict::GrowChoice growChoice;
+    int growChoice;
     wxColour backColour;
     wxString backImage;
+    int backBlur;
 
     //bool operator==(const OptionsContainer &oc) const {
     //    return width == oc.width &&
@@ -53,29 +54,35 @@ class ToolsPanel: public wxScrolledCanvas {
         unsigned int hegihtCrop() const;
         void widthCrop(unsigned int width);
         void heightCrop(unsigned int height);
-        int growChoice() const;
         OptionsContainer currentStatus() const;
         ~ToolsPanel();
 
     private:
+        void widthChange(wxCommandEvent &event);
+        void heightChange(wxCommandEvent &event);
+        void fixRatioChange(wxCommandEvent &event);
+        void shapeChange(wxCommandEvent &event);
+        void colourChange(wxColourPickerEvent &event);
+        void imageChange(wxFileDirPickerEvent &event);
+        void blurChange(wxScrollEvent &event);
+        void growChoiceChange(wxCommandEvent &event);
+        void growStateChange(wxCommandEvent &event);
+        void updateVirtualSize(wxCollapsiblePaneEvent &event);
+
         void setBindings();
         void createTools();
         void overlayTools();
-        void updateVirtualSize(wxCollapsiblePaneEvent &event);
-        void showPresetRatioTools(wxCommandEvent &event);
         void createAspectBlock();
         void createGrowBlock();
         void createShapeBlock();
         void initGrowChoices();
         void initShapeChoices();
         void growChoiceState(bool state, int choice);
-        void growChoice(int choice);
-        void growState(bool state);
         void updateGrowBlock();
         
         wxCollapsiblePane *aspectBlock;
-        wxTextCtrl *widthRatio;
-        wxTextCtrl *heightRatio;
+        wxTextCtrl *widthCtrl;
+        wxTextCtrl *heightCtrl;
         wxCheckBox *fixRatio;
         wxBoxSizer *aspectSizer;
         wxBoxSizer *widthSizer;
@@ -85,7 +92,7 @@ class ToolsPanel: public wxScrolledCanvas {
         wxCheckBox *growCheck;
         wxRadioBox *growSelector;
         wxSlider *backBlur;
-        wxFilePickerCtrl *backPicker;
+        wxFilePickerCtrl *imagePicker;
         wxColourPickerCtrl *colorPicker;
         wxBoxSizer *growSizer;
         wxString growChoices[ict::GROW_CHOICE_SIZE];
@@ -98,8 +105,6 @@ class ToolsPanel: public wxScrolledCanvas {
 
         wxButton *apply;
         wxBoxSizer *toolsSizer;
-
-        unsigned int width, height;
         OptionsContainer status;
 
 };
