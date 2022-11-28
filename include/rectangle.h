@@ -46,6 +46,7 @@ class Rectangle : public wxControl {
 
         ict::Zone zonePressed = ict::NONE;
         float ratio;
+        bool changed = false;
 };
 
 wxDECLARE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);

@@ -56,21 +56,20 @@ void Rectangle::leaveWinHandler(wxMouseEvent &event) {
 }
 
 void Rectangle::mouseMotion(wxMouseEvent &event) {
-    if(!zonePressed) changeCursor(getLocation(event.GetPosition()));
+    if(!zonePressed) {
+        changeCursor(getLocation(event.GetPosition()));
+        event.Skip();
+        return;
+    }
     if(zonePressed == ict::INNER) {
         wxPoint screenPoint(wxGetMousePosition());
         screenPoint = screenPoint - clientPressPoint;
         Move(GetParent()->ScreenToClient(screenPoint));
     } else {
-        if(zonePressed != ict::NONE) {
-            resizeUsing(zonePressed);
-        }
+        resizeUsing(zonePressed);
     }
-    if(zonePressed) {
-        wxCommandEvent toSend(EVT_RECTANGLE_CHANGE, GetId());
-        toSend.SetEventObject(this);
-        ProcessWindowEvent(toSend);
-    }
+    changed = true;
+    event.Skip();
 }
 
 void Rectangle::resizeUsing(ict::Zone zone){
@@ -254,6 +253,12 @@ void Rectangle::mouseRelease(wxMouseEvent &event) {
         else throw std::runtime_error("Error code: ");
     } catch (std::runtime_error &e) {
         std::cout << e.what() << MOUSE_NEVER_CAPTURED << std::endl;
+    }
+    if(changed) {
+        wxCommandEvent toSend(EVT_RECTANGLE_CHANGE, GetId());
+        toSend.SetEventObject(this);
+        ProcessWindowEvent(toSend);
+        changed = false;
     }
     zonePressed = ict::NONE;
     if(mouseLeftWin) changeCursor(ict::NONE);
