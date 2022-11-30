@@ -99,6 +99,13 @@ void Rectangle::activateRestrictions(bool op) {
     restricted = op;
 }
 
+void Rectangle::resize(wxSize &s) {
+    wxRect newGeometry(GetPosition(), s);
+    if(restricted) newGeometry.Intersect(restrictions);
+    s = newGeometry.GetSize();
+    SetSize(s);
+}
+
 void Rectangle::resizeUsing(ict::Zone zone){
     wxPoint mousePosition(wxGetMousePosition());
     wxPoint positionOnScreen(GetScreenPosition());

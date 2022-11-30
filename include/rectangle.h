@@ -25,6 +25,7 @@ class Rectangle : public wxControl {
         bool fixRatio() const;
         void setRestrictions(wxRect &r);
         void activateRestrictions(bool op);
+        void resize(wxSize &s);
         ~Rectangle();
         
         wxDECLARE_DYNAMIC_CLASS(Rectangle);
