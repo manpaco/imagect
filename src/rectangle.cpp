@@ -158,32 +158,27 @@ void Rectangle::resizeUsing(ict::Zone zone){
         modify(newGeometry);
         return;
     }
-    //if(zone == ict::NE) {
-    //    limitPosX = positionOnScreen.x + resizeLimit;
-    //    limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
-    //    deltaX = bestWidth;
-    //    deltaY = -bestWidth;
-    //    deltaX += mousePosition.x - 
-    //            (positionOnScreen.x + GetSize().GetWidth());
-    //    deltaY += mousePosition.y - positionOnScreen.y;
-    //    if(mousePosition.x < limitPosX && mousePosition.y > limitPosY) return;
-    //    if(mousePosition.x < limitPosX) {
-    //        SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
-    //                wxDefaultCoord, GetSize().GetHeight() - deltaY, 
-    //                wxSIZE_USE_EXISTING);
-    //        return;
-    //    }
-    //    if(mousePosition.y > limitPosY) {
-    //        SetSize(wxDefaultCoord, wxDefaultCoord, 
-    //                GetSize().GetWidth() + deltaX, wxDefaultCoord, 
-    //                wxSIZE_USE_EXISTING);
-    //        return;
-    //    }
-    //    SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
-    //            GetSize().GetWidth() + deltaX, 
-    //            GetSize().GetHeight() - deltaY, wxSIZE_USE_EXISTING);
-    //    return;
-    //}
+    if(zone == ict::NE) {
+        limitPosX = positionOnScreen.x + resizeLimit;
+        limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
+        deltaX = bestWidth;
+        deltaY = -bestWidth;
+        deltaX += mousePosition.x - 
+                (positionOnScreen.x + GetSize().GetWidth());
+        deltaY += mousePosition.y - positionOnScreen.y;
+        wxRect newGeometry(positionOnParent.x, positionOnParent.y + deltaY, 
+                GetSize().GetWidth() + deltaX, 
+                GetSize().GetHeight() - deltaY);
+        if(mousePosition.x < limitPosX) {
+            newGeometry.SetSize(wxSize(resizeLimit, newGeometry.GetHeight()));
+        }
+        if(mousePosition.y > limitPosY) {
+            newGeometry.SetPosition(wxPoint(newGeometry.GetX(), (GetPosition().y + GetSize().GetHeight()) - resizeLimit));
+            newGeometry.SetSize(wxSize(newGeometry.GetWidth(), resizeLimit));
+        }
+        modify(newGeometry);
+        return;
+    }
     //if(zone == ict::SW) {
     //    limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
     //    limitPosY = positionOnScreen.y + resizeLimit;
