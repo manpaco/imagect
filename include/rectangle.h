@@ -33,7 +33,7 @@ class Rectangle : public wxControl {
         ict::Zone getLocation(const wxPoint);
         bool isContained(wxRect area, wxPoint point);
         void changeCursor(ict::Zone type);
-        bool resizeUsing(ict::Zone);
+        void resizeUsing(ict::Zone);
         void init();
         void onPaint(wxPaintEvent &);
         void mouseMotion(wxMouseEvent &);
@@ -53,7 +53,7 @@ class Rectangle : public wxControl {
         bool fix = false;
         wxRect restrictions;
         bool restricted = false;
-        bool changed = false;
+        wxRect rectInPress;
 };
 
 wxDECLARE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);

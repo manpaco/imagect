@@ -30,10 +30,6 @@ void Rectangle::init() {
     Bind(wxEVT_SIZE, &Rectangle::updateSizes, this);
 }
 
-void Rectangle::enterWinHandler(wxMouseEvent &event) {
-    mouseLeftWin = false;
-}
-
 void Rectangle::updateSizes(wxSizeEvent &event) {
     ratio = (float)event.GetSize().GetWidth() / 
             (float)event.GetSize().GetHeight();
@@ -53,6 +49,10 @@ void Rectangle::updateSizes(wxSizeEvent &event) {
 void Rectangle::leaveWinHandler(wxMouseEvent &event) {
     if(!zonePressed) changeCursor(ict::NONE);
     mouseLeftWin = true;
+}
+
+void Rectangle::enterWinHandler(wxMouseEvent &event) {
+    mouseLeftWin = false;
 }
 
 void Rectangle::mouseMotion(wxMouseEvent &event) {
@@ -76,12 +76,9 @@ void Rectangle::mouseMotion(wxMouseEvent &event) {
             if(ny1 < cy1) newGeometry.SetPosition(wxPoint(newGeometry.GetPosition().x, cy1));
             if(ny2 > cy2) newGeometry.SetPosition(wxPoint(newGeometry.GetPosition().x, cy2 - GetSize().GetHeight()));
         }
-        if(GetPosition() != newGeometry.GetPosition()) {
-            Move(newGeometry.GetPosition());
-            changed = true;
-        }
+        Move(newGeometry.GetPosition());
     } else {
-        changed = resizeUsing(zonePressed);
+        resizeUsing(zonePressed);
     }
     event.Skip();
 }
@@ -102,7 +99,7 @@ void Rectangle::activateRestrictions(bool op) {
     restricted = op;
 }
 
-bool Rectangle::resizeUsing(ict::Zone zone){
+void Rectangle::resizeUsing(ict::Zone zone){
     wxPoint mousePosition(wxGetMousePosition());
     wxPoint positionOnScreen(GetScreenPosition());
     wxPoint positionOnParent(GetPosition());
@@ -129,9 +126,8 @@ bool Rectangle::resizeUsing(ict::Zone zone){
         if(restricted) newGeometry.Intersect(restrictions);
         SetSize(wxDefaultCoord, wxDefaultCoord, newGeometry.GetWidth(), 
                 newGeometry.GetHeight());
-        return true;
+        return;
     }
-    return false;
     //if(zone == ict::NW) {
     //    limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
     //    limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
@@ -273,6 +269,7 @@ void Rectangle::mousePress(wxMouseEvent &event) {
     }
     clientPressPoint = event.GetPosition();
     zonePressed = getLocation(event.GetPosition());
+    rectInPress = GetRect();
 }
 
 void Rectangle::mouseRelease(wxMouseEvent &event) {
@@ -282,11 +279,10 @@ void Rectangle::mouseRelease(wxMouseEvent &event) {
     } catch (std::runtime_error &e) {
         std::cout << e.what() << MOUSE_NEVER_CAPTURED << std::endl;
     }
-    if(changed) {
+    if(rectInPress != GetRect()) {
         wxCommandEvent toSend(EVT_RECTANGLE_CHANGE, GetId());
         toSend.SetEventObject(this);
         ProcessWindowEvent(toSend);
-        changed = false;
     }
     zonePressed = ict::NONE;
     if(mouseLeftWin) changeCursor(ict::NONE);
