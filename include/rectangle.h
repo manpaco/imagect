@@ -26,6 +26,7 @@ class Rectangle : public wxControl {
         void setRestrictions(wxRect &r);
         void activateRestrictions(bool op);
         void resize(wxSize &s);
+        void modify(wxRect &ng);
         ~Rectangle();
         
         wxDECLARE_DYNAMIC_CLASS(Rectangle);
