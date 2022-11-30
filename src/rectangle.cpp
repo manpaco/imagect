@@ -238,17 +238,19 @@ void Rectangle::resizeUsing(ict::Zone zone){
         modify(newGeometry);
         return;
     }
-    //if(zone == ict::E) {
-    //    limitPosX = positionOnScreen.x + resizeLimit;
-    //    deltaX = bestWidth;
-    //    deltaX += mousePosition.x - 
-    //            (positionOnScreen.x + GetSize().GetWidth());
-    //    if(mousePosition.x < limitPosX) return;
-    //    SetSize(wxDefaultCoord, wxDefaultCoord, 
-    //            GetSize().GetWidth() + deltaX, wxDefaultCoord, 
-    //            wxSIZE_USE_EXISTING);
-    //    return;
-    //}
+    if(zone == ict::E) {
+        limitPosX = positionOnScreen.x + resizeLimit;
+        deltaX = bestWidth;
+        deltaX += mousePosition.x - 
+                (positionOnScreen.x + GetSize().GetWidth());
+        wxRect newGeometry(positionOnParent.x, positionOnParent.y, 
+                GetSize().GetWidth() + deltaX, GetSize().GetHeight());
+        if(mousePosition.x < limitPosX) {
+            newGeometry.SetSize(wxSize(resizeLimit, newGeometry.GetHeight()));
+        }
+        modify(newGeometry);
+        return;
+    }
 }
 
 void Rectangle::changeCursor(ict::Zone type) {
