@@ -212,16 +212,19 @@ void Rectangle::resizeUsing(ict::Zone zone){
         modify(newGeometry);
         return;
     }
-    //if(zone == ict::S) {
-    //    limitPosY = positionOnScreen.y + resizeLimit;
-    //    deltaY = bestWidth;
-    //    deltaY += mousePosition.y - 
-    //            (positionOnScreen.y + GetSize().GetHeight());
-    //    if(mousePosition.y < limitPosY) return;
-    //    SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
-    //            GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING);
-    //    return;
-    //}
+    if(zone == ict::S) {
+        limitPosY = positionOnScreen.y + resizeLimit;
+        deltaY = bestWidth;
+        deltaY += mousePosition.y - 
+                (positionOnScreen.y + GetSize().GetHeight());
+        wxRect newGeometry(positionOnParent.x, positionOnParent.y, GetSize().GetWidth(), 
+                GetSize().GetHeight() + deltaY);
+        if(mousePosition.y < limitPosY) {
+            newGeometry.SetSize(wxSize(newGeometry.GetWidth(), resizeLimit));
+        }
+        modify(newGeometry);
+        return;
+    }
     //if(zone == ict::W) {
     //    limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
     //    deltaX = -bestWidth;
