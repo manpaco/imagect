@@ -69,10 +69,12 @@ void Rectangle::mouseMotion(wxMouseEvent &event) {
         if(restricted) {
             int cx1 = restrictions.GetPosition().x, cx2 = restrictions.GetPosition().x + restrictions.GetSize().GetWidth();
             int nx1 = newGeometry.GetPosition().x, nx2 = newGeometry.GetPosition().x + newGeometry.GetSize().GetWidth();
-            if((nx1 < cx1) || (nx2 > cx2)) newGeometry.SetPosition(wxPoint(GetPosition().x, newGeometry.GetPosition().y));
+            if(nx1 < cx1) newGeometry.SetPosition(wxPoint(cx1, newGeometry.GetPosition().y));
+            if(nx2 > cx2) newGeometry.SetPosition(wxPoint(cx2 - GetSize().GetWidth(), newGeometry.GetPosition().y));
             int cy1 = restrictions.GetPosition().y, cy2 = restrictions.GetPosition().y + restrictions.GetSize().GetHeight();
             int ny1 = newGeometry.GetPosition().y, ny2 = newGeometry.GetPosition().y + newGeometry.GetSize().GetHeight();
-            if((ny1 < cy1) || (ny2 > cy2)) newGeometry.SetPosition(wxPoint(newGeometry.GetPosition().x, GetPosition().y));
+            if(ny1 < cy1) newGeometry.SetPosition(wxPoint(newGeometry.GetPosition().x, cy1));
+            if(ny2 > cy2) newGeometry.SetPosition(wxPoint(newGeometry.GetPosition().x, cy2 - GetSize().GetHeight()));
         }
         if(GetPosition() != newGeometry.GetPosition()) {
             Move(newGeometry.GetPosition());
