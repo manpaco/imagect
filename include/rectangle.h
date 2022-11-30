@@ -21,6 +21,10 @@ class Rectangle : public wxControl {
                 const wxSize &size=wxDefaultSize, long style=wxBORDER_NONE, 
                 const wxValidator &validator=wxDefaultValidator, 
                 const wxString &name=wxControlNameStr);    
+        void fixRatio(bool op);
+        bool fixRatio() const;
+        void setRestrictions(wxRect &r);
+        void activateRestrictions(bool op);
         ~Rectangle();
         
         wxDECLARE_DYNAMIC_CLASS(Rectangle);
@@ -29,7 +33,7 @@ class Rectangle : public wxControl {
         ict::Zone getLocation(const wxPoint);
         bool isContained(wxRect area, wxPoint point);
         void changeCursor(ict::Zone type);
-        void resizeUsing(ict::Zone);
+        bool resizeUsing(ict::Zone);
         void init();
         void onPaint(wxPaintEvent &);
         void mouseMotion(wxMouseEvent &);
@@ -46,6 +50,9 @@ class Rectangle : public wxControl {
 
         ict::Zone zonePressed = ict::NONE;
         float ratio;
+        bool fix = false;
+        wxRect restrictions;
+        bool restricted = false;
         bool changed = false;
 };
 

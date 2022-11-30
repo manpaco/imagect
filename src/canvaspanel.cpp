@@ -25,6 +25,8 @@ void CanvasPanel::setBindings() {
 void CanvasPanel::saveCropPosition(wxScrollWinEvent &event) {
     HandleOnScroll(event);
     oldCropPosition = cropArea->GetPosition();
+    wxRect r(img->GetPosition().x, img->GetPosition().y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
+    cropArea->setRestrictions(r);
     event.Skip();
 }
 
@@ -41,6 +43,8 @@ void CanvasPanel::updateCropPosition(wxSizeEvent &event) {
     shadow->Move(img->GetPosition().x - 2, img->GetPosition().y - 2);
     cropArea->Move(img->GetPosition().x + cropOffset.x, img->GetPosition().y + cropOffset.y);
     oldCropPosition = cropArea->GetPosition();
+    wxRect r(img->GetPosition().x, img->GetPosition().y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
+    cropArea->setRestrictions(r);
     event.Skip();
 }
 
@@ -80,6 +84,9 @@ void CanvasPanel::initCrop() {
     oldCropPosition = img->GetPosition();
     cropOffset = wxPoint(0, 0);
     cropArea->SetSize(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
+    wxRect r(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
+    cropArea->setRestrictions(r);
+    cropArea->activateRestrictions(true);
 }
 
 void CanvasPanel::initParams() {

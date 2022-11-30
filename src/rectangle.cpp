@@ -64,15 +64,43 @@ void Rectangle::mouseMotion(wxMouseEvent &event) {
     if(zonePressed == ict::INNER) {
         wxPoint screenPoint(wxGetMousePosition());
         screenPoint = screenPoint - clientPressPoint;
-        Move(GetParent()->ScreenToClient(screenPoint));
+        wxPoint parentClientPoint(GetParent()->ScreenToClient(screenPoint));
+        wxRect newGeometry(parentClientPoint.x, parentClientPoint.y, GetSize().GetWidth(), GetSize().GetHeight());
+        if(restricted) {
+            int cx1 = restrictions.GetPosition().x, cx2 = restrictions.GetPosition().x + restrictions.GetSize().GetWidth();
+            int nx1 = newGeometry.GetPosition().x, nx2 = newGeometry.GetPosition().x + newGeometry.GetSize().GetWidth();
+            if((nx1 < cx1) || (nx2 > cx2)) newGeometry.SetPosition(wxPoint(GetPosition().x, newGeometry.GetPosition().y));
+            int cy1 = restrictions.GetPosition().y, cy2 = restrictions.GetPosition().y + restrictions.GetSize().GetHeight();
+            int ny1 = newGeometry.GetPosition().y, ny2 = newGeometry.GetPosition().y + newGeometry.GetSize().GetHeight();
+            if((ny1 < cy1) || (ny2 > cy2)) newGeometry.SetPosition(wxPoint(newGeometry.GetPosition().x, GetPosition().y));
+        }
+        if(GetPosition() != newGeometry.GetPosition()) {
+            Move(newGeometry.GetPosition());
+            changed = true;
+        }
     } else {
-        resizeUsing(zonePressed);
+        changed = resizeUsing(zonePressed);
     }
-    changed = true;
     event.Skip();
 }
 
-void Rectangle::resizeUsing(ict::Zone zone){
+void Rectangle::fixRatio(bool op) {
+    fix = op;
+}
+
+bool Rectangle::fixRatio() const {
+    return fix;
+}
+
+void Rectangle::setRestrictions(wxRect &r) {
+    restrictions = r;
+}
+
+void Rectangle::activateRestrictions(bool op) {
+    restricted = op;
+}
+
+bool Rectangle::resizeUsing(ict::Zone zone){
     wxPoint mousePosition(wxGetMousePosition());
     wxPoint positionOnScreen(GetScreenPosition());
     wxPoint positionOnParent(GetPosition());
@@ -88,137 +116,135 @@ void Rectangle::resizeUsing(ict::Zone zone){
                 (positionOnScreen.x + GetSize().GetWidth());
         deltaY += mousePosition.y - 
                 (positionOnScreen.y + GetSize().GetHeight());
-        if(mousePosition.x < limitPosX && mousePosition.y < limitPosY) return;
-        if(mousePosition.x < limitPosX) {
-            SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
-                    GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING); 
-            return;
-        }
-        if(mousePosition.y < limitPosY) {
-            SetSize(wxDefaultCoord, wxDefaultCoord, 
-                    GetSize().GetWidth() + deltaX, wxDefaultCoord, 
-                    wxSIZE_USE_EXISTING); 
-            return;
-        }
-        SetSize(wxDefaultCoord, wxDefaultCoord, GetSize().GetWidth() + deltaX, 
+        wxRect newGeometry(positionOnParent.x, positionOnParent.y, GetSize().GetWidth() + deltaX, 
                 GetSize().GetHeight() + deltaY);
-        return;
-    }
-    if(zone == ict::NW) {
-        limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
-        limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
-        deltaX = -bestWidth;
-        deltaY = -bestWidth;
-        deltaX += mousePosition.x - positionOnScreen.x;
-        deltaY += mousePosition.y - positionOnScreen.y;
-        if(mousePosition.x > limitPosX && mousePosition.y > limitPosY) return;
-        if(mousePosition.x > limitPosX) {
-            SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
-                    wxDefaultCoord, GetSize().GetHeight() - deltaY, 
-                    wxSIZE_USE_EXISTING);
-            return;
-        }
-        if(mousePosition.y > limitPosY) {
-            SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
-                    GetSize().GetWidth() - deltaX, wxDefaultCoord, 
-                    wxSIZE_USE_EXISTING);
-            return;
-        }
-        SetSize(positionOnParent.x + deltaX, positionOnParent.y + deltaY, 
-                GetSize().GetWidth() - deltaX, GetSize().GetHeight() - deltaY);
-        return;
-    }
-    if(zone == ict::NE) {
-        limitPosX = positionOnScreen.x + resizeLimit;
-        limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
-        deltaX = bestWidth;
-        deltaY = -bestWidth;
-        deltaX += mousePosition.x - 
-                (positionOnScreen.x + GetSize().GetWidth());
-        deltaY += mousePosition.y - positionOnScreen.y;
-        if(mousePosition.x < limitPosX && mousePosition.y > limitPosY) return;
         if(mousePosition.x < limitPosX) {
-            SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
-                    wxDefaultCoord, GetSize().GetHeight() - deltaY, 
-                    wxSIZE_USE_EXISTING);
-            return;
-        }
-        if(mousePosition.y > limitPosY) {
-            SetSize(wxDefaultCoord, wxDefaultCoord, 
-                    GetSize().GetWidth() + deltaX, wxDefaultCoord, 
-                    wxSIZE_USE_EXISTING);
-            return;
-        }
-        SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
-                GetSize().GetWidth() + deltaX, 
-                GetSize().GetHeight() - deltaY, wxSIZE_USE_EXISTING);
-        return;
-    }
-    if(zone == ict::SW) {
-        limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
-        limitPosY = positionOnScreen.y + resizeLimit;
-        deltaX = -bestWidth;
-        deltaY = bestWidth;
-        deltaX += mousePosition.x - positionOnScreen.x;
-        deltaY += mousePosition.y - 
-                (positionOnScreen.y + GetSize().GetHeight());
-        if(mousePosition.x > limitPosX && mousePosition.y < limitPosY) return;
-        if(mousePosition.x > limitPosX) {
-            SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
-                    GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING);
-            return;
+            newGeometry.SetSize(wxSize(resizeLimit, newGeometry.GetHeight()));
         }
         if(mousePosition.y < limitPosY) {
-            SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
-                    GetSize().GetWidth() - deltaX, wxDefaultCoord, 
-                    wxSIZE_USE_EXISTING);
-            return;
+            newGeometry.SetSize(wxSize(newGeometry.GetWidth(), resizeLimit));
         }
-        SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
-                GetSize().GetWidth() - deltaX, GetSize().GetHeight() + deltaY, 
-                wxSIZE_USE_EXISTING);
-        return;
+        if(restricted) newGeometry.Intersect(restrictions);
+        SetSize(wxDefaultCoord, wxDefaultCoord, newGeometry.GetWidth(), 
+                newGeometry.GetHeight());
+        return true;
     }
-    if(zone == ict::N) {
-        limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
-        deltaY = -bestWidth;
-        deltaY += mousePosition.y - positionOnScreen.y;
-        if(mousePosition.y > limitPosY) return;
-        SetSize(wxDefaultCoord, positionOnParent.y + deltaY, wxDefaultCoord, 
-                GetSize().GetHeight() - deltaY, wxSIZE_USE_EXISTING);
-        return;
-    }
-    if(zone == ict::S) {
-        limitPosY = positionOnScreen.y + resizeLimit;
-        deltaY = bestWidth;
-        deltaY += mousePosition.y - 
-                (positionOnScreen.y + GetSize().GetHeight());
-        if(mousePosition.y < limitPosY) return;
-        SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
-                GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING);
-        return;
-    }
-    if(zone == ict::W) {
-        limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
-        deltaX = -bestWidth;
-        deltaX += mousePosition.x - positionOnScreen.x;
-        if(mousePosition.x > limitPosX) return;
-        SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
-                GetSize().GetWidth() - deltaX, wxDefaultCoord, 
-                wxSIZE_USE_EXISTING);
-        return;
-    }
-    if(zone == ict::E) {
-        limitPosX = positionOnScreen.x + resizeLimit;
-        deltaX = bestWidth;
-        deltaX += mousePosition.x - 
-                (positionOnScreen.x + GetSize().GetWidth());
-        if(mousePosition.x < limitPosX) return;
-        SetSize(wxDefaultCoord, wxDefaultCoord, 
-                GetSize().GetWidth() + deltaX, wxDefaultCoord, 
-                wxSIZE_USE_EXISTING);
-        return;
-    }
+    return false;
+    //if(zone == ict::NW) {
+    //    limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
+    //    limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
+    //    deltaX = -bestWidth;
+    //    deltaY = -bestWidth;
+    //    deltaX += mousePosition.x - positionOnScreen.x;
+    //    deltaY += mousePosition.y - positionOnScreen.y;
+    //    if(mousePosition.x > limitPosX && mousePosition.y > limitPosY) return;
+    //    if(mousePosition.x > limitPosX) {
+    //        SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
+    //                wxDefaultCoord, GetSize().GetHeight() - deltaY, 
+    //                wxSIZE_USE_EXISTING);
+    //        return;
+    //    }
+    //    if(mousePosition.y > limitPosY) {
+    //        SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
+    //                GetSize().GetWidth() - deltaX, wxDefaultCoord, 
+    //                wxSIZE_USE_EXISTING);
+    //        return;
+    //    }
+    //    SetSize(positionOnParent.x + deltaX, positionOnParent.y + deltaY, 
+    //            GetSize().GetWidth() - deltaX, GetSize().GetHeight() - deltaY);
+    //    return;
+    //}
+    //if(zone == ict::NE) {
+    //    limitPosX = positionOnScreen.x + resizeLimit;
+    //    limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
+    //    deltaX = bestWidth;
+    //    deltaY = -bestWidth;
+    //    deltaX += mousePosition.x - 
+    //            (positionOnScreen.x + GetSize().GetWidth());
+    //    deltaY += mousePosition.y - positionOnScreen.y;
+    //    if(mousePosition.x < limitPosX && mousePosition.y > limitPosY) return;
+    //    if(mousePosition.x < limitPosX) {
+    //        SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
+    //                wxDefaultCoord, GetSize().GetHeight() - deltaY, 
+    //                wxSIZE_USE_EXISTING);
+    //        return;
+    //    }
+    //    if(mousePosition.y > limitPosY) {
+    //        SetSize(wxDefaultCoord, wxDefaultCoord, 
+    //                GetSize().GetWidth() + deltaX, wxDefaultCoord, 
+    //                wxSIZE_USE_EXISTING);
+    //        return;
+    //    }
+    //    SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
+    //            GetSize().GetWidth() + deltaX, 
+    //            GetSize().GetHeight() - deltaY, wxSIZE_USE_EXISTING);
+    //    return;
+    //}
+    //if(zone == ict::SW) {
+    //    limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
+    //    limitPosY = positionOnScreen.y + resizeLimit;
+    //    deltaX = -bestWidth;
+    //    deltaY = bestWidth;
+    //    deltaX += mousePosition.x - positionOnScreen.x;
+    //    deltaY += mousePosition.y - 
+    //            (positionOnScreen.y + GetSize().GetHeight());
+    //    if(mousePosition.x > limitPosX && mousePosition.y < limitPosY) return;
+    //    if(mousePosition.x > limitPosX) {
+    //        SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
+    //                GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING);
+    //        return;
+    //    }
+    //    if(mousePosition.y < limitPosY) {
+    //        SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
+    //                GetSize().GetWidth() - deltaX, wxDefaultCoord, 
+    //                wxSIZE_USE_EXISTING);
+    //        return;
+    //    }
+    //    SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
+    //            GetSize().GetWidth() - deltaX, GetSize().GetHeight() + deltaY, 
+    //            wxSIZE_USE_EXISTING);
+    //    return;
+    //}
+    //if(zone == ict::N) {
+    //    limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
+    //    deltaY = -bestWidth;
+    //    deltaY += mousePosition.y - positionOnScreen.y;
+    //    if(mousePosition.y > limitPosY) return;
+    //    SetSize(wxDefaultCoord, positionOnParent.y + deltaY, wxDefaultCoord, 
+    //            GetSize().GetHeight() - deltaY, wxSIZE_USE_EXISTING);
+    //    return;
+    //}
+    //if(zone == ict::S) {
+    //    limitPosY = positionOnScreen.y + resizeLimit;
+    //    deltaY = bestWidth;
+    //    deltaY += mousePosition.y - 
+    //            (positionOnScreen.y + GetSize().GetHeight());
+    //    if(mousePosition.y < limitPosY) return;
+    //    SetSize(wxDefaultCoord, wxDefaultCoord, wxDefaultCoord, 
+    //            GetSize().GetHeight() + deltaY, wxSIZE_USE_EXISTING);
+    //    return;
+    //}
+    //if(zone == ict::W) {
+    //    limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
+    //    deltaX = -bestWidth;
+    //    deltaX += mousePosition.x - positionOnScreen.x;
+    //    if(mousePosition.x > limitPosX) return;
+    //    SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
+    //            GetSize().GetWidth() - deltaX, wxDefaultCoord, 
+    //            wxSIZE_USE_EXISTING);
+    //    return;
+    //}
+    //if(zone == ict::E) {
+    //    limitPosX = positionOnScreen.x + resizeLimit;
+    //    deltaX = bestWidth;
+    //    deltaX += mousePosition.x - 
+    //            (positionOnScreen.x + GetSize().GetWidth());
+    //    if(mousePosition.x < limitPosX) return;
+    //    SetSize(wxDefaultCoord, wxDefaultCoord, 
+    //            GetSize().GetWidth() + deltaX, wxDefaultCoord, 
+    //            wxSIZE_USE_EXISTING);
+    //    return;
+    //}
 }
 
 void Rectangle::changeCursor(ict::Zone type) {
