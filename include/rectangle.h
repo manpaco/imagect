@@ -23,6 +23,7 @@ class Rectangle : public wxControl {
                 const wxString &name=wxControlNameStr);    
         void fixRatio(bool op);
         bool fixRatio() const;
+        void setRatio(float r);
         void setRestrictions(wxRect &r);
         void activateRestrictions(bool op);
         void resize(wxSize &s);
@@ -44,6 +45,8 @@ class Rectangle : public wxControl {
         void enterWinHandler(wxMouseEvent &);
         void updateSizes(wxSizeEvent &);
         void paintSpecialFrame(const wxRect &, wxGraphicsContext *, bool);
+        void accumulateX(int &dxToCalc, int &dyToUse);
+        void accumulateY(int &dyToCalc, int &dxToUse);
 
         wxPoint clientPressPoint;
         wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
@@ -52,6 +55,7 @@ class Rectangle : public wxControl {
         ict::Zone zonePressed = ict::NONE;
         float ratio;
         bool fix = false;
+        float accumX = 0.0, accumY = 0.0;
         wxRect restrictions;
         bool restricted = false;
         wxRect rectInPress;
