@@ -199,15 +199,19 @@ void Rectangle::resizeUsing(ict::Zone zone){
         modify(newGeometry);
         return;
     }
-    //if(zone == ict::N) {
-    //    limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
-    //    deltaY = -bestWidth;
-    //    deltaY += mousePosition.y - positionOnScreen.y;
-    //    if(mousePosition.y > limitPosY) return;
-    //    SetSize(wxDefaultCoord, positionOnParent.y + deltaY, wxDefaultCoord, 
-    //            GetSize().GetHeight() - deltaY, wxSIZE_USE_EXISTING);
-    //    return;
-    //}
+    if(zone == ict::N) {
+        limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
+        deltaY = -bestWidth;
+        deltaY += mousePosition.y - positionOnScreen.y;
+        wxRect newGeometry(positionOnParent.x, positionOnParent.y + deltaY, GetSize().GetWidth(), 
+                GetSize().GetHeight() - deltaY);
+        if(mousePosition.y > limitPosY) {
+            newGeometry.SetPosition(wxPoint(newGeometry.GetX(), (GetPosition().y + GetSize().GetHeight()) - resizeLimit));
+            newGeometry.SetSize(wxSize(newGeometry.GetWidth(), resizeLimit));
+        }
+        modify(newGeometry);
+        return;
+    }
     //if(zone == ict::S) {
     //    limitPosY = positionOnScreen.y + resizeLimit;
     //    deltaY = bestWidth;
