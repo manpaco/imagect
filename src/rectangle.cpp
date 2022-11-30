@@ -225,16 +225,19 @@ void Rectangle::resizeUsing(ict::Zone zone){
         modify(newGeometry);
         return;
     }
-    //if(zone == ict::W) {
-    //    limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
-    //    deltaX = -bestWidth;
-    //    deltaX += mousePosition.x - positionOnScreen.x;
-    //    if(mousePosition.x > limitPosX) return;
-    //    SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
-    //            GetSize().GetWidth() - deltaX, wxDefaultCoord, 
-    //            wxSIZE_USE_EXISTING);
-    //    return;
-    //}
+    if(zone == ict::W) {
+        limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
+        deltaX = -bestWidth;
+        deltaX += mousePosition.x - positionOnScreen.x;
+        wxRect newGeometry(positionOnParent.x + deltaX, positionOnParent.y, 
+                GetSize().GetWidth() - deltaX, GetSize().GetHeight());
+        if(mousePosition.x > limitPosX) {
+            newGeometry.SetPosition(wxPoint((GetPosition().x + GetSize().GetWidth()) - resizeLimit, newGeometry.GetY()));
+            newGeometry.SetSize(wxSize(resizeLimit, newGeometry.GetHeight()));
+        }
+        modify(newGeometry);
+        return;
+    }
     //if(zone == ict::E) {
     //    limitPosX = positionOnScreen.x + resizeLimit;
     //    deltaX = bestWidth;
