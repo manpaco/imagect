@@ -101,9 +101,13 @@ void Rectangle::activateRestrictions(bool op) {
 
 void Rectangle::resize(wxSize &s) {
     wxRect newGeometry(GetPosition(), s);
-    if(restricted) newGeometry.Intersect(restrictions);
+    modify(newGeometry);
     s = newGeometry.GetSize();
-    SetSize(s);
+}
+
+void Rectangle::modify(wxRect &ng) {
+    if(restricted) ng.Intersect(restrictions);
+    SetSize(ng.GetX(), ng.GetY(), ng.GetWidth(), ng.GetHeight());
 }
 
 void Rectangle::resizeUsing(ict::Zone zone){
@@ -130,35 +134,30 @@ void Rectangle::resizeUsing(ict::Zone zone){
         if(mousePosition.y < limitPosY) {
             newGeometry.SetSize(wxSize(newGeometry.GetWidth(), resizeLimit));
         }
-        if(restricted) newGeometry.Intersect(restrictions);
-        SetSize(wxDefaultCoord, wxDefaultCoord, newGeometry.GetWidth(), 
-                newGeometry.GetHeight());
+        modify(newGeometry);
         return;
     }
-    //if(zone == ict::NW) {
-    //    limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
-    //    limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
-    //    deltaX = -bestWidth;
-    //    deltaY = -bestWidth;
-    //    deltaX += mousePosition.x - positionOnScreen.x;
-    //    deltaY += mousePosition.y - positionOnScreen.y;
-    //    if(mousePosition.x > limitPosX && mousePosition.y > limitPosY) return;
-    //    if(mousePosition.x > limitPosX) {
-    //        SetSize(wxDefaultCoord, positionOnParent.y + deltaY, 
-    //                wxDefaultCoord, GetSize().GetHeight() - deltaY, 
-    //                wxSIZE_USE_EXISTING);
-    //        return;
-    //    }
-    //    if(mousePosition.y > limitPosY) {
-    //        SetSize(positionOnParent.x + deltaX, wxDefaultCoord, 
-    //                GetSize().GetWidth() - deltaX, wxDefaultCoord, 
-    //                wxSIZE_USE_EXISTING);
-    //        return;
-    //    }
-    //    SetSize(positionOnParent.x + deltaX, positionOnParent.y + deltaY, 
-    //            GetSize().GetWidth() - deltaX, GetSize().GetHeight() - deltaY);
-    //    return;
-    //}
+    if(zone == ict::NW) {
+        limitPosX = (positionOnScreen.x + GetSize().GetWidth()) - resizeLimit;
+        limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
+        deltaX = -bestWidth;
+        deltaY = -bestWidth;
+        deltaX += mousePosition.x - positionOnScreen.x;
+        deltaY += mousePosition.y - positionOnScreen.y;
+        wxRect newGeometry(positionOnParent.x + deltaX, positionOnParent.y + deltaY,
+                GetSize().GetWidth() - deltaX, GetSize().GetHeight() - deltaY);
+        if(mousePosition.x > limitPosX) {
+            newGeometry.SetPosition(wxPoint((GetPosition().x + GetSize().GetWidth()) - resizeLimit, newGeometry.GetPosition().y));
+            newGeometry.SetSize(wxSize(resizeLimit, newGeometry.GetHeight()));
+        }
+        if(mousePosition.y > limitPosY) {
+            newGeometry.SetPosition(wxPoint(newGeometry.GetPosition().x, 
+                        (GetPosition().y + GetSize().GetHeight()) - resizeLimit));
+            newGeometry.SetSize(wxSize(newGeometry.GetWidth(), resizeLimit));
+        }
+        modify(newGeometry);
+        return;
+    }
     //if(zone == ict::NE) {
     //    limitPosX = positionOnScreen.x + resizeLimit;
     //    limitPosY = (positionOnScreen.y + GetSize().GetHeight()) - resizeLimit;
