@@ -298,24 +298,16 @@ void Rectangle::mouseRelease(wxMouseEvent &event) {
 }
 
 ict::Zone Rectangle::getLocation(const wxPoint p) {
-    if(isContained(nez, p)) return ict::NE;
-    if(isContained(nwz, p)) return ict::NW;
-    if(isContained(sez, p)) return ict::SE;
-    if(isContained(swz, p)) return ict::SW;
-    if(isContained(nz, p)) return ict::N;
-    if(isContained(sz, p)) return ict::S;
-    if(isContained(ez, p)) return ict::E;
-    if(isContained(wz, p)) return ict::W;
-    if(isContained(iz, p)) return ict::INNER;
+    if(nez.Contains(p)) return ict::NE;
+    if(nwz.Contains(p)) return ict::NW;
+    if(sez.Contains(p)) return ict::SE;
+    if(swz.Contains(p)) return ict::SW;
+    if(nz.Contains(p)) return ict::N;
+    if(sz.Contains(p)) return ict::S;
+    if(ez.Contains(p)) return ict::E;
+    if(wz.Contains(p)) return ict::W;
+    if(iz.Contains(p)) return ict::INNER;
     return ict::NONE;
-}
-
-bool Rectangle::isContained(wxRect area, wxPoint point) {
-    int rightSide = area.GetWidth() + area.GetX();
-    int bottomSide = area.GetHeight() + area.GetY();
-    if((area.GetX() <= point.x && point.x <= rightSide) &&
-        (area.GetY() <= point.y && point.y <= bottomSide)) return true;
-    return false;
 }
 
 void Rectangle::paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill) {

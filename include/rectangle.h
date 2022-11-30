@@ -33,7 +33,6 @@ class Rectangle : public wxControl {
 
     private:
         ict::Zone getLocation(const wxPoint);
-        bool isContained(wxRect area, wxPoint point);
         void changeCursor(ict::Zone type);
         void resizeUsing(ict::Zone);
         void init();
