@@ -102,19 +102,54 @@ void Rectangle::activateRestrictions(bool op) {
 }
 
 void Rectangle::resize(wxSize &s) {
+    if(fix) fixHint = ict::SE;
     wxRect newGeometry(GetPosition(), s);
     modify(newGeometry);
     s = newGeometry.GetSize();
 }
 
+void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
+    bool exceedsTopY = fixRatioRect.GetY() < restrictions.GetY();
+    bool exceedsBottomY = (fixRatioRect.GetY() + fixRatioRect.GetHeight()) > (restrictions.GetY() + restrictions.GetHeight());
+    bool exceedsLeftX = fixRatioRect.GetX() < restrictions.GetX();
+    bool exceedsRightX = (fixRatioRect.GetX() + fixRatioRect.GetWidth()) > (restrictions.GetX() + restrictions.GetWidth());
+    wxRect aux(fixRatioRect);
+    aux.Intersect(restrictions);
+    if(fixHint == ict::SE) {
+        if(exceedsRightX) {
+            int newWidth, newHeight;
+            newWidth = aux.GetWidth();
+            defineY(newHeight, newWidth);
+            fixRatioRect.SetSize(wxSize(newWidth, newHeight));
+            exceedsBottomY = (fixRatioRect.GetY() + fixRatioRect.GetHeight()) > (restrictions.GetY() + restrictions.GetHeight());
+        }
+        if(exceedsBottomY) {
+            int newWidth, newHeight;
+            newHeight = aux.GetHeight();
+            defineX(newWidth, newHeight);
+            fixRatioRect.SetSize(wxSize(newWidth, newHeight));
+        }
+    }
+}
+
 void Rectangle::modify(wxRect &ng) {
     if(restricted && !restrictions.Contains(ng)) {
         if(!fix) ng.Intersect(restrictions);
-        else {
-
-        }
+        else fitInRestrictions(ng);
     }
     SetSize(ng.GetX(), ng.GetY(), ng.GetWidth(), ng.GetHeight());
+}
+
+void Rectangle::defineX(int &dxToCalc, int &dyToUse) {
+    accumX = (float)dyToUse * ratio;
+    dxToCalc = std::floor(accumX);
+    accumX -= dxToCalc;
+}
+
+void Rectangle::defineY(int &dyToCalc, int &dxToUse) {
+    accumY = (float)dxToUse / ratio;
+    dyToCalc = std::floor(accumY);
+    accumY -= dyToCalc;
 }
 
 void Rectangle::accumulateX(int &dxToCalc, int &dyToUse) {
@@ -130,6 +165,7 @@ void Rectangle::accumulateY(int &dyToCalc, int &dxToUse) {
 }
 
 void Rectangle::resizeUsing(ict::Zone zone){
+    if(fix) fixHint = zone;
     wxPoint mousePosition(wxGetMousePosition());
     wxPoint positionOnScreen(GetScreenPosition());
     wxPoint positionOnParent(GetPosition());

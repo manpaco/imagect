@@ -27,7 +27,6 @@ class Rectangle : public wxControl {
         void setRestrictions(wxRect &r);
         void activateRestrictions(bool op);
         void resize(wxSize &s);
-        void modify(wxRect &ng);
         ~Rectangle();
         
         wxDECLARE_DYNAMIC_CLASS(Rectangle);
@@ -35,7 +34,9 @@ class Rectangle : public wxControl {
     private:
         ict::Zone getLocation(const wxPoint);
         void changeCursor(ict::Zone type);
+        void modify(wxRect &ng);
         void resizeUsing(ict::Zone);
+        void fitInRestrictions(wxRect &fixRatioRect);
         void init();
         void onPaint(wxPaintEvent &);
         void mouseMotion(wxMouseEvent &);
@@ -47,18 +48,21 @@ class Rectangle : public wxControl {
         void paintSpecialFrame(const wxRect &, wxGraphicsContext *, bool);
         void accumulateX(int &dxToCalc, int &dyToUse);
         void accumulateY(int &dyToCalc, int &dxToUse);
+        void defineX(int &dxToCalc, int &dyToUse);
+        void defineY(int &dyToCalc, int &dxToUse);
 
         wxPoint clientPressPoint;
         wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
         bool mouseLeftWin = true;
-
         ict::Zone zonePressed = ict::NONE;
+        wxRect rectInPress;
+
         float ratio;
         bool fix = false;
         float accumX = 0.0, accumY = 0.0;
         wxRect restrictions;
         bool restricted = false;
-        wxRect rectInPress;
+        ict::Zone fixHint;
 };
 
 wxDECLARE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);
