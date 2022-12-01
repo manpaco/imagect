@@ -4,6 +4,7 @@
 #include "cropevent.h"
 #include "identifiersdef.h"
 #include "previewpanel.h"
+#include "toolspanel.h"
 #include "wx/splitter.h"
 #include "imgtools.h"
 
@@ -56,10 +57,20 @@ void MainFrame::setBindings() {
 
 void MainFrame::onCropChange(CropEvent &event) {
     // update preview
+    Magick::Geometry crop(event.getSize().GetWidth(), event.getSize().GetHeight(), event.getOffset().x, event.getOffset().y);
+    Magick::Image ext(extractArea(crop, *lowResImg));
+    if(dumpBitmap) delete dumpBitmap;
+    dumpBitmap = createBitmap(ext);
+    updatePreview();
+
+    std::cout << ext.columns() << " - " << ext.rows() << std::endl;
+    std::cout << dumpBitmap->GetWidth() << " - " << dumpBitmap->GetHeight() << std::endl;
 }
 
 void MainFrame::applyChanges(wxCommandEvent &event) {
     // update preview and/or update crop rectangle
+    OptionsContainer attribs = tools->currentStatus();
+    
 }
 
 void MainFrame::updatePreview() {
