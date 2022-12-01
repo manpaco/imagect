@@ -376,7 +376,10 @@ void Rectangle::paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, bo
     gc->SetPen(wLine);
     gc->DrawRectangle(paint.GetX() + 1, paint.GetY() + 1, paint.GetWidth() - 3, paint.GetHeight() - 3);
     gc->SetPen(bLine);
-    if(fill) gc->SetBrush(wxBrush(wxColour(*wxWHITE)));
+    if(fill) { 
+        gc->SetBrush(wxBrush(wxColour(*wxWHITE)));
+        gc->SetPen(wxPen(wxColour(*wxWHITE)));
+    }
     gc->DrawRectangle(paint.GetX() + 2, paint.GetY() + 2, paint.GetWidth() - 5, paint.GetHeight() - 5);
 }
 
