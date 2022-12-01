@@ -116,7 +116,7 @@ void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
     wxRect aux(fixRatioRect);
     aux.Intersect(restrictions);
     int newWidth, newHeight;
-    if(fixHint == ict::SE) {
+    if(fixHint == ict::SE || fixHint == ict::S) {
         if(exceedsRightX) {
             newWidth = aux.GetWidth();
             defineY(newHeight, newWidth);
@@ -129,7 +129,7 @@ void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
             fixRatioRect.SetSize(wxSize(newWidth, newHeight));
         }
     }
-    if(fixHint == ict::SW) {
+    if(fixHint == ict::SW || fixHint == ict::W) {
         if(exceedsLeftX) {
             newWidth = aux.GetWidth();
             defineY(newHeight, newWidth);
@@ -145,7 +145,7 @@ void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
             fixRatioRect.SetPosition(newPos);
         }
     }
-    if(fixHint == ict::NE) {
+    if(fixHint == ict::NE || fixHint == ict::E) {
         if(exceedsRightX) {
             newWidth = aux.GetWidth();
             defineY(newHeight, newWidth);
@@ -159,6 +159,23 @@ void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
             defineX(newWidth, newHeight);
             fixRatioRect.SetSize(wxSize(newWidth, newHeight));
             fixRatioRect.SetPosition(wxPoint(fixRatioRect.GetX(), restrictions.GetY()));
+        }
+    }
+    if(fixHint == ict::NW || fixHint == ict::N) {
+        if(exceedsLeftX) {
+            newWidth = aux.GetWidth();
+            defineY(newHeight, newWidth);
+            wxPoint newPos(restrictions.GetX(), fixRatioRect.GetY() + fixRatioRect.GetHeight() - newHeight);
+            fixRatioRect.SetSize(wxSize(newWidth, newHeight));
+            fixRatioRect.SetPosition(newPos);
+            exceedsTopY = fixRatioRect.GetY() < restrictions.GetY();
+        }
+        if(exceedsTopY) {
+            newHeight = aux.GetHeight();
+            defineX(newWidth, newHeight);
+            wxPoint newPos(fixRatioRect.GetX() + fixRatioRect.GetWidth() - newWidth, restrictions.GetY());
+            fixRatioRect.SetSize(wxSize(newWidth, newHeight));
+            fixRatioRect.SetPosition(newPos);
         }
     }
 }
