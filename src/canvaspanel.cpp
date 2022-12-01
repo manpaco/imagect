@@ -83,12 +83,12 @@ void CanvasPanel::initShadow() {
 void CanvasPanel::initCrop() {
     oldCropPosition = img->GetPosition();
     cropOffset = wxPoint(0, 0);
-    cropArea->SetSize(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetWidth() / 2);
+    cropArea->SetSize(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
     wxRect r(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
     cropArea->setRestrictions(r);
-    cropArea->activateRestrictions(true);
-    cropArea->setRatio(2);
-    cropArea->fixRatio(true);
+    //cropArea->activateRestrictions(true);
+    //cropArea->setRatio(2);
+    //cropArea->fixRatio(true);
 }
 
 void CanvasPanel::initParams() {
