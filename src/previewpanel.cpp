@@ -32,6 +32,7 @@ void PreviewPanel::setPreview(wxBitmap &bm) {
         sz->Add(preview, 0, wxALIGN_CENTER);
         Fit();
     } else preview->updateImage(bm);
+    Layout();
 }
 
 void PreviewPanel::updatePreview(wxBitmap &bm) {

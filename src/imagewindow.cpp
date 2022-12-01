@@ -2,7 +2,7 @@
 
 ImageWindow::ImageWindow(wxWindow *parent, wxWindowID id, wxBitmap &bm, const wxPoint &pos, const wxSize &size) {
     Create(parent, id, pos, size);
-    setImage(bm);
+    updateImage(bm);
     setBindings();
 }
 
@@ -25,6 +25,7 @@ void ImageWindow::setBindings() {
 
 void ImageWindow::updateImage(wxBitmap &bm) {
     setImage(bm);
+    Refresh();
 }
 
 void ImageWindow::onPaint(wxPaintEvent &event) {
