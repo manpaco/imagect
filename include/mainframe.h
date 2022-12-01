@@ -37,7 +37,6 @@ class MainFrame: public wxFrame {
         wxBoxSizer *mainSizer = nullptr;
         Magick::Image *sourceImg = nullptr;
         Magick::Image *lowResImg = nullptr;
-        wxBitmap *dumpBitmap = nullptr;
 
 };
 

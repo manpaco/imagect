@@ -19,7 +19,6 @@ MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Croping Tool") {
 MainFrame::~MainFrame() {
     if(sourceImg) delete(sourceImg);
     if(lowResImg) delete(lowResImg);
-    if(dumpBitmap) delete(dumpBitmap);
 }
 
 void MainFrame::allocateMem() {
@@ -59,7 +58,6 @@ void MainFrame::onCropChange(CropEvent &event) {
     // update preview
     Magick::Geometry crop(event.getSize().GetWidth(), event.getSize().GetHeight(), event.getOffset().x, event.getOffset().y);
     Magick::Image ext(extractArea(crop, *lowResImg));
-    if(dumpBitmap) delete dumpBitmap;
     wxBitmap newPreview = createBitmap(ext);
     updatePreview(newPreview);
 }
