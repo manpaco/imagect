@@ -27,18 +27,18 @@ void MainFrame::allocateMem() {
     lowResImg = new Magick::Image(*sourceImg);
     Magick::Geometry newRes(lowResImg->columns() * 0.3, lowResImg->rows() * 0.3);
     lowResImg->zoom(newRes);
-    dumpBitmap = createBitmap(*lowResImg);
+    wxBitmap initBitmap = createBitmap(*lowResImg);
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
-    canvas = new CanvasPanel(mainSplitter, ict::CANVAS, *dumpBitmap);
+    canvas = new CanvasPanel(mainSplitter, ict::CANVAS, initBitmap);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxHORIZONTAL);
-    updatePreview();
+    updatePreview(initBitmap);
 }
 
-wxBitmap * MainFrame::createBitmap(Magick::Image &img) {
-    return new wxBitmap(wxImage(img.columns(), img.rows(), 
+wxBitmap MainFrame::createBitmap(Magick::Image &img) {
+    return wxBitmap(wxImage(img.columns(), img.rows(), 
             extractRgb(img), extractAlpha(img)));
 }
 
@@ -60,11 +60,8 @@ void MainFrame::onCropChange(CropEvent &event) {
     Magick::Geometry crop(event.getSize().GetWidth(), event.getSize().GetHeight(), event.getOffset().x, event.getOffset().y);
     Magick::Image ext(extractArea(crop, *lowResImg));
     if(dumpBitmap) delete dumpBitmap;
-    dumpBitmap = createBitmap(ext);
-    updatePreview();
-
-    std::cout << ext.columns() << " - " << ext.rows() << std::endl;
-    std::cout << dumpBitmap->GetWidth() << " - " << dumpBitmap->GetHeight() << std::endl;
+    wxBitmap newPreview = createBitmap(ext);
+    updatePreview(newPreview);
 }
 
 void MainFrame::applyChanges(wxCommandEvent &event) {
@@ -73,6 +70,6 @@ void MainFrame::applyChanges(wxCommandEvent &event) {
     
 }
 
-void MainFrame::updatePreview() {
-    preview->updatePreview(*dumpBitmap);
+void MainFrame::updatePreview(wxBitmap &bm) {
+    preview->updatePreview(bm);
 }

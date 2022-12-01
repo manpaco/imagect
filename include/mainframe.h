@@ -21,12 +21,12 @@ class MainFrame: public wxFrame {
         ~MainFrame();
 
     private:
-        void updatePreview();
+        void updatePreview(wxBitmap &bm);
         void allocateMem();
         void setBindings();
         void overlayPanels();
         void applyChanges(wxCommandEvent &);
-        wxBitmap * createBitmap(Magick::Image &img);
+        wxBitmap createBitmap(Magick::Image &img);
         void onCropChange(CropEvent &);
 
         CanvasPanel *canvas = nullptr;
