@@ -1,4 +1,6 @@
 #include "imgtools.h"
+#include <cmath>
+#include <cstdlib>
 
 using Magick::Quantum;
 
@@ -27,6 +29,7 @@ void overlap(const Magick::Image &overlay, Magick::Image &background, bool fit,
 
 Magick::Image extractArea(const Magick::Geometry area, Magick::Image target) {
     Magick::Image extracted(area, Magick::Color(0, 0, 0, QuantumRange));
+    if(!isContained(area, target)) return extracted;
     target.crop(area);
 
     int xOff, yOff;
@@ -42,6 +45,15 @@ Magick::Image extractArea(const Magick::Geometry area, Magick::Image target) {
 }
 
 bool isContained(const Magick::Geometry &area, const Magick::Image &image) {
+    bool outX = false, outY = false;
+    outX = area.xOff() >= image.columns();
+    if(area.xOff() < 0) outX = abs(area.xOff()) >= area.width();
+    outY = area.yOff() >= image.rows();
+    if(area.yOff() < 0) outY = abs(area.yOff()) >= area.height();
+    return !outX && !outY;
+}
+
+bool isFullyContained(const Magick::Geometry &area, const Magick::Image &image) {
     if((area.xOff() <= 0) && (area.yOff() <= 0)) {
         int right = area.width() + area.xOff();
         int down = area.height() + area.yOff();
