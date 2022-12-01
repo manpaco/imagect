@@ -145,6 +145,22 @@ void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
             fixRatioRect.SetPosition(newPos);
         }
     }
+    if(fixHint == ict::NE) {
+        if(exceedsRightX) {
+            newWidth = aux.GetWidth();
+            defineY(newHeight, newWidth);
+            wxPoint newPos(fixRatioRect.GetX(), fixRatioRect.GetY() + fixRatioRect.GetHeight() - newHeight);
+            fixRatioRect.SetSize(wxSize(newWidth, newHeight));
+            fixRatioRect.SetPosition(newPos);
+            exceedsTopY = fixRatioRect.GetY() < restrictions.GetY();
+        }
+        if(exceedsTopY) {
+            newHeight = aux.GetHeight();
+            defineX(newWidth, newHeight);
+            fixRatioRect.SetSize(wxSize(newWidth, newHeight));
+            fixRatioRect.SetPosition(wxPoint(fixRatioRect.GetX(), restrictions.GetY()));
+        }
+    }
 }
 
 void Rectangle::modify(wxRect &ng) {
