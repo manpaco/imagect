@@ -29,7 +29,13 @@ Magick::Image extractArea(const Magick::Geometry area, Magick::Image target) {
     Magick::Image extracted(area, Magick::Color(0, 0, 0, QuantumRange));
     target.crop(area);
 
-    Magick::Geometry compOff(0, 0, abs(area.xOff()), abs(area.yOff()));
+    int xOff, yOff;
+    if(area.xOff() < 0) xOff = abs(area.xOff());
+    else xOff = 0;
+    if(area.yOff() < 0) yOff = abs(area.xOff());
+    else yOff = 0;
+
+    Magick::Geometry compOff(0, 0, xOff, yOff);
     extracted.composite(target, compOff, Magick::OverCompositeOp);
 
     return extracted;
