@@ -115,19 +115,34 @@ void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
     bool exceedsRightX = (fixRatioRect.GetX() + fixRatioRect.GetWidth()) > (restrictions.GetX() + restrictions.GetWidth());
     wxRect aux(fixRatioRect);
     aux.Intersect(restrictions);
+    int newWidth, newHeight;
     if(fixHint == ict::SE) {
         if(exceedsRightX) {
-            int newWidth, newHeight;
             newWidth = aux.GetWidth();
             defineY(newHeight, newWidth);
             fixRatioRect.SetSize(wxSize(newWidth, newHeight));
             exceedsBottomY = (fixRatioRect.GetY() + fixRatioRect.GetHeight()) > (restrictions.GetY() + restrictions.GetHeight());
         }
         if(exceedsBottomY) {
-            int newWidth, newHeight;
             newHeight = aux.GetHeight();
             defineX(newWidth, newHeight);
             fixRatioRect.SetSize(wxSize(newWidth, newHeight));
+        }
+    }
+    if(fixHint == ict::SW) {
+        if(exceedsLeftX) {
+            newWidth = aux.GetWidth();
+            defineY(newHeight, newWidth);
+            fixRatioRect.SetSize(wxSize(newWidth, newHeight));
+            fixRatioRect.SetPosition(wxPoint(restrictions.GetX(), fixRatioRect.GetY()));
+            exceedsBottomY = (fixRatioRect.GetY() + fixRatioRect.GetHeight()) > (restrictions.GetY() + restrictions.GetHeight());
+        }
+        if(exceedsBottomY) {
+            newHeight = aux.GetHeight();
+            defineX(newWidth, newHeight);
+            wxPoint newPos(fixRatioRect.GetX() + fixRatioRect.GetWidth() - newWidth, fixRatioRect.GetY());
+            fixRatioRect.SetSize(wxSize(newWidth, newHeight));
+            fixRatioRect.SetPosition(newPos);
         }
     }
 }
