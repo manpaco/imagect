@@ -107,13 +107,11 @@ void Rectangle::activateRestrictions(bool op) {
     restricted = op;
 }
 
-void Rectangle::resize(wxSize &s) {
+void Rectangle::changeSize(wxSize &s) {
     if(fix) fixHint = ict::SE;
-    wxRect previousRect(GetRect());
     wxRect newGeometry(GetPosition(), s);
     modify(newGeometry);
     s = newGeometry.GetSize();
-    if(previousRect != GetRect()) sendChangeEvent();
 }
 
 void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {

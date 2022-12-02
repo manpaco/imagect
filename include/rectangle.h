@@ -26,7 +26,7 @@ class Rectangle : public wxControl {
         void setRatio(float r);
         void setRestrictions(wxRect &r);
         void activateRestrictions(bool op);
-        void resize(wxSize &s);
+        void changeSize(wxSize &s);
         void sendChangeEvent();
         ~Rectangle();
         
