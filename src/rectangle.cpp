@@ -125,8 +125,7 @@ void Rectangle::changeSize(wxSize &s) {
     wxPoint prevPos = GetPosition();
     wxPoint p = prevPos;
     if(restricted)
-        if((GetPosition().x < restrictions.GetPosition().x) || (GetPosition().y < restrictions.GetPosition().y))
-            p = restrictions.GetPosition();
+        if(!restrictions.Contains(p)) p = restrictions.GetPosition();
     wxRect newGeometry(p, s);
     modify(newGeometry);
     s = newGeometry.GetSize();
