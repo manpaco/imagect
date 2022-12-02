@@ -48,6 +48,13 @@ void CanvasPanel::updateCropPosition(wxSizeEvent &event) {
     event.Skip();
 }
 
+void CanvasPanel::cropGeometry(const wxRect &g) {
+    cropOffset = g.GetPosition();
+    cropArea->SetSize(g.GetSize());
+    cropArea->Move(img->GetPosition().x + cropOffset.x, img->GetPosition().y + cropOffset.y);
+    oldCropPosition = cropArea->GetPosition();
+}
+
 wxPoint CanvasPanel::getCropOffset() const {
     return cropOffset;
 }

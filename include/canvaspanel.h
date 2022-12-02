@@ -20,6 +20,7 @@ class CanvasPanel: public wxScrolledCanvas {
         void updateCanvas(wxBitmap &);
         void cropSize(wxSize &s);
         wxPoint getCropOffset() const;
+        void cropGeometry(const wxRect &g);
         ~CanvasPanel();
 
     private:
