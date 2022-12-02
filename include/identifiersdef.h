@@ -19,6 +19,8 @@ enum ControlID {
     SHAPE_CH,
 
     APPLY_BT,
+    UNDO_BT,
+    REDO_BT,
     EXPORT_BT,
 
     CROP_AREA
