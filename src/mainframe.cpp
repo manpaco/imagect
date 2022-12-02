@@ -57,8 +57,8 @@ void MainFrame::overlayPanels() {
 void MainFrame::setBindings() {
     tools->Bind(wxEVT_BUTTON, &MainFrame::saveOpts, this, ict::APPLY_BT);
     canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
-    tools->Bind(wxEVT_BUTTON, &MainFrame::undo, this, 5432);
-    tools->Bind(wxEVT_BUTTON, &MainFrame::redo, this, 5433);
+    tools->Bind(wxEVT_BUTTON, &MainFrame::undo, this, ict::UNDO_BT);
+    tools->Bind(wxEVT_BUTTON, &MainFrame::redo, this, ict::REDO_BT);
 }
 
 void MainFrame::undo(wxCommandEvent &event) {
