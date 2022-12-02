@@ -60,6 +60,8 @@ class ToolsPanel: public wxScrolledCanvas {
         void cropSize(const wxSize &s);
         wxSize cropSize() const;
         OptionsContainer currentOpts() const;
+        void enableUndo(bool);
+        void enableRedo(bool);
         ~ToolsPanel();
 
     private:
@@ -77,6 +79,7 @@ class ToolsPanel: public wxScrolledCanvas {
         void setBindings();
         void createTools();
         void overlayTools();
+        void createButtons();
         void createAspectBlock();
         void createGrowBlock();
         void createShapeBlock();
@@ -108,9 +111,11 @@ class ToolsPanel: public wxScrolledCanvas {
         wxChoice *shapeSelector;
         wxString shapeChoices[ict::SHAPE_CHOICE_SIZE];
 
-        wxButton *apply;
         wxBoxSizer *toolsSizer;
         OptionsContainer opts;
+
+        wxBoxSizer *btsSizer;
+        wxButton *undo, *redo, *apply;
 
 };
 

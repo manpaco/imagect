@@ -28,6 +28,14 @@ void ToolsPanel::setBindings() {
     Bind(wxEVT_SCROLL_THUMBRELEASE, &ToolsPanel::blurChange, this, ict::BACK_BLUR_SL);
 }
 
+void ToolsPanel::enableUndo(bool op) {
+    undo->Enable(op);
+}
+
+void ToolsPanel::enableRedo(bool op) {
+    redo->Enable(op);
+}
+
 void ToolsPanel::cropSize(const wxSize &s) {
     widthCrop(s.GetWidth());
     heightCrop(s.GetHeight());
@@ -94,7 +102,17 @@ void ToolsPanel::createTools() {
     createAspectBlock();
     createGrowBlock();
     createShapeBlock();
+    createButtons();
+}
+
+void ToolsPanel::createButtons() {
     apply = new wxButton(this, ict::APPLY_BT, "Apply");
+    undo = new wxButton(this, ict::UNDO_BT, "UN");
+    redo = new wxButton(this, ict::REDO_BT, "RE");
+    undo->SetMinSize(wxSize(undo->GetSize().GetHeight(), undo->GetSize().GetHeight()));
+    redo->SetMinSize(wxSize(redo->GetSize().GetHeight(), redo->GetSize().GetHeight()));
+    undo->Enable(false);
+    redo->Enable(false);
 }
 
 void ToolsPanel::createAspectBlock() {
@@ -211,7 +229,13 @@ void ToolsPanel::overlayTools() {
     toolsSizer->Add(shapeBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->Add(growBlock, 0, wxGROW | wxALL, 5);
     toolsSizer->AddSpacer(10);
-    toolsSizer->Add(apply, 0, wxALIGN_CENTER);
+    btsSizer = new wxBoxSizer(wxHORIZONTAL);
+    btsSizer->Add(undo);
+    btsSizer->AddSpacer(5);
+    btsSizer->Add(apply);
+    btsSizer->AddSpacer(5);
+    btsSizer->Add(redo);
+    toolsSizer->Add(btsSizer, 0, wxALIGN_CENTER);
     SetSizerAndFit(toolsSizer);
     SetScrollRate(5, 5);
 }
