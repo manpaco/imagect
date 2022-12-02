@@ -57,19 +57,30 @@ void MainFrame::overlayPanels() {
 void MainFrame::setBindings() {
     tools->Bind(wxEVT_BUTTON, &MainFrame::saveOpts, this, ict::APPLY_BT);
     canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
+    tools->Bind(wxEVT_BUTTON, &MainFrame::undo, this, 5432);
+    tools->Bind(wxEVT_BUTTON, &MainFrame::redo, this, 5433);
 }
 
-void MainFrame::undo() {
+void MainFrame::undo(wxCommandEvent &event) {
     currentState--;
-    if(currentState == history.begin()) {}
+    generateCropGeometry();
+    if(currentState == history.begin()) tools->enableUndo(false);
+    tools->enableRedo(true);
     composePreview();
 }
 
-void MainFrame::redo() {
+void MainFrame::generateCropGeometry() {
+    wxRect g(std::get<0>(*currentState), std::get<1>(*currentState).cropSize);
+    canvas->cropGeometry(g);
+}
+
+void MainFrame::redo(wxCommandEvent &event) {
+    if(currentState == history.begin()) tools->enableUndo(true);
     currentState++;
-    std::list<State>::iterator verify(currentState);
-    verify++;
-    if(verify == history.end()) {}
+    generateCropGeometry();
+    std::list<State>::const_iterator last(history.end());
+    last--;
+    if(currentState == last) tools->enableRedo(false);
     composePreview();
 }
 
@@ -80,6 +91,8 @@ void MainFrame::saveState(State toSave) {
     history.push_back(toSave);
     currentState = history.end();
     currentState--;
+    tools->enableRedo(false);
+    if(currentState == ++history.begin()) tools->enableUndo(true);
     composePreview();
 }
 

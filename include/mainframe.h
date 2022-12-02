@@ -37,8 +37,9 @@ class MainFrame: public wxFrame {
         void onCropChange(CropEvent &);
         void initVars();
         void saveState(State toSave);
-        void redo();
-        void undo();
+        void redo(wxCommandEvent &);
+        void undo(wxCommandEvent &);
+        void generateCropGeometry();
 
         CanvasPanel *canvas = nullptr;
         ToolsPanel *tools = nullptr;
