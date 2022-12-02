@@ -106,6 +106,8 @@ void Rectangle::setRestrictions(wxRect &r) {
 
 void Rectangle::activateRestrictions(bool op) {
     restricted = op;
+    wxSize s(GetSize());
+    if(restricted && !restrictions.Contains(GetRect())) changeSize(s);
 }
 
 void Rectangle::changeSize(wxSize &s) {
@@ -113,7 +115,11 @@ void Rectangle::changeSize(wxSize &s) {
         fixHint = ict::SE;
         setRatio((float)s.GetWidth() / (float)s.GetHeight());
     }
-    wxRect newGeometry(GetPosition(), s);
+    wxPoint p = GetPosition();
+    if(restricted)
+        if((GetPosition().x < restrictions.GetPosition().x) || (GetPosition().y < restrictions.GetPosition().y))
+            p = restrictions.GetPosition();
+    wxRect newGeometry(p, s);
     modify(newGeometry);
     s = newGeometry.GetSize();
 }
