@@ -49,16 +49,19 @@ void ToolsPanel::widthChange(wxCommandEvent &event) {
     std::string text = event.GetString().ToStdString();
     if(text.empty()) return;
     opts.cropSize.SetWidth(std::stoi(text));
+    if(opts.fixRatio) heightCrop((float)opts.cropSize.GetWidth() / opts.ratio);
 }
 
 void ToolsPanel::heightChange(wxCommandEvent &event) {
     std::string text = event.GetString().ToStdString();
     if(text.empty()) return;
     opts.cropSize.SetHeight(std::stoi(text));
+    if(opts.fixRatio) widthCrop((float)opts.cropSize.GetHeight() * opts.ratio);
 }
 
 void ToolsPanel::fixRatioChange(wxCommandEvent &event) {
     opts.fixRatio = event.IsChecked();
+    opts.ratio = (float)opts.cropSize.GetWidth() / (float)opts.cropSize.GetHeight();
 }
 
 void ToolsPanel::shapeChange(wxCommandEvent &event) {
@@ -241,11 +244,13 @@ void ToolsPanel::overlayTools() {
 }
 
 void ToolsPanel::widthCrop(unsigned int width) {
-    widthCtrl->SetValue(wxString(std::to_string(width)));
+    widthCtrl->ChangeValue(wxString(std::to_string(width)));
+    opts.cropSize.SetWidth(width);
 }
 
 void ToolsPanel::heightCrop(unsigned int height) {
-    heightCtrl->SetValue(wxString(std::to_string(height)));
+    heightCtrl->ChangeValue(wxString(std::to_string(height)));
+    opts.cropSize.SetHeight(height);
 }
 
 OptionsContainer ToolsPanel::currentOpts() const {

@@ -22,6 +22,7 @@
 struct OptionsContainer {
     wxSize cropSize;
     bool fixRatio;
+    float ratio;
     int shapeChoice;
     unsigned int strokeWidth;
     wxColour strokeColour;
