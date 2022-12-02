@@ -20,12 +20,12 @@
 #include "identifiersdef.h"
 
 struct OptionsContainer {
-    unsigned int width, height;
+    wxRect cropArea;
     bool fixRatio;
     int shapeChoice;
     unsigned int strokeWidth;
     wxColour strokeColour;
-    int strokePos;
+    int strokeOff;
     bool allowGrow;
     int growChoice;
     wxColour backColour;
