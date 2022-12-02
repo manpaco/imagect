@@ -8,21 +8,22 @@ void overlap(const Magick::Image &overlay, Magick::Image &background, bool fit,
         bool crop) {
     if(fit) {
         Magick::Geometry geoBack(background.columns(), background.rows());
-        geoBack.aspect(false);
-        int xDiff = geoBack.width() - overlay.columns();
-        int yDiff = geoBack.height() - overlay.rows();
-        if(xDiff < yDiff){
-            geoBack.width(overlay.columns());
-        } else {
+        float backRatio = (float)background.columns() / (float)background.rows();
+        float overRatio = (float)overlay.columns() / (float)overlay.rows();
+        if(backRatio > overRatio) {
             geoBack.height(overlay.rows());
+            geoBack.width((float)overlay.rows() * backRatio);
+        } else {
+            geoBack.width(overlay.columns());
+            geoBack.height((float)overlay.columns() / backRatio);
         }
         background.resize(geoBack);
+        if(crop) {
+            int xco = (background.columns() - overlay.columns()) / 2;
+            int yco = (background.rows() - overlay.rows()) / 2;
+            background.crop(Magick::Geometry(overlay.columns(), overlay.rows(), xco, yco));
+        }
     }
-
-    if(crop) {
-        background.crop(Magick::Geometry(overlay.columns(), overlay.rows()));
-    }
-
     background.composite(overlay, Magick::CenterGravity, 
             Magick::OverCompositeOp);
 }
@@ -35,7 +36,7 @@ Magick::Image extractArea(const Magick::Geometry area, Magick::Image target) {
     int xOff, yOff;
     if(area.xOff() < 0) xOff = abs(area.xOff());
     else xOff = 0;
-    if(area.yOff() < 0) yOff = abs(area.xOff());
+    if(area.yOff() < 0) yOff = abs(area.yOff());
     else yOff = 0;
 
     Magick::Geometry compOff(0, 0, xOff, yOff);
