@@ -55,12 +55,24 @@ void CanvasPanel::cropGeometry(const wxRect &g) {
     oldCropPosition = cropArea->GetPosition();
 }
 
+void CanvasPanel::fixCrop(bool op) {
+    cropArea->fixRatio(op);
+}
+
+void CanvasPanel::allowGrow(bool op) {
+    cropArea->activateRestrictions(!op);
+}
+
 wxPoint CanvasPanel::getCropOffset() const {
     return cropOffset;
 }
 
 void CanvasPanel::cropSize(wxSize &s) {
     cropArea->changeSize(s);
+}
+
+wxSize CanvasPanel::cropSize() {
+    return cropArea->GetSize();
 }
 
 void CanvasPanel::updateCanvas(wxBitmap &bm) {
