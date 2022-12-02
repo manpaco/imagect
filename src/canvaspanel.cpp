@@ -48,6 +48,14 @@ void CanvasPanel::updateCropPosition(wxSizeEvent &event) {
     event.Skip();
 }
 
+wxPoint CanvasPanel::getCropOffset() const {
+    return cropOffset;
+}
+
+void CanvasPanel::cropSize(wxSize &s) {
+    cropArea->changeSize(s);
+}
+
 void CanvasPanel::updateCanvas(wxBitmap &bm) {
     createElements(bm);
 }

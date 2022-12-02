@@ -18,6 +18,8 @@ class CanvasPanel: public wxScrolledCanvas {
         CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &);
         CanvasPanel(wxWindow *parent, wxWindowID id);
         void updateCanvas(wxBitmap &);
+        void cropSize(wxSize &s);
+        wxPoint getCropOffset() const;
         ~CanvasPanel();
 
     private:
