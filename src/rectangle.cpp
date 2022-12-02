@@ -6,6 +6,7 @@
 
 wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
 wxDEFINE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);
+wxDEFINE_EVENT(EVT_RECTANGLE_COLLATERAL, wxCommandEvent);
 
 Rectangle::Rectangle() {
     init();
@@ -110,18 +111,26 @@ void Rectangle::activateRestrictions(bool op) {
     if(restricted && !restrictions.Contains(GetRect())) changeSize(s);
 }
 
+void Rectangle::sendCollateralEvent() {
+    wxCommandEvent toSend(EVT_RECTANGLE_COLLATERAL, GetId());
+    toSend.SetEventObject(this);
+    ProcessWindowEvent(toSend);
+}
+
 void Rectangle::changeSize(wxSize &s) {
     if(fix) {
         fixHint = ict::SE;
         setRatio((float)s.GetWidth() / (float)s.GetHeight());
     }
-    wxPoint p = GetPosition();
+    wxPoint prevPos = GetPosition();
+    wxPoint p = prevPos;
     if(restricted)
         if((GetPosition().x < restrictions.GetPosition().x) || (GetPosition().y < restrictions.GetPosition().y))
             p = restrictions.GetPosition();
     wxRect newGeometry(p, s);
     modify(newGeometry);
     s = newGeometry.GetSize();
+    if(p != prevPos) sendCollateralEvent();
 }
 
 void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {

@@ -51,6 +51,7 @@ class Rectangle : public wxControl {
         void accumulateY(int &dyToCalc, int &dxToUse);
         void defineX(int &dxToCalc, int &dyToUse);
         void defineY(int &dyToCalc, int &dxToUse);
+        void sendCollateralEvent();
 
         wxPoint clientPressPoint;
         wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
@@ -67,5 +68,6 @@ class Rectangle : public wxControl {
 };
 
 wxDECLARE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);
+wxDECLARE_EVENT(EVT_RECTANGLE_COLLATERAL, wxCommandEvent);
 
 #endif // RECTANGLE_H
