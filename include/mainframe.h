@@ -14,6 +14,11 @@
 #include "previewpanel.h"
 #include "cropevent.h"
 
+#define PREVIEW_COMP 0;
+#define FINAL_COMP 1;
+
+typedef std::tuple<wxPoint, OptionsContainer> State;
+
 class MainFrame: public wxFrame {
     
     public:
@@ -25,9 +30,15 @@ class MainFrame: public wxFrame {
         void allocateMem();
         void setBindings();
         void overlayPanels();
-        void applyChanges(wxCommandEvent &);
+        void saveOpts(wxCommandEvent &);
+        Magick::Image composeUsingState(Magick::Image &img);
+        void composePreview();
         wxBitmap createBitmap(Magick::Image &img);
         void onCropChange(CropEvent &);
+        void initVars();
+        void saveState(State toSave);
+        void redo();
+        void undo();
 
         CanvasPanel *canvas = nullptr;
         ToolsPanel *tools = nullptr;
@@ -37,6 +48,9 @@ class MainFrame: public wxFrame {
         wxBoxSizer *mainSizer = nullptr;
         Magick::Image *sourceImg = nullptr;
         Magick::Image *lowResImg = nullptr;
+
+        std::list<State> history;
+        std::list<State>::iterator currentState;
 
 };
 
