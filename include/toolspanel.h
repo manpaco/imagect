@@ -45,6 +45,9 @@ struct OptionsContainer {
             backImage == oc.backImage &&
             backBlur == oc.backBlur;
     }
+    bool operator!=(const OptionsContainer &oc) const {
+        return !(*this == oc);
+    }
 };
 
 class ToolsPanel: public wxScrolledCanvas {
@@ -54,7 +57,9 @@ class ToolsPanel: public wxScrolledCanvas {
         unsigned int hegihtCrop() const;
         void widthCrop(unsigned int width);
         void heightCrop(unsigned int height);
-        OptionsContainer currentStatus() const;
+        void cropSize(const wxSize &s);
+        wxSize cropSize() const;
+        OptionsContainer currentOpts() const;
         ~ToolsPanel();
 
     private:
@@ -105,7 +110,7 @@ class ToolsPanel: public wxScrolledCanvas {
 
         wxButton *apply;
         wxBoxSizer *toolsSizer;
-        OptionsContainer status;
+        OptionsContainer opts;
 
 };
 

@@ -28,39 +28,52 @@ void ToolsPanel::setBindings() {
     Bind(wxEVT_SCROLL_THUMBRELEASE, &ToolsPanel::blurChange, this, ict::BACK_BLUR_SL);
 }
 
+void ToolsPanel::cropSize(const wxSize &s) {
+    widthCrop(s.GetWidth());
+    heightCrop(s.GetHeight());
+}
+
+wxSize ToolsPanel::cropSize() const {
+    return opts.cropSize;
+}
+
 void ToolsPanel::widthChange(wxCommandEvent &event) {
-    status.cropSize.SetWidth(std::stoi(event.GetString().ToStdString()));
+    std::string text = event.GetString().ToStdString();
+    if(text.empty()) return;
+    opts.cropSize.SetWidth(std::stoi(text));
 }
 
 void ToolsPanel::heightChange(wxCommandEvent &event) {
-    status.cropSize.SetHeight(std::stoi(event.GetString().ToStdString()));
+    std::string text = event.GetString().ToStdString();
+    if(text.empty()) return;
+    opts.cropSize.SetHeight(std::stoi(text));
 }
 
 void ToolsPanel::fixRatioChange(wxCommandEvent &event) {
-    status.fixRatio = event.IsChecked();
+    opts.fixRatio = event.IsChecked();
 }
 
 void ToolsPanel::shapeChange(wxCommandEvent &event) {
-    status.shapeChoice = event.GetInt();
+    opts.shapeChoice = event.GetInt();
 }
 
 void ToolsPanel::colourChange(wxColourPickerEvent &event) {
-    status.backColour = event.GetColour();
+    opts.backColour = event.GetColour();
 }
 
 void ToolsPanel::imageChange(wxFileDirPickerEvent &event) {
-    status.backImage = event.GetPath();
+    opts.backImage = event.GetPath();
 }
 
 void ToolsPanel::blurChange(wxScrollEvent &event) {
-    status.backBlur = event.GetPosition();
+    opts.backBlur = event.GetPosition();
 }
 
 void ToolsPanel::growChoiceChange(wxCommandEvent &event) {
     if(showedGrowChoice == event.GetInt()) return;
     growChoiceState(false, showedGrowChoice);
     growChoiceState(true, event.GetInt());
-    status.growChoice = event.GetInt();
+    opts.growChoice = event.GetInt();
     showedGrowChoice = event.GetInt();
     updateGrowBlock();
 }
@@ -68,7 +81,7 @@ void ToolsPanel::growChoiceChange(wxCommandEvent &event) {
 void ToolsPanel::growStateChange(wxCommandEvent &event) {
     growSelector->Enable(event.IsChecked());
     growChoiceState(event.IsChecked(), showedGrowChoice);
-    status.allowGrow = event.IsChecked();
+    opts.allowGrow = event.IsChecked();
     updateGrowBlock();
 }
 
@@ -204,13 +217,13 @@ void ToolsPanel::overlayTools() {
 }
 
 void ToolsPanel::widthCrop(unsigned int width) {
-    widthCtrl->ChangeValue(wxString(std::to_string(width)));
+    widthCtrl->SetValue(wxString(std::to_string(width)));
 }
 
 void ToolsPanel::heightCrop(unsigned int height) {
-    heightCtrl->ChangeValue(wxString(std::to_string(height)));
+    heightCtrl->SetValue(wxString(std::to_string(height)));
 }
 
-OptionsContainer ToolsPanel::currentStatus() const {
-    return status;
+OptionsContainer ToolsPanel::currentOpts() const {
+    return opts;
 }
