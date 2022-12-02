@@ -44,6 +44,12 @@ void Rectangle::updateSizes(wxSizeEvent &event) {
     event.Skip();
 }
 
+void Rectangle::sendChangeEvent() {
+    wxCommandEvent toSend(EVT_RECTANGLE_CHANGE, GetId());
+    toSend.SetEventObject(this);
+    ProcessWindowEvent(toSend);
+}
+
 void Rectangle::setRatio(float r) {
     ratio = r;
 }
@@ -103,9 +109,11 @@ void Rectangle::activateRestrictions(bool op) {
 
 void Rectangle::resize(wxSize &s) {
     if(fix) fixHint = ict::SE;
+    wxRect previousRect(GetRect());
     wxRect newGeometry(GetPosition(), s);
     modify(newGeometry);
     s = newGeometry.GetSize();
+    if(previousRect != GetRect()) sendChangeEvent();
 }
 
 void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
@@ -344,11 +352,7 @@ void Rectangle::mouseRelease(wxMouseEvent &event) {
     } catch (std::runtime_error &e) {
         std::cout << e.what() << MOUSE_NEVER_CAPTURED << std::endl;
     }
-    if(rectInPress != GetRect()) {
-        wxCommandEvent toSend(EVT_RECTANGLE_CHANGE, GetId());
-        toSend.SetEventObject(this);
-        ProcessWindowEvent(toSend);
-    }
+    if(rectInPress != GetRect()) sendChangeEvent();
     zonePressed = ict::NONE;
     if(mouseLeftWin) changeCursor(ict::NONE);
     else changeCursor(getLocation(event.GetPosition()));
