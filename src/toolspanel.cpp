@@ -29,11 +29,11 @@ void ToolsPanel::setBindings() {
 }
 
 void ToolsPanel::widthChange(wxCommandEvent &event) {
-    status.cropArea.SetWidth(std::stoi(event.GetString().ToStdString()));
+    status.cropSize.SetWidth(std::stoi(event.GetString().ToStdString()));
 }
 
 void ToolsPanel::heightChange(wxCommandEvent &event) {
-    status.cropArea.SetHeight(std::stoi(event.GetString().ToStdString()));
+    status.cropSize.SetHeight(std::stoi(event.GetString().ToStdString()));
 }
 
 void ToolsPanel::fixRatioChange(wxCommandEvent &event) {

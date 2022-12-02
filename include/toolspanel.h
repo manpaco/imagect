@@ -20,7 +20,7 @@
 #include "identifiersdef.h"
 
 struct OptionsContainer {
-    wxRect cropArea;
+    wxSize cropSize;
     bool fixRatio;
     int shapeChoice;
     unsigned int strokeWidth;
@@ -32,19 +32,19 @@ struct OptionsContainer {
     wxString backImage;
     int backBlur;
 
-    //bool operator==(const OptionsContainer &oc) const {
-    //    return width == oc.width &&
-    //        height == oc.height &&
-    //        fixRatio == oc.fixRatio &&
-    //        shape == oc.shape &&
-    //        strokeWidth == oc.strokeWidth &&
-    //        strokeColour == oc.strokeColour &&
-    //        strokePos == oc.strokePos &&
-    //        allowGrow == oc.allowGrow &&
-    //        growChoice == oc.growChoice &&
-    //        backColour == oc.backColour &&
-    //        backImage == oc.backImage;
-    //}
+    bool operator==(const OptionsContainer &oc) const {
+        return cropSize == oc.cropSize &&
+            fixRatio == oc.fixRatio &&
+            shapeChoice == oc.shapeChoice &&
+            strokeWidth == oc.strokeWidth &&
+            strokeColour == oc.strokeColour &&
+            strokeOff == oc.strokeOff &&
+            allowGrow == oc.allowGrow &&
+            growChoice == oc.growChoice &&
+            backColour == oc.backColour &&
+            backImage == oc.backImage &&
+            backBlur == oc.backBlur;
+    }
 };
 
 class ToolsPanel: public wxScrolledCanvas {
