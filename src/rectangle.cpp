@@ -93,6 +93,7 @@ void Rectangle::mouseMotion(wxMouseEvent &event) {
 
 void Rectangle::fixRatio(bool op) {
     fix = op;
+    if(fix) setRatio((float)GetSize().GetWidth() / (float)GetSize().GetHeight());
 }
 
 bool Rectangle::fixRatio() const {
@@ -108,7 +109,10 @@ void Rectangle::activateRestrictions(bool op) {
 }
 
 void Rectangle::changeSize(wxSize &s) {
-    if(fix) fixHint = ict::SE;
+    if(fix) {
+        fixHint = ict::SE;
+        setRatio((float)s.GetWidth() / (float)s.GetHeight());
+    }
     wxRect newGeometry(GetPosition(), s);
     modify(newGeometry);
     s = newGeometry.GetSize();
