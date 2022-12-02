@@ -40,6 +40,8 @@ class MainFrame: public wxFrame {
         void redo(wxCommandEvent &);
         void undo(wxCommandEvent &);
         void generateCropGeometry();
+        void onFixRatio(wxCommandEvent &);
+        void onAllowGrow(wxCommandEvent &event);
 
         CanvasPanel *canvas = nullptr;
         ToolsPanel *tools = nullptr;

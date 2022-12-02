@@ -55,10 +55,28 @@ void MainFrame::overlayPanels() {
 }
 
 void MainFrame::setBindings() {
-    tools->Bind(wxEVT_BUTTON, &MainFrame::saveOpts, this, ict::APPLY_BT);
     canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
+    tools->Bind(wxEVT_BUTTON, &MainFrame::saveOpts, this, ict::APPLY_BT);
+    tools->Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
+    tools->Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
     tools->Bind(wxEVT_BUTTON, &MainFrame::undo, this, ict::UNDO_BT);
     tools->Bind(wxEVT_BUTTON, &MainFrame::redo, this, ict::REDO_BT);
+}
+
+void MainFrame::onFixRatio(wxCommandEvent &event) {
+    canvas->fixCrop(event.IsChecked());
+    event.Skip();
+}
+
+void MainFrame::onAllowGrow(wxCommandEvent &event) {
+    canvas->allowGrow(event.IsChecked());
+    if((canvas->cropSize() != std::get<1>(*currentState).cropSize) || 
+            (canvas->getCropOffset() != std::get<0>(*currentState))) {
+        tools->cropSize(canvas->cropSize());
+        OptionsContainer opts = tools->currentOpts();
+        saveState(std::make_tuple(canvas->getCropOffset(), opts));
+    }
+    event.Skip();
 }
 
 void MainFrame::undo(wxCommandEvent &event) {
@@ -127,8 +145,7 @@ void MainFrame::saveOpts(wxCommandEvent &event) {
     canvas->cropSize(opts.cropSize);
     if(tools->cropSize() != opts.cropSize) tools->cropSize(opts.cropSize);
     if(opts == std::get<1>(*currentState)) return;
-    wxPoint off(canvas->getCropOffset());
-    saveState(std::make_tuple(off, opts));
+    saveState(std::make_tuple(canvas->getCropOffset(), opts));
 }
 
 void MainFrame::updatePreview(wxBitmap &bm) {
