@@ -33,6 +33,23 @@ struct OptionsContainer {
     wxString backImage;
     int backBlur;
 
+    OptionsContainer() : 
+        cropSize(0, 0),
+        fixRatio(false),
+        ratio(0.0),
+        shapeChoice(0),
+        strokeWidth(1),
+        strokeColour(*wxBLACK),
+        strokeOff(0),
+        allowGrow(false),
+        growChoice(0),
+        backColour(*wxBLACK),
+        backImage(""),
+        backBlur(0)
+    {
+
+    }
+
     bool operator==(const OptionsContainer &oc) const {
         return cropSize == oc.cropSize &&
             fixRatio == oc.fixRatio &&
@@ -61,6 +78,7 @@ class ToolsPanel: public wxScrolledCanvas {
         void cropSize(const wxSize &s);
         wxSize cropSize() const;
         OptionsContainer currentOpts() const;
+        void setOpts(const OptionsContainer &oc);
         void enableUndo(bool);
         void enableRedo(bool);
         ~ToolsPanel();
@@ -105,7 +123,6 @@ class ToolsPanel: public wxScrolledCanvas {
         wxColourPickerCtrl *colorPicker;
         wxBoxSizer *growSizer;
         wxString growChoices[ict::GROW_CHOICE_SIZE];
-        int showedGrowChoice;
 
         wxCollapsiblePane *shapeBlock;
         wxBoxSizer *shapeSizer;
