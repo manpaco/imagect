@@ -79,8 +79,6 @@ class ToolsPanel: public wxScrolledCanvas {
         wxSize cropSize() const;
         OptionsContainer currentOpts() const;
         void setOpts(const OptionsContainer &oc);
-        void enableUndo(bool);
-        void enableRedo(bool);
         ~ToolsPanel();
 
     private:
@@ -132,8 +130,7 @@ class ToolsPanel: public wxScrolledCanvas {
         wxBoxSizer *toolsSizer;
         OptionsContainer opts;
 
-        wxBoxSizer *btsSizer;
-        wxButton *undo, *redo, *apply;
+        wxButton *apply;
 
 };
 
