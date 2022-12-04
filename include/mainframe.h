@@ -20,6 +20,7 @@ class MainFrame: public wxFrame {
     
     public:
         MainFrame();
+        MainFrame(const wxString &initImg);
         ~MainFrame();
 
     private:
@@ -28,11 +29,10 @@ class MainFrame: public wxFrame {
         void setBindings();
         void overlayPanels();
         void saveState(wxCommandEvent &);
-        Magick::Image composeUsingState(Magick::Image &img);
+        Magick::Image composeState(const Magick::Image &img, const State &s);
         void composePreview();
         wxBitmap createBitmap(Magick::Image &img);
         void onCropChange(CropEvent &);
-        void initVars();
         void updateHistory(State toSave);
         void redo(wxCommandEvent &);
         void undo(wxCommandEvent &);
@@ -40,6 +40,13 @@ class MainFrame: public wxFrame {
         void onFixRatio(wxCommandEvent &);
         void onAllowGrow(wxCommandEvent &event);
         void createMenuBar();
+        void onClose(wxCommandEvent &event);
+        void onOpen(wxCommandEvent &event);
+        void onExport(wxCommandEvent &event);
+        void onQuit(wxCommandEvent &event);
+        void exportImage();
+        void openImage(const wxString &p);
+        void clear();
 
         CanvasPanel *canvas = nullptr;
         ToolsPanel *tools = nullptr;
@@ -48,13 +55,15 @@ class MainFrame: public wxFrame {
         PreviewPanel *preview = nullptr;
         wxBoxSizer *mainSizer = nullptr;
         Magick::Image *sourceImg = nullptr;
-        Magick::Image *lowResImg = nullptr;
+        Magick::Image *scaledImg = nullptr;
 
         wxMenuBar *topMenuBar;
         wxMenu *mFile, *mEdit, *mHelp;
 
         std::list<State> history{};
         std::list<State>::iterator currentState;
+
+        bool openedImg, exportedImg;
 
 };
 
