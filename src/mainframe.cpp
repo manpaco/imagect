@@ -54,6 +54,8 @@ void MainFrame::createMenuBar() {
     mEdit = new wxMenu;
     mEdit->Append(wxID_UNDO);
     mEdit->Append(wxID_REDO);
+    mEdit->Enable(wxID_UNDO, false);
+    mEdit->Enable(wxID_REDO, false);
 
     mHelp = new wxMenu;
     mHelp->Append(wxID_HELP);
@@ -85,8 +87,8 @@ void MainFrame::setBindings() {
     tools->Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     tools->Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
     tools->Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
-    tools->Bind(wxEVT_BUTTON, &MainFrame::undo, this, ict::UNDO_BT);
-    tools->Bind(wxEVT_BUTTON, &MainFrame::redo, this, ict::REDO_BT);
+    Bind(wxEVT_MENU, &MainFrame::undo, this, wxID_UNDO);
+    Bind(wxEVT_MENU, &MainFrame::redo, this, wxID_REDO);
 }
 
 void MainFrame::onFixRatio(wxCommandEvent &event) {
@@ -102,8 +104,8 @@ void MainFrame::onAllowGrow(wxCommandEvent &event) {
 void MainFrame::undo(wxCommandEvent &event) {
     currentState--;
     updateCropGeometry();
-    if(currentState == history.begin()) tools->enableUndo(false);
-    tools->enableRedo(true);
+    if(currentState == history.begin()) mEdit->Enable(wxID_UNDO, false);
+    mEdit->Enable(wxID_REDO, true);
     tools->setOpts(std::get<1>(*currentState));
     composePreview();
     std::cout << std::distance(history.begin(), currentState) << std::endl;
@@ -115,10 +117,10 @@ void MainFrame::updateCropGeometry() {
 }
 
 void MainFrame::redo(wxCommandEvent &event) {
-    if(currentState == history.begin()) tools->enableUndo(true);
+    if(currentState == history.begin()) mEdit->Enable(wxID_UNDO, true);
     currentState++;
     updateCropGeometry();
-    if(currentState == --history.end()) tools->enableRedo(false);
+    if(currentState == --history.end()) mEdit->Enable(wxID_REDO, false);
     tools->setOpts(std::get<1>(*currentState));
     composePreview();
     std::cout << std::distance(history.begin(), currentState) << std::endl;
@@ -128,8 +130,8 @@ void MainFrame::updateHistory(State toSave) {
     if(currentState != history.end()) history.erase(++currentState, history.end());
     history.push_back(toSave);
     currentState = --history.end();
-    tools->enableRedo(false);
-    if(currentState == ++history.begin()) tools->enableUndo(true);
+    mEdit->Enable(wxID_REDO, false);
+    if(currentState == ++history.begin()) mEdit->Enable(wxID_UNDO, true);
     composePreview();
     std::cout << std::distance(history.begin(), currentState) << std::endl;
 }
