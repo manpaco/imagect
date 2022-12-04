@@ -30,16 +30,16 @@ class MainFrame: public wxFrame {
         void allocateMem();
         void setBindings();
         void overlayPanels();
-        void saveOpts(wxCommandEvent &);
+        void saveState(wxCommandEvent &);
         Magick::Image composeUsingState(Magick::Image &img);
         void composePreview();
         wxBitmap createBitmap(Magick::Image &img);
         void onCropChange(CropEvent &);
         void initVars();
-        void saveState(State toSave);
+        void updateHistory(State toSave);
         void redo(wxCommandEvent &);
         void undo(wxCommandEvent &);
-        void generateCropGeometry();
+        void updateCropGeometry();
         void onFixRatio(wxCommandEvent &);
         void onAllowGrow(wxCommandEvent &event);
 
@@ -52,7 +52,7 @@ class MainFrame: public wxFrame {
         Magick::Image *sourceImg = nullptr;
         Magick::Image *lowResImg = nullptr;
 
-        std::list<State> history;
+        std::list<State> history{};
         std::list<State>::iterator currentState;
 
 };

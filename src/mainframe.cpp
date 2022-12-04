@@ -56,7 +56,7 @@ void MainFrame::overlayPanels() {
 
 void MainFrame::setBindings() {
     canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
-    tools->Bind(wxEVT_BUTTON, &MainFrame::saveOpts, this, ict::APPLY_BT);
+    tools->Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     tools->Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
     tools->Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
     tools->Bind(wxEVT_BUTTON, &MainFrame::undo, this, ict::UNDO_BT);
@@ -70,24 +70,20 @@ void MainFrame::onFixRatio(wxCommandEvent &event) {
 
 void MainFrame::onAllowGrow(wxCommandEvent &event) {
     canvas->allowGrow(event.IsChecked());
-    if((canvas->cropSize() != std::get<1>(*currentState).cropSize) || 
-            (canvas->getCropOffset() != std::get<0>(*currentState))) {
-        tools->cropSize(canvas->cropSize());
-        OptionsContainer opts = tools->currentOpts();
-        saveState(std::make_tuple(canvas->getCropOffset(), opts));
-    }
     event.Skip();
 }
 
 void MainFrame::undo(wxCommandEvent &event) {
     currentState--;
-    generateCropGeometry();
+    updateCropGeometry();
     if(currentState == history.begin()) tools->enableUndo(false);
     tools->enableRedo(true);
+    tools->setOpts(std::get<1>(*currentState));
     composePreview();
+    std::cout << std::distance(history.begin(), currentState) << std::endl;
 }
 
-void MainFrame::generateCropGeometry() {
+void MainFrame::updateCropGeometry() {
     wxRect g(std::get<0>(*currentState), std::get<1>(*currentState).cropSize);
     canvas->cropGeometry(g);
 }
@@ -95,30 +91,25 @@ void MainFrame::generateCropGeometry() {
 void MainFrame::redo(wxCommandEvent &event) {
     if(currentState == history.begin()) tools->enableUndo(true);
     currentState++;
-    generateCropGeometry();
-    std::list<State>::const_iterator last(history.end());
-    last--;
-    if(currentState == last) tools->enableRedo(false);
+    updateCropGeometry();
+    if(currentState == --history.end()) tools->enableRedo(false);
+    tools->setOpts(std::get<1>(*currentState));
     composePreview();
+    std::cout << std::distance(history.begin(), currentState) << std::endl;
 }
 
-void MainFrame::saveState(State toSave) {
-    std::list<State>::iterator deleteFrom(currentState);
-    if(deleteFrom != history.end()) deleteFrom++;
-    history.erase(deleteFrom, history.end());
+void MainFrame::updateHistory(State toSave) {
+    if(currentState != history.end()) history.erase(++currentState, history.end());
     history.push_back(toSave);
-    currentState = history.end();
-    currentState--;
+    currentState = --history.end();
     tools->enableRedo(false);
     if(currentState == ++history.begin()) tools->enableUndo(true);
     composePreview();
+    std::cout << std::distance(history.begin(), currentState) << std::endl;
 }
 
 void MainFrame::onCropChange(CropEvent &event) {
-    // update preview
-    tools->cropSize(event.getSize());
-    OptionsContainer opts = tools->currentOpts();
-    saveState(std::make_tuple(event.getOffset(), opts));
+    if(tools->cropSize() != event.getSize()) tools->cropSize(event.getSize());
 }
 
 Magick::Image MainFrame::composeUsingState(Magick::Image &img) {
@@ -139,13 +130,14 @@ void MainFrame::composePreview() {
     updatePreview(newPreview);
 }
 
-void MainFrame::saveOpts(wxCommandEvent &event) {
+void MainFrame::saveState(wxCommandEvent &event) {
     // update preview and/or update crop rectangle
     OptionsContainer opts = tools->currentOpts();
     canvas->cropSize(opts.cropSize);
     if(tools->cropSize() != opts.cropSize) tools->cropSize(opts.cropSize);
-    if(opts == std::get<1>(*currentState)) return;
-    saveState(std::make_tuple(canvas->getCropOffset(), opts));
+    State toSave = std::make_tuple(canvas->getCropOffset(), opts);
+    if(toSave == *currentState) return;
+    updateHistory(toSave);
 }
 
 void MainFrame::updatePreview(wxBitmap &bm) {
