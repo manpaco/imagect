@@ -11,6 +11,7 @@
 using Magick::Quantum;
 
 MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Croping Tool") {
+    createMenuBar();
     allocateMem();
     overlayPanels();
     setBindings();
@@ -39,6 +40,31 @@ void MainFrame::allocateMem() {
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxHORIZONTAL);
     updatePreview(initBitmap);
+}
+
+void MainFrame::createMenuBar() {
+    topMenuBar = new wxMenuBar;
+
+    mFile = new wxMenu;
+    mFile->Append(wxID_OPEN);
+    mFile->AppendSeparator();
+    mFile->Append(wxID_CLOSE);
+    mFile->Append(wxID_EXIT);
+
+    mEdit = new wxMenu;
+    mEdit->Append(wxID_UNDO);
+    mEdit->Append(wxID_REDO);
+
+    mHelp = new wxMenu;
+    mHelp->Append(wxID_HELP);
+    mHelp->AppendSeparator();
+    mHelp->Append(wxID_ABOUT);
+
+    topMenuBar->Append(mFile, "File");
+    topMenuBar->Append(mEdit, "Edit");
+    topMenuBar->Append(mHelp, "More");
+    
+    SetMenuBar(topMenuBar);
 }
 
 wxBitmap MainFrame::createBitmap(Magick::Image &img) {

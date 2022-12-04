@@ -14,9 +14,6 @@
 #include "previewpanel.h"
 #include "cropevent.h"
 
-#define PREVIEW_COMP 0;
-#define FINAL_COMP 1;
-
 typedef std::tuple<wxPoint, OptionsContainer> State;
 
 class MainFrame: public wxFrame {
@@ -42,6 +39,7 @@ class MainFrame: public wxFrame {
         void updateCropGeometry();
         void onFixRatio(wxCommandEvent &);
         void onAllowGrow(wxCommandEvent &event);
+        void createMenuBar();
 
         CanvasPanel *canvas = nullptr;
         ToolsPanel *tools = nullptr;
@@ -51,6 +49,9 @@ class MainFrame: public wxFrame {
         wxBoxSizer *mainSizer = nullptr;
         Magick::Image *sourceImg = nullptr;
         Magick::Image *lowResImg = nullptr;
+
+        wxMenuBar *topMenuBar;
+        wxMenu *mFile, *mEdit, *mHelp;
 
         std::list<State> history{};
         std::list<State>::iterator currentState;
