@@ -101,14 +101,26 @@ bool Rectangle::fixRatio() const {
     return fix;
 }
 
-void Rectangle::setRestrictions(wxRect &r) {
+void Rectangle::setRestrictions(const wxRect &r) {
     restrictions = r;
 }
 
 void Rectangle::activateRestrictions(bool op) {
     restricted = op;
-    wxSize s(GetSize());
-    if(restricted && !restrictions.Contains(GetRect())) changeSize(s);
+    wxRect prevRect(GetRect());
+    wxRect actualRect(GetRect());
+    if(restricted) {
+        if(!restrictions.Contains(actualRect.GetPosition())) {
+            Move(restrictions.GetPosition());
+            actualRect = GetRect();
+        }
+        if(!restrictions.Contains(actualRect)) {
+            fixHint = ict::SE;
+            modify(actualRect);
+            actualRect = GetRect();
+        }
+    }
+    if(prevRect != actualRect) sendCollateralEvent();
 }
 
 void Rectangle::sendCollateralEvent() {
@@ -121,15 +133,11 @@ void Rectangle::changeSize(wxSize &s) {
     if(fix) {
         fixHint = ict::SE;
         setRatio((float)s.GetWidth() / (float)s.GetHeight());
+        accumX = 0.0; accumY = 0.0;
     }
-    wxPoint prevPos = GetPosition();
-    wxPoint p = prevPos;
-    if(restricted)
-        if(!restrictions.Contains(p)) p = restrictions.GetPosition();
-    wxRect newGeometry(p, s);
+    wxRect newGeometry(GetPosition(), s);
     modify(newGeometry);
     s = newGeometry.GetSize();
-    if(p != prevPos) sendCollateralEvent();
 }
 
 void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
