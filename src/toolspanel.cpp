@@ -28,6 +28,30 @@ void ToolsPanel::setBindings() {
     Bind(wxEVT_SCROLL_THUMBRELEASE, &ToolsPanel::blurChange, this, ict::BACK_BLUR_SL);
 }
 
+void ToolsPanel::setOpts(const OptionsContainer &oc) {
+    wxCommandEvent h(wxEVT_RADIOBOX, growSelector->GetId());
+    h.SetEventObject(growSelector);
+    h.SetInt(oc.growChoice);
+    ProcessWindowEvent(h);
+    wxCommandEvent f(wxEVT_CHECKBOX, growCheck->GetId());
+    f.SetEventObject(growCheck);
+    f.SetInt(oc.allowGrow);
+    ProcessWindowEvent(f);
+    opts = oc;
+    cropSize(opts.cropSize);
+    fixRatio->SetValue(opts.fixRatio);
+    wxCommandEvent e(wxEVT_CHECKBOX, fixRatio->GetId());
+    e.SetEventObject(fixRatio);
+    e.SetInt(opts.fixRatio);
+    ProcessWindowEvent(e);
+    shapeSelector->SetSelection(opts.shapeChoice);
+    backBlur->SetValue(opts.backBlur);
+    imagePicker->SetPath(opts.backImage);
+    colorPicker->SetColour(opts.backColour);
+    growSelector->SetSelection(opts.growChoice);
+    growCheck->SetValue(opts.allowGrow);
+}
+
 void ToolsPanel::enableUndo(bool op) {
     undo->Enable(op);
 }
@@ -81,19 +105,20 @@ void ToolsPanel::blurChange(wxScrollEvent &event) {
 }
 
 void ToolsPanel::growChoiceChange(wxCommandEvent &event) {
-    if(showedGrowChoice == event.GetInt()) return;
-    growChoiceState(false, showedGrowChoice);
+    if(opts.growChoice == event.GetInt()) return;
+    growChoiceState(false, opts.growChoice);
     growChoiceState(true, event.GetInt());
     opts.growChoice = event.GetInt();
-    showedGrowChoice = event.GetInt();
     updateGrowBlock();
+    event.Skip();
 }
 
 void ToolsPanel::growStateChange(wxCommandEvent &event) {
     growSelector->Enable(event.IsChecked());
-    growChoiceState(event.IsChecked(), showedGrowChoice);
+    growChoiceState(event.IsChecked(), opts.growChoice);
     opts.allowGrow = event.IsChecked();
     updateGrowBlock();
+    event.Skip();
 }
 
 void ToolsPanel::updateVirtualSize(wxCollapsiblePaneEvent &event) {
@@ -217,7 +242,7 @@ void ToolsPanel::growChoiceState(bool state, int choice) {
 void ToolsPanel::initGrowChoices() {
     growChoices[ict::COLOR] = wxString("Color");
     growChoices[ict::IMAGE] = wxString("Image");
-    showedGrowChoice = 0;
+    opts.growChoice = 0;
 }
 
 void ToolsPanel::initShapeChoices() {
