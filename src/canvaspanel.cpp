@@ -18,25 +18,29 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id) {
 
 void CanvasPanel::setBindings() {
     img->Bind(wxEVT_SIZE, &CanvasPanel::updateCropPosition, this);
-    Bind(EVT_RECTANGLE_CHANGE, &CanvasPanel::sendCropChange, this);
+    Bind(EVT_RECTANGLE_CHANGE, &CanvasPanel::reportChange, this);
     Bind(wxEVT_SCROLLWIN_THUMBTRACK, &CanvasPanel::saveCropPosition, this);
-    Bind(EVT_RECTANGLE_COLLATERAL, &CanvasPanel::updateCropOffset, this);
+    Bind(EVT_RECTANGLE_COLLATERAL, &CanvasPanel::reportCollateral, this);
 }
 
-void CanvasPanel::updateCropOffset(wxCommandEvent &event) {
+void CanvasPanel::reportCollateral(wxCommandEvent &event) {
     cropOffset += cropArea->GetPosition() - oldCropPosition;
     oldCropPosition = cropArea->GetPosition();
+    sendCropEvent();
+}
+
+void CanvasPanel::reportChange(wxCommandEvent &event) {
+    sendCropEvent();
 }
 
 void CanvasPanel::saveCropPosition(wxScrollWinEvent &event) {
     HandleOnScroll(event);
     oldCropPosition = cropArea->GetPosition();
-    wxRect r(img->GetPosition().x, img->GetPosition().y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
-    cropArea->setRestrictions(r);
+    cropArea->setRestrictions(img->GetRect());
     event.Skip();
 }
 
-void CanvasPanel::sendCropChange(wxCommandEvent &event) {
+void CanvasPanel::sendCropEvent() {
     wxSize size(cropArea->GetSize());
     cropOffset += cropArea->GetPosition() - oldCropPosition;
     oldCropPosition = cropArea->GetPosition();
@@ -49,8 +53,7 @@ void CanvasPanel::updateCropPosition(wxSizeEvent &event) {
     shadow->Move(img->GetPosition().x - 2, img->GetPosition().y - 2);
     cropArea->Move(img->GetPosition().x + cropOffset.x, img->GetPosition().y + cropOffset.y);
     oldCropPosition = cropArea->GetPosition();
-    wxRect r(img->GetPosition().x, img->GetPosition().y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
-    cropArea->setRestrictions(r);
+    cropArea->setRestrictions(img->GetRect());
     event.Skip();
 }
 
@@ -117,8 +120,7 @@ void CanvasPanel::initCrop() {
     oldCropPosition = img->GetPosition();
     cropOffset = wxPoint(0, 0);
     cropArea->SetSize(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
-    wxRect r(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
-    cropArea->setRestrictions(r);
+    cropArea->setRestrictions(img->GetRect());
     //cropArea->activateRestrictions(true);
     //cropArea->setRatio(2);
     //cropArea->fixRatio(true);
