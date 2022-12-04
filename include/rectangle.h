@@ -24,7 +24,7 @@ class Rectangle : public wxControl {
         void fixRatio(bool op);
         bool fixRatio() const;
         void setRatio(float r);
-        void setRestrictions(wxRect &r);
+        void setRestrictions(const wxRect &r);
         void activateRestrictions(bool op);
         void changeSize(wxSize &s);
         void sendChangeEvent();
