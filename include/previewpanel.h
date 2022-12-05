@@ -16,19 +16,21 @@ class PreviewPanel: public wxPanel {
         PreviewPanel(wxWindow *parent, wxWindowID id);
         PreviewPanel(wxWindow *parent, wxWindowID id, wxBitmap &);
         void updatePreview(wxBitmap &);
+        void clear();
         ~PreviewPanel();
 
     private:
-        void createElements(wxBitmap &bm);
         void paintImage(wxPaintEvent &event); 
         void setBindings();
-        void init();
         void initDimensions();
-        void setPreview(wxBitmap &bm);
+        void updateElements(wxBitmap &bm);
+        void tryToAttachImg();
 
         wxBoxSizer *sz = nullptr;
         ImageWindow *preview = nullptr;
         wxStaticText *title = nullptr;
+
+        bool attachedImg = false;
 };
 
 #endif // PREVIEWPANEL_H
