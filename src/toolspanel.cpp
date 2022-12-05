@@ -7,10 +7,20 @@ ToolsPanel::ToolsPanel(wxWindow *parent, wxWindowID id) {
     createTools();
     overlayTools();
     setBindings();
+    clear(false);
 }
 
 ToolsPanel::~ToolsPanel() {
 
+}
+
+void ToolsPanel::clear(bool enableOp) {
+    Enable(enableOp);
+    opts = OptionsContainer();
+    setOpts(opts);
+    shapeBlock->Collapse();
+    growBlock->Collapse();
+    aspectBlock->Collapse();
 }
 
 void ToolsPanel::setBindings() {

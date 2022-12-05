@@ -79,6 +79,7 @@ class ToolsPanel: public wxScrolledCanvas {
         wxSize cropSize() const;
         OptionsContainer currentOpts() const;
         void setOpts(const OptionsContainer &oc);
+        void clear(bool enableOp);
         ~ToolsPanel();
 
     private:
