@@ -12,10 +12,10 @@ using Magick::Quantum;
 
 MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Cropping Tool") {
     createMenuBar();
+    bindMenuBar();
     allocateMem();
     overlayPanels();
-    setBindings();
-    clear();
+    initParams();
 }
 
 MainFrame::MainFrame(const wxString &initImg): MainFrame() {
@@ -51,8 +51,6 @@ void MainFrame::createMenuBar() {
     mEdit->Append(wxID_UNDO);
     mEdit->Append(wxID_REDO);
     mEdit->Append(wxID_APPLY);
-    mEdit->Enable(wxID_UNDO, false);
-    mEdit->Enable(wxID_REDO, false);
 
     mHelp = new wxMenu;
     mHelp->Append(wxID_HELP);
@@ -79,11 +77,7 @@ void MainFrame::overlayPanels() {
     SetSizerAndFit(mainSizer);
 }
 
-void MainFrame::setBindings() {
-    canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
-    tools->Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
-    tools->Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
-    tools->Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
+void MainFrame::bindMenuBar() {
     Bind(wxEVT_MENU, &MainFrame::undo, this, wxID_UNDO);
     Bind(wxEVT_MENU, &MainFrame::redo, this, wxID_REDO);
     Bind(wxEVT_MENU, &MainFrame::onOpen, this, wxID_OPEN);
@@ -93,6 +87,20 @@ void MainFrame::setBindings() {
     Bind(wxEVT_MENU, &MainFrame::onClose, this, wxID_CLOSE);
 }
 
+void MainFrame::bindElements() {
+    canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
+    tools->Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
+    tools->Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
+    tools->Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
+}
+
+void MainFrame::unbindElements() {
+    canvas->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
+    tools->Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
+    tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
+    tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
+}
+
 void MainFrame::onClose(wxCommandEvent &event) {
     if(!openedImg) return;
     if(!exportedImg) {
@@ -100,7 +108,6 @@ void MainFrame::onClose(wxCommandEvent &event) {
                 _("Please confirm"), wxYES_NO, this) == wxNO) return;
     }
     clear();
-    openedImg = false;
 }
 
 void MainFrame::onOpen(wxCommandEvent &event) {
@@ -112,9 +119,7 @@ void MainFrame::onOpen(wxCommandEvent &event) {
             _("PNG (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*jpeg;*.jpg"), 
             wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     if(openDlg.ShowModal() == wxID_CANCEL) return;
-    if(openedImg) clear();
     openImage(openDlg.GetPath());
-    openedImg = true;
 }
 
 void MainFrame::onExport(wxCommandEvent &event) {
@@ -130,26 +135,49 @@ void MainFrame::onQuit(wxCommandEvent &event) {
 }
 
 void MainFrame::exportImage() {
+    if(!openedImg) return;
     wxFileDialog exportDlg(this, _("Export image"),wxEmptyString, wxEmptyString, 
             "PNG (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*jpeg;*.jpg", 
             wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if(exportDlg.ShowModal() == wxID_CANCEL) return;
-    sourceImg->write(exportDlg.GetPath().ToStdString());
+    Magick::Image out(composeState(*sourceImg, *currentState));
+    out.write(exportDlg.GetPath().ToStdString());
     exportedImg = true;
 }
 
 void MainFrame::openImage(const wxString &p) {
+    if(openedImg) {
+        delete sourceImg;
+        delete scaledImg;
+        history.clear();
+        currentState = history.begin();
+    } else bindElements();
     sourceImg = new Magick::Image(p.ToStdString());
     scaledImg = new Magick::Image(*sourceImg);
     scaledImg->zoom(Magick::Geometry(scaledImg->columns() * 0.3, scaledImg->rows() * 0.3));
     wxBitmap newBmp = createBitmap(*scaledImg);
-    canvas->updateCanvas(newBmp);
     preview->updatePreview(newBmp);
+    canvas->updateCanvas(newBmp);
+    tools->clear(true);
     tools->cropSize(canvas->cropSize());
+    OptionsContainer opts = tools->currentOpts();
+    State toSave = std::make_tuple(canvas->getCropOffset(), opts);
+    updateHistory(toSave);
+    mEdit->Enable(wxID_APPLY, true);
     openedImg = true;
 }
 
+void MainFrame::initParams() {
+    currentState = history.begin();
+    openedImg = false;
+    exportedImg = false;
+    mEdit->Enable(wxID_APPLY, false);
+    mEdit->Enable(wxID_UNDO, false);
+    mEdit->Enable(wxID_REDO, false);
+}
+
 void MainFrame::clear() {
+    unbindElements();
     if(sourceImg) {
         delete sourceImg;
         sourceImg = nullptr;
@@ -159,10 +187,8 @@ void MainFrame::clear() {
         scaledImg = nullptr;
     }
     history.clear();
-    currentState = history.begin();
-    openedImg = false;
-    exportedImg = false;
-    tools->clear();
+    initParams();
+    tools->clear(false);
     canvas->clear();
     preview->clear();
 }
@@ -185,7 +211,6 @@ void MainFrame::undo(wxCommandEvent &event) {
     tools->setOpts(std::get<1>(*currentState));
     composePreview();
     exportedImg = false;
-    std::cout << std::distance(history.begin(), currentState) << std::endl;
 }
 
 void MainFrame::updateCropGeometry() {
@@ -201,7 +226,6 @@ void MainFrame::redo(wxCommandEvent &event) {
     tools->setOpts(std::get<1>(*currentState));
     composePreview();
     exportedImg = false;
-    std::cout << std::distance(history.begin(), currentState) << std::endl;
 }
 
 void MainFrame::updateHistory(State toSave) {
@@ -212,7 +236,6 @@ void MainFrame::updateHistory(State toSave) {
     if(currentState == ++history.begin()) mEdit->Enable(wxID_UNDO, true);
     composePreview();
     exportedImg = false;
-    std::cout << std::distance(history.begin(), currentState) << std::endl;
 }
 
 void MainFrame::onCropChange(CropEvent &event) {
@@ -220,15 +243,21 @@ void MainFrame::onCropChange(CropEvent &event) {
 }
 
 Magick::Image MainFrame::composeState(const Magick::Image &img, const State &s) {
-    int w = std::get<1>(*currentState).cropSize.GetWidth();
-    int h = std::get<1>(*currentState).cropSize.GetHeight();
-    int xo = std::get<0>(*currentState).x;
-    int yo = std::get<0>(*currentState).y;
-    Magick::Geometry crop(w, h, xo, yo);;
+    int w = std::get<1>(s).cropSize.GetWidth();
+    int h = std::get<1>(s).cropSize.GetHeight();
+    int xo = std::get<0>(s).x;
+    int yo = std::get<0>(s).y;
+    Magick::Geometry crop(w, h, xo, yo);
     Magick::Image comp(extractArea(crop, img));
-    Magick::Image back("/usr/share/desktop-base/homeworld-theme/grub/grub-4x3.png");
-    overlap(comp, back, true, true);
-    return back;
+    if(std::get<1>(s).allowGrow) {
+        //Magick::Image back(img.geometry(), Magick::Color(0, 0, 0, QuantumRange / 2));
+        //if(std::get<1>(s).growChoice == ict::IMAGE) 
+        //    if(!std::get<1>(s).backImage.ToStdString().empty())
+        //        back.read(std::get<1>(s).backImage.ToStdString());
+        //overlap(comp, back, true, true);
+        //return back;
+    }
+    return comp;
 }
 
 void MainFrame::composePreview() {

@@ -24,9 +24,12 @@ class MainFrame: public wxFrame {
         ~MainFrame();
 
     private:
+        void initParams();
         void updatePreview(wxBitmap &bm);
         void allocateMem();
-        void setBindings();
+        void bindMenuBar();
+        void bindElements();
+        void unbindElements();
         void overlayPanels();
         void saveState(wxCommandEvent &);
         Magick::Image composeState(const Magick::Image &img, const State &s);
