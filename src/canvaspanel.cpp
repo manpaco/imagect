@@ -3,24 +3,45 @@
 #include "cropevent.h"
 #include <wx/graphics.h>
 
-CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm) {
-    Create(parent, id);
-    createElements(bm);
-    initParams();
-    setBindings();
-}
-
 CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
     initParams();
-    setBindings();
 }
 
-void CanvasPanel::setBindings() {
+CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm): CanvasPanel(parent, id) {
+    updateElements(bm);
+}
+
+void CanvasPanel::clear() {
+    unbindCrop();
+    if(shadow) {
+        shadow->Destroy();
+        shadow = nullptr;
+    }
+    if(img) {
+        sz->Detach(img);
+        attachedImg = false;
+        img->Destroy();
+        img = nullptr;
+    }
+    if(cropArea) {
+        cropArea->Destroy();
+        cropArea = nullptr;
+    }
+}
+
+void CanvasPanel::bindCrop() {
     img->Bind(wxEVT_SIZE, &CanvasPanel::updateCropPosition, this);
     Bind(EVT_RECTANGLE_CHANGE, &CanvasPanel::reportChange, this);
     Bind(wxEVT_SCROLLWIN_THUMBTRACK, &CanvasPanel::saveCropPosition, this);
     Bind(EVT_RECTANGLE_COLLATERAL, &CanvasPanel::reportCollateral, this);
+}
+
+void CanvasPanel::unbindCrop() {
+    img->Unbind(wxEVT_SIZE, &CanvasPanel::updateCropPosition, this);
+    Unbind(EVT_RECTANGLE_CHANGE, &CanvasPanel::reportChange, this);
+    Unbind(wxEVT_SCROLLWIN_THUMBTRACK, &CanvasPanel::saveCropPosition, this);
+    Unbind(EVT_RECTANGLE_COLLATERAL, &CanvasPanel::reportCollateral, this);
 }
 
 void CanvasPanel::reportCollateral(wxCommandEvent &event) {
@@ -85,26 +106,32 @@ wxSize CanvasPanel::cropSize() {
 }
 
 void CanvasPanel::updateCanvas(wxBitmap &bm) {
-    createElements(bm);
+    updateElements(bm);
 }
 
-void CanvasPanel::createElements(wxBitmap &bm) {
+void CanvasPanel::updateElements(wxBitmap &bm) {
     if(!bm.IsOk()) return;
     if(!shadow) shadow = new wxWindow(this, wxID_ANY);
-    if(!img) img = new ImageWindow(this, wxID_ANY, bm);
-    else img->updateImage(bm);
+    if(!img) {
+        img = new ImageWindow(this, wxID_ANY, bm);
+    } else img->updateImage(bm);
     initShadow();
     if(!sz) {
         sz = new wxGridSizer(1, 0, 0);
-        initSizer();
+        SetSizer(sz);
     }
-    if(!cropArea) cropArea = new Rectangle(this, ict::CROP_AREA);
+    tryToAttachImg();
+    if(!cropArea) {
+        cropArea = new Rectangle(this, ict::CROP_AREA);
+        bindCrop();
+    }
     initCrop();
 }
 
-void CanvasPanel::initSizer() {
+void CanvasPanel::tryToAttachImg() {
+    if(attachedImg) return;
     sz->Add(img, 0, wxALIGN_CENTER | wxALL, 100);
-    SetSizer(sz);
+    attachedImg = true;
 }
 
 void CanvasPanel::initShadow() {
@@ -121,9 +148,6 @@ void CanvasPanel::initCrop() {
     cropOffset = wxPoint(0, 0);
     cropArea->SetSize(oldCropPosition.x, oldCropPosition.y, img->GetSize().GetWidth(), img->GetSize().GetHeight());
     cropArea->setRestrictions(img->GetRect());
-    //cropArea->activateRestrictions(true);
-    //cropArea->setRatio(2);
-    //cropArea->fixRatio(true);
 }
 
 void CanvasPanel::initParams() {

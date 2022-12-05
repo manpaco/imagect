@@ -24,22 +24,25 @@ class CanvasPanel: public wxScrolledCanvas {
         void cropGeometry(const wxRect &g);
         void fixCrop(bool);
         void allowGrow(bool);
+        void clear();
         ~CanvasPanel();
 
     private:
-        void createElements(wxBitmap &bm);
+        void updateElements(wxBitmap &bm);
         void initElements();
         void reportCollateral(wxCommandEvent &);
         void updateCropPosition(wxSizeEvent &event);
         void reportChange(wxCommandEvent &);
         void sendCropEvent();
         void paintShadow(const wxRect &, wxGraphicsContext *);
-        void setBindings(); 
+        void bindCrop(); 
+        void unbindCrop();
         void saveCropPosition(wxScrollWinEvent &event);
         void initSizer();
         void initShadow();
         void initCrop();
         void initParams();
+        void tryToAttachImg();
 
         Rectangle *cropArea = nullptr;
         ImageWindow *img = nullptr;
@@ -49,6 +52,7 @@ class CanvasPanel: public wxScrolledCanvas {
         wxPoint oldCropPosition;
         wxPoint cropOffset;
         int ppuX, ppuY;
+        bool attachedImg = false;
 };
 
 #endif // CANVASPANEL_H
