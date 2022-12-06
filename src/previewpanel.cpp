@@ -3,11 +3,19 @@
 
 PreviewPanel::PreviewPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
-    initDimensions();
+    createSizer();
+    initParams();
 }
 
 PreviewPanel::PreviewPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm): PreviewPanel(parent, id) {
     updateElements(bm);
+}
+
+void PreviewPanel::createSizer() {
+    sz = new wxBoxSizer(wxVERTICAL);
+    title = new wxStaticText(this, wxID_ANY, "Preview");
+    sz->Add(title, 0, wxALIGN_CENTER_HORIZONTAL);
+    SetSizer(sz);
 }
 
 void PreviewPanel::clear() {
@@ -19,7 +27,7 @@ void PreviewPanel::clear() {
     }
 }
 
-void PreviewPanel::initDimensions() {
+void PreviewPanel::initParams() {
     SetMinSize(wxSize(150, 150));
 }
 
@@ -28,12 +36,6 @@ void PreviewPanel::updateElements(wxBitmap &bm) {
     if(!preview) {
         preview = new ImageWindow(this, wxID_ANY, bm);
     } else preview->updateImage(bm);
-    if(!sz) {
-        sz = new wxBoxSizer(wxVERTICAL);
-        title = new wxStaticText(this, wxID_ANY, "Preview");
-        sz->Add(title, 0, wxALIGN_CENTER_HORIZONTAL);
-        SetSizerAndFit(sz);
-    }
     tryToAttachImg();
     Layout();
 }

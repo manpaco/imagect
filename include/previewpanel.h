@@ -20,9 +20,10 @@ class PreviewPanel: public wxPanel {
         ~PreviewPanel();
 
     private:
+        void createSizer();
         void paintImage(wxPaintEvent &event); 
         void setBindings();
-        void initDimensions();
+        void initParams();
         void updateElements(wxBitmap &bm);
         void tryToAttachImg();
 

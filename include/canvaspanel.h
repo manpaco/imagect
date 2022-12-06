@@ -38,7 +38,7 @@ class CanvasPanel: public wxScrolledCanvas {
         void bindCrop(); 
         void unbindCrop();
         void saveCropPosition(wxScrollWinEvent &event);
-        void initSizer();
+        void createSizer();
         void initShadow();
         void initCrop();
         void initParams();

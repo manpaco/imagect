@@ -5,11 +5,17 @@
 
 CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
+    createSizer();
     initParams();
 }
 
 CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm): CanvasPanel(parent, id) {
     updateElements(bm);
+}
+
+void CanvasPanel::createSizer() {
+    sz = new wxGridSizer(1, 0, 0);
+    SetSizer(sz);
 }
 
 void CanvasPanel::clear() {
@@ -116,16 +122,13 @@ void CanvasPanel::updateElements(wxBitmap &bm) {
         img = new ImageWindow(this, wxID_ANY, bm);
     } else img->updateImage(bm);
     initShadow();
-    if(!sz) {
-        sz = new wxGridSizer(1, 0, 0);
-        SetSizer(sz);
-    }
     tryToAttachImg();
     if(!cropArea) {
         cropArea = new Rectangle(this, ict::CROP_AREA);
         bindCrop();
     }
     initCrop();
+    Layout();
 }
 
 void CanvasPanel::tryToAttachImg() {
