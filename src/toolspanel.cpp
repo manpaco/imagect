@@ -111,7 +111,6 @@ void ToolsPanel::growChoiceChange(wxCommandEvent &event) {
     growChoiceState(false, opts.growChoice);
     growChoiceState(true, event.GetInt());
     opts.growChoice = event.GetInt();
-    updateGrowBlock();
     event.Skip();
 }
 
@@ -119,7 +118,6 @@ void ToolsPanel::growStateChange(wxCommandEvent &event) {
     growSelector->Enable(event.IsChecked());
     growChoiceState(event.IsChecked(), opts.growChoice);
     opts.allowGrow = event.IsChecked();
-    updateGrowBlock();
     event.Skip();
 }
 
@@ -156,21 +154,21 @@ void ToolsPanel::createAspectBlock() {
     widthSizer = new wxBoxSizer(wxHORIZONTAL);
     widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Width:"), 0, 
             wxALIGN_CENTER_VERTICAL);
-    widthSizer->AddSpacer(10);
+    widthSizer->AddSpacer(bestSpace * 2);
     widthSizer->Add(widthCtrl);
 
     heightSizer = new wxBoxSizer(wxHORIZONTAL);
     heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Height:"), 0, 
             wxALIGN_CENTER_VERTICAL);
-    heightSizer->AddSpacer(10);
+    heightSizer->AddSpacer(bestSpace * 2);
     heightSizer->Add(heightCtrl);
 
     aspectSizer = new wxBoxSizer(wxVERTICAL);
-    aspectSizer->AddSpacer(5);
+    aspectSizer->AddSpacer(bestSpace);
     aspectSizer->Add(widthSizer);
-    aspectSizer->AddSpacer(5);
+    aspectSizer->AddSpacer(bestSpace);
     aspectSizer->Add(heightSizer);
-    aspectSizer->AddSpacer(5);
+    aspectSizer->AddSpacer(bestSpace);
     aspectSizer->Add(fixRatio);
     winAspect->SetSizerAndFit(aspectSizer);
 }
@@ -188,18 +186,43 @@ void ToolsPanel::createGrowBlock() {
     growSelector->Enable(false);
     colorPicker = new wxColourPickerCtrl(winGrow, ict::PICK_COLOUR_BT, 
             *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_USE_TEXTCTRL);
-    colorPicker->Show(false);
+    colorPicker->Enable(false);
     imagePicker = new wxFilePickerCtrl(winGrow, ict::PICK_IMG_FP);
-    imagePicker->Show(false);
+    imagePicker->Enable(false);
     backBlur = new wxSlider(winGrow, ict::BACK_BLUR_SL, 0, 0, 100);
-    backBlur->Show(false);
+    backBlur->Enable(false);
 
     growSizer = new wxBoxSizer(wxVERTICAL);
+    growSizer->AddSpacer(bestSpace);
     growSizer->Add(growCheck);
+    growSizer->AddSpacer(bestSpace);
     growSizer->Add(growSelector);
-    growSizer->Add(colorPicker);
-    growSizer->Add(imagePicker);
-    growSizer->Add(backBlur);
+
+    wxBoxSizer *colorSizer = new wxBoxSizer(wxVERTICAL);
+    colorTitle = new wxStaticText(winGrow, wxID_ANY, "Color");
+    colorTitle->Enable(false);
+    colorSizer->AddSpacer(bestSpace);
+    colorSizer->Add(colorTitle);
+    colorSizer->AddSpacer(bestSpace);
+    colorSizer->Add(colorPicker);
+
+    wxBoxSizer *imageSizer = new wxBoxSizer(wxVERTICAL);
+    imageTitle = new wxStaticText(winGrow, wxID_ANY, "Image");
+    imageTitle->Enable(false);
+    imageSizer->AddSpacer(bestSpace);
+    imageSizer->Add(imageTitle);
+    wxBoxSizer *blurSizer = new wxBoxSizer(wxHORIZONTAL);
+    blurSizer->Add(imagePicker);
+    blurSizer->AddSpacer(bestSpace * 2);
+    blurSizer->Add(backBlur);
+    imageSizer->AddSpacer(bestSpace);
+    imageSizer->Add(blurSizer);
+
+    growSizer->AddSpacer(bestSpace);
+    growSizer->Add(colorSizer);
+    growSizer->AddSpacer(bestSpace);
+    growSizer->Add(imageSizer);
+
     winGrow->SetSizerAndFit(growSizer);
 }
 
@@ -214,24 +237,21 @@ void ToolsPanel::createShapeBlock() {
     shapeSelector->SetSelection(0);
     
     shapeSizer = new wxBoxSizer(wxVERTICAL);
+    shapeSizer->AddSpacer(bestSpace);
     shapeSizer->Add(shapeSelector);
     winShape->SetSizerAndFit(shapeSizer);
-}
-
-void ToolsPanel::updateGrowBlock() {
-    if(growBlock->IsCollapsed()) return;
-    growBlock->Collapse();
-    growBlock->Expand();
 }
 
 void ToolsPanel::growChoiceState(bool state, int choice) {
     switch (choice) {
     case ict::COLOR:
-        colorPicker->Show(state);
+        colorTitle->Enable(state);
+        colorPicker->Enable(state);
         break;
     case ict::IMAGE:
-        imagePicker->Show(state);
-        backBlur->Show(state);
+        imageTitle->Enable(state);
+        imagePicker->Enable(state);
+        backBlur->Enable(state);
         break;
     }
 }

@@ -121,6 +121,10 @@ class ToolsPanel: public wxScrolledCanvas {
         wxFilePickerCtrl *imagePicker;
         wxColourPickerCtrl *colorPicker;
         wxBoxSizer *growSizer;
+        ;
+        ;
+        wxStaticText *imageTitle;
+        wxStaticText *colorTitle;
         wxString growChoices[ict::GROW_CHOICE_SIZE];
 
         wxCollapsiblePane *shapeBlock;
@@ -132,6 +136,8 @@ class ToolsPanel: public wxScrolledCanvas {
         OptionsContainer opts;
 
         wxButton *apply;
+
+        const int bestSpace = 5;
 
 };
 
