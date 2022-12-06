@@ -86,6 +86,7 @@ void MainFrame::bindMenuBar() {
     Bind(wxEVT_MENU, &MainFrame::onQuit, this, wxID_EXIT);
     Bind(wxEVT_MENU, &MainFrame::saveState, this, wxID_APPLY);
     Bind(wxEVT_MENU, &MainFrame::onClose, this, wxID_CLOSE);
+    Bind(wxEVT_MENU, &MainFrame::onAbout, this, wxID_ABOUT);
 }
 
 void MainFrame::bindElements() {
@@ -100,6 +101,10 @@ void MainFrame::unbindElements() {
     tools->Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
     tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
+}
+
+void MainFrame::onAbout(wxCommandEvent &event) {
+    wxMessageBox(_("Image Cropping Tool\rby manpaco"), _("About"), wxOK | wxICON_INFORMATION);
 }
 
 void MainFrame::onClose(wxCommandEvent &event) {

@@ -53,6 +53,7 @@ class MainFrame: public wxFrame {
         void onQuitFrame(wxCloseEvent &event);
         int showProceedMessage();
         int showCloseMessage();
+        void onAbout(wxCommandEvent &event);
 
         CanvasPanel *canvas = nullptr;
         ToolsPanel *tools = nullptr;
