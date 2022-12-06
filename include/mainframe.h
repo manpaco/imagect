@@ -50,6 +50,9 @@ class MainFrame: public wxFrame {
         void exportImage();
         void openImage(const wxString &p);
         void clear();
+        void onQuitFrame(wxCloseEvent &event);
+        int showProceedMessage();
+        int showCloseMessage();
 
         CanvasPanel *canvas = nullptr;
         ToolsPanel *tools = nullptr;

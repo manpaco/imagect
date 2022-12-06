@@ -16,6 +16,7 @@ MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Cropping Tool") {
     allocateMem();
     overlayPanels();
     initParams();
+    Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onQuitFrame, this);
 }
 
 MainFrame::MainFrame(const wxString &initImg): MainFrame() {
@@ -104,16 +105,14 @@ void MainFrame::unbindElements() {
 void MainFrame::onClose(wxCommandEvent &event) {
     if(!openedImg) return;
     if(!exportedImg) {
-        if(wxMessageBox(_("Current content has not been exported! Proceed?"), 
-                _("Please confirm"), wxYES_NO, this) == wxNO) return;
+        if(showProceedMessage() == wxNO) return;
     }
     clear();
 }
 
 void MainFrame::onOpen(wxCommandEvent &event) {
     if(openedImg && !exportedImg) {
-        if(wxMessageBox(_("Current content has not been exported! Proceed?"), 
-                _("Please confirm"), wxYES_NO, this) == wxNO) return;
+        if(showProceedMessage() == wxNO) return;
     }
     wxFileDialog openDlg(this, _("Open image"), "", "", 
             _("PNG (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*jpeg;*.jpg"), 
@@ -123,19 +122,42 @@ void MainFrame::onOpen(wxCommandEvent &event) {
 }
 
 void MainFrame::onExport(wxCommandEvent &event) {
+    if(!openedImg) return;
     exportImage();
 }
 
 void MainFrame::onQuit(wxCommandEvent &event) {
-    if(openedImg && !exportedImg) {
-        if(wxMessageBox(_("Current content has not been exported! Proceed?"), 
-                _("Please confirm"), wxYES_NO, this) == wxNO) return;
+    Close(false);
+}
+
+void MainFrame::onQuitFrame(wxCloseEvent &event) {
+    if(event.CanVeto() && openedImg) {
+        if(!exportedImg) {
+            if(showProceedMessage() == wxNO) {
+                event.Veto();
+                return;
+            }
+        } else {
+            if(showCloseMessage() == wxNO) {
+                event.Veto();
+                return;
+            }
+        }
     }
-    Close();
+    event.Skip();
+}
+
+int MainFrame::showCloseMessage() {
+    return wxMessageBox(_("There is an image in the workspace! Close anyway?"), 
+            _("Please confirm"), wxYES_NO, this);
+}
+
+int MainFrame::showProceedMessage() {
+    return wxMessageBox(_("Current content has not been exported! Proceed?"), 
+            _("Please confirm"), wxICON_QUESTION | wxYES_NO, this);
 }
 
 void MainFrame::exportImage() {
-    if(!openedImg) return;
     wxFileDialog exportDlg(this, _("Export image"),wxEmptyString, wxEmptyString, 
             "PNG (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*jpeg;*.jpg", 
             wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
