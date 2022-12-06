@@ -10,13 +10,19 @@
 
 using Magick::Quantum;
 
-MainFrame::MainFrame(): wxFrame(NULL, wxID_ANY, "Image Cropping Tool") {
+MainFrame::MainFrame(): 
+    wxFrame(NULL, wxID_ANY, "Image Cropping Tool", wxDefaultPosition, 
+            wxDefaultSize, wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | 
+            wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN | 
+            wxMAXIMIZE) {
     createMenuBar();
     bindMenuBar();
     allocateMem();
     overlayPanels();
     initParams();
+    initDimensions();
     Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onQuitFrame, this);
+    //Bind(wxEVT_MAXIMIZE, &MainFrame::onMaximize, this);
 }
 
 MainFrame::MainFrame(const wxString &initImg): MainFrame() {
@@ -26,6 +32,19 @@ MainFrame::MainFrame(const wxString &initImg): MainFrame() {
 MainFrame::~MainFrame() {
     if(sourceImg) delete(sourceImg);
     if(scaledImg) delete(scaledImg);
+}
+
+void MainFrame::onMaximize(wxMaximizeEvent &event) {
+    Fit();
+    event.Skip();
+}
+
+void MainFrame::initDimensions() {
+    minMainSplitterSize = wxSystemSettings::GetMetric(wxSYS_SCREEN_X) / mainSplitterFactor;
+    minSideSplitterSize = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) / sideSplitterFactor;
+    mainSplitter->SetMinimumPaneSize(minMainSplitterSize);
+    sideSplitter->SetMinimumPaneSize(minSideSplitterSize);
+    SetMinClientSize(wxSize(minMainSplitterSize * 2, minSideSplitterSize * 2));
 }
 
 void MainFrame::allocateMem() {
@@ -71,9 +90,8 @@ wxBitmap MainFrame::createBitmap(Magick::Image &img) {
 }
 
 void MainFrame::overlayPanels() {
-    sideSplitter->SplitHorizontally(tools, preview);
-    mainSplitter->SplitVertically(canvas, sideSplitter);
-    mainSplitter->SetMinimumPaneSize(150);
+    sideSplitter->SplitHorizontally(preview, tools);
+    mainSplitter->SplitVertically(sideSplitter, canvas);
     mainSizer->Add(mainSplitter, 1, wxEXPAND);
     SetSizerAndFit(mainSizer);
 }

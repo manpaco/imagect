@@ -54,6 +54,8 @@ class MainFrame: public wxFrame {
         int showProceedMessage();
         int showCloseMessage();
         void onAbout(wxCommandEvent &event);
+        void initDimensions();
+        void onMaximize(wxMaximizeEvent &event);
 
         CanvasPanel *canvas = nullptr;
         ToolsPanel *tools = nullptr;
@@ -71,6 +73,10 @@ class MainFrame: public wxFrame {
         std::list<State>::iterator currentState;
 
         bool openedImg, exportedImg;
+
+        int minMainSplitterSize, minSideSplitterSize;
+        const int mainSplitterFactor = 4;
+        const int sideSplitterFactor = 3;
 
 };
 
