@@ -219,6 +219,7 @@ void ToolsPanel::createShapeBlock() {
 }
 
 void ToolsPanel::updateGrowBlock() {
+    if(growBlock->IsCollapsed()) return;
     growBlock->Collapse();
     growBlock->Expand();
 }
