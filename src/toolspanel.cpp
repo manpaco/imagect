@@ -130,11 +130,6 @@ void ToolsPanel::createTools() {
     createAspectBlock();
     createGrowBlock();
     createShapeBlock();
-    createButtons();
-}
-
-void ToolsPanel::createButtons() {
-    apply = new wxButton(this, ict::APPLY_BT, "Apply");
 }
 
 void ToolsPanel::createAspectBlock() {
@@ -259,7 +254,6 @@ void ToolsPanel::growChoiceState(bool state, int choice) {
 void ToolsPanel::initGrowChoices() {
     growChoices[ict::COLOR] = wxString("Color");
     growChoices[ict::IMAGE] = wxString("Image");
-    opts.growChoice = 0;
 }
 
 void ToolsPanel::initShapeChoices() {
@@ -270,11 +264,9 @@ void ToolsPanel::initShapeChoices() {
 
 void ToolsPanel::overlayTools() {
     toolsSizer = new wxBoxSizer(wxVERTICAL);
-    toolsSizer->Add(aspectBlock, 0, wxGROW | wxALL, 5);
-    toolsSizer->Add(shapeBlock, 0, wxGROW | wxALL, 5);
-    toolsSizer->Add(growBlock, 0, wxGROW | wxALL, 5);
-    toolsSizer->AddSpacer(10);
-    toolsSizer->Add(apply, 0, wxALIGN_CENTER);
+    toolsSizer->Add(aspectBlock, 0, wxGROW | wxALL, bestSpace);
+    toolsSizer->Add(shapeBlock, 0, wxGROW | wxALL, bestSpace);
+    toolsSizer->Add(growBlock, 0, wxGROW | wxALL, bestSpace);
     SetSizerAndFit(toolsSizer);
     SetScrollRate(5, 5);
 }
