@@ -119,12 +119,16 @@ void Rectangle::setGeometryInternally(const wxRect &g) {
 }
 
 void Rectangle::setGeometry(const wxRect &g) {
+    wxRect next(g);
+    wxRect prevRect = GetRect();
     fixHint = ict::SE;
     setRatio((float)g.GetWidth() / (float)g.GetHeight());
     accumX = 0.0; accumY = 0.0;
-    wxRect prevRect = GetRect();
-    modify(g);
-    if(g != prevRect || g != GetRect()) sendChangeEvent();
+    if(restricted && !restrictions.Contains(next.GetPosition())) {
+        next.SetPosition(restrictions.GetPosition());
+    }
+    modify(next);
+    if(prevRect != GetRect() || g != GetRect()) sendChangeEvent();
 }
 
 void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
@@ -201,10 +205,6 @@ void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
 
 void Rectangle::modify(const wxRect &ng) {
     wxRect next(ng);
-    if(restricted && !restrictions.Contains(next.GetPosition())) {
-        Move(restrictions.GetPosition());
-        next.SetPosition(GetPosition());
-    }
     if(restricted && !restrictions.Contains(next)) {
         if(!fix) next.Intersect(restrictions);
         else fitInRestrictions(next);
