@@ -1,7 +1,6 @@
 #include "canvaspanel.h"
 #include "rectangle.h"
 #include "cropevent.h"
-#include <wx/graphics.h>
 
 CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);

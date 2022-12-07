@@ -7,7 +7,6 @@
     #include <wx/wx.h>
 #endif
 
-#include "wx/custombgwin.h"
 #include "rectangle.h"
 #include "imagewindow.h"
 

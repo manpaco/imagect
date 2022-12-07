@@ -10,9 +10,11 @@
 #if wxUSE_COLOURPICKERCTRL
     #include <wx/clrpicker.h>
 #endif
+
 #if wxUSE_FILEPICKERCTRL
     #include <wx/filepicker.h>
 #endif
+
 #if wxUSE_COLLPANE
     #include <wx/collpane.h>
 #endif
