@@ -17,6 +17,10 @@
     #include <wx/collpane.h>
 #endif
 
+#if wxUSE_STATLINE
+    #include <wx/statline.h>
+#endif
+
 #include "identifiersdef.h"
 
 struct OptionsContainer {
@@ -120,9 +124,10 @@ class ToolsPanel: public wxScrolledCanvas {
         wxFilePickerCtrl *imagePicker;
         wxColourPickerCtrl *colorPicker;
         wxBoxSizer *growSizer;
-        wxStaticText *imageTitle;
-        wxStaticText *colorTitle;
         wxString growChoices[ict::GROW_CHOICE_SIZE];
+        wxStaticText *blurText;
+        wxStaticText *colorText;
+        wxStaticText *imageText;
 
         wxCollapsiblePane *shapeBlock;
         wxBoxSizer *shapeSizer;

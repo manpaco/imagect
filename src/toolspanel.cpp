@@ -161,11 +161,15 @@ void ToolsPanel::createAspectBlock() {
 
     aspectSizer = new wxBoxSizer(wxVERTICAL);
     aspectSizer->AddSpacer(bestSpace);
-    aspectSizer->Add(widthSizer);
-    aspectSizer->AddSpacer(bestSpace);
-    aspectSizer->Add(heightSizer);
-    aspectSizer->AddSpacer(bestSpace);
     aspectSizer->Add(fixRatio);
+    wxStaticLine *fl = new wxStaticLine(winAspect);
+    aspectSizer->AddSpacer(bestSpace);
+    aspectSizer->Add(fl, 0, wxEXPAND);
+    aspectSizer->AddSpacer(bestSpace);
+    aspectSizer->Add(widthSizer, 0, wxALIGN_CENTER);
+    aspectSizer->AddSpacer(bestSpace);
+    aspectSizer->Add(heightSizer, 0, wxALIGN_CENTER);
+    aspectSizer->AddSpacer(bestSpace);
     winAspect->SetSizerAndFit(aspectSizer);
 }
 
@@ -181,7 +185,7 @@ void ToolsPanel::createGrowBlock() {
             wxArrayString(ict::GROW_CHOICE_SIZE, growChoices));
     growSelector->Enable(false);
     colorPicker = new wxColourPickerCtrl(winGrow, ict::PICK_COLOUR_BT, 
-            *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_USE_TEXTCTRL);
+            *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL);
     colorPicker->Enable(false);
     imagePicker = new wxFilePickerCtrl(winGrow, ict::PICK_IMG_FP);
     imagePicker->Enable(false);
@@ -192,32 +196,35 @@ void ToolsPanel::createGrowBlock() {
     growSizer->AddSpacer(bestSpace);
     growSizer->Add(growCheck);
     growSizer->AddSpacer(bestSpace);
-    growSizer->Add(growSelector);
-
-    wxBoxSizer *colorSizer = new wxBoxSizer(wxVERTICAL);
-    colorTitle = new wxStaticText(winGrow, wxID_ANY, "Color");
-    colorTitle->Enable(false);
-    colorSizer->AddSpacer(bestSpace);
-    colorSizer->Add(colorTitle);
-    colorSizer->AddSpacer(bestSpace);
-    colorSizer->Add(colorPicker);
-
-    wxBoxSizer *imageSizer = new wxBoxSizer(wxVERTICAL);
-    imageTitle = new wxStaticText(winGrow, wxID_ANY, "Image");
-    imageTitle->Enable(false);
-    imageSizer->AddSpacer(bestSpace);
-    imageSizer->Add(imageTitle);
-    wxBoxSizer *blurSizer = new wxBoxSizer(wxHORIZONTAL);
-    blurSizer->Add(imagePicker);
-    blurSizer->AddSpacer(bestSpace * 2);
-    blurSizer->Add(backBlur);
-    imageSizer->AddSpacer(bestSpace);
-    imageSizer->Add(blurSizer);
-
+    growSizer->Add(growSelector, 0, wxALIGN_CENTER);
     growSizer->AddSpacer(bestSpace);
-    growSizer->Add(colorSizer);
+    wxStaticLine *fl = new wxStaticLine(winGrow);
+    growSizer->Add(fl, 0, wxEXPAND);
     growSizer->AddSpacer(bestSpace);
-    growSizer->Add(imageSizer);
+    colorText = new wxStaticText(winGrow, wxID_ANY, "Color :");
+    colorText->Enable(false);
+    wxBoxSizer *hColorSizer = new wxBoxSizer(wxHORIZONTAL);
+    hColorSizer->Add(colorText, 0, wxALIGN_CENTER);
+    hColorSizer->AddSpacer(bestSpace);
+    hColorSizer->Add(colorPicker, 0, wxALIGN_CENTER);
+    growSizer->Add(hColorSizer, 0, wxALIGN_CENTER);
+    growSizer->AddSpacer(bestSpace);
+    wxStaticLine *sl = new wxStaticLine(winGrow);
+    growSizer->Add(sl, 0, wxEXPAND);
+    growSizer->AddSpacer(bestSpace);
+    imageText = new wxStaticText(winGrow, wxID_ANY, "Image :");
+    imageText->Enable(false);
+    wxBoxSizer *hImageSizer = new wxBoxSizer(wxHORIZONTAL);
+    hImageSizer->Add(imageText, 0, wxALIGN_CENTER);
+    hImageSizer->AddSpacer(bestSpace);
+    hImageSizer->Add(imagePicker);
+    growSizer->Add(hImageSizer, 0, wxALIGN_CENTER);
+    blurText = new wxStaticText(winGrow, wxID_ANY, "Blur");
+    blurText->Enable(false);
+    growSizer->AddSpacer(bestSpace);
+    growSizer->Add(blurText, 0, wxALIGN_CENTER);
+    growSizer->Add(backBlur, 0, wxEXPAND);
+    growSizer->AddSpacer(bestSpace);
 
     winGrow->SetSizerAndFit(growSizer);
 }
@@ -234,19 +241,20 @@ void ToolsPanel::createShapeBlock() {
     
     shapeSizer = new wxBoxSizer(wxVERTICAL);
     shapeSizer->AddSpacer(bestSpace);
-    shapeSizer->Add(shapeSelector);
+    shapeSizer->Add(shapeSelector, 0, wxALIGN_CENTER);
     winShape->SetSizerAndFit(shapeSizer);
 }
 
 void ToolsPanel::growChoiceState(bool state, int choice) {
     switch (choice) {
     case ict::COLOR:
-        colorTitle->Enable(state);
+        colorText->Enable(state);
         colorPicker->Enable(state);
         break;
     case ict::IMAGE:
-        imageTitle->Enable(state);
+        imageText->Enable(state);
         imagePicker->Enable(state);
+        blurText->Enable(state);
         backBlur->Enable(state);
         break;
     }
