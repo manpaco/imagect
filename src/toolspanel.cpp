@@ -18,8 +18,7 @@ ToolsPanel::~ToolsPanel() {
 
 void ToolsPanel::clear(bool enableOp) {
     Enable(enableOp);
-    opts = OptionsContainer();
-    setOpts(opts);
+    setOpts(OptionsContainer());
     shapeBlock->Collapse();
     growBlock->Collapse();
     aspectBlock->Collapse();
