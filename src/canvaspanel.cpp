@@ -40,20 +40,12 @@ void CanvasPanel::bindCrop() {
     img->Bind(wxEVT_SIZE, &CanvasPanel::updateCropPosition, this);
     Bind(EVT_RECTANGLE_CHANGE, &CanvasPanel::reportChange, this);
     Bind(wxEVT_SCROLLWIN_THUMBTRACK, &CanvasPanel::saveCropPosition, this);
-    Bind(EVT_RECTANGLE_COLLATERAL, &CanvasPanel::reportCollateral, this);
 }
 
 void CanvasPanel::unbindCrop() {
     img->Unbind(wxEVT_SIZE, &CanvasPanel::updateCropPosition, this);
     Unbind(EVT_RECTANGLE_CHANGE, &CanvasPanel::reportChange, this);
     Unbind(wxEVT_SCROLLWIN_THUMBTRACK, &CanvasPanel::saveCropPosition, this);
-    Unbind(EVT_RECTANGLE_COLLATERAL, &CanvasPanel::reportCollateral, this);
-}
-
-void CanvasPanel::reportCollateral(wxCommandEvent &event) {
-    cropOffset += cropArea->GetPosition() - oldCropPosition;
-    oldCropPosition = cropArea->GetPosition();
-    sendCropEvent();
 }
 
 void CanvasPanel::reportChange(wxCommandEvent &event) {

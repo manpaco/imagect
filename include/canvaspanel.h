@@ -30,7 +30,6 @@ class CanvasPanel: public wxScrolledCanvas {
     private:
         void updateElements(wxBitmap &bm);
         void initElements();
-        void reportCollateral(wxCommandEvent &);
         void updateCropPosition(wxSizeEvent &event);
         void reportChange(wxCommandEvent &);
         void sendCropEvent();
