@@ -123,12 +123,13 @@ void MainFrame::bindElements() {
 void MainFrame::unbindElements() {
     canvas->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
     Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
+    Unbind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
     tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
 }
 
 void MainFrame::resetCrop(wxCommandEvent &event) {
-
+    canvas->cropGeometry(wxRect(wxPoint(0, 0), wxSize(-1, -1)));
 }
 
 void MainFrame::onAbout(wxCommandEvent &event) {
@@ -260,25 +261,25 @@ void MainFrame::onAllowGrow(wxCommandEvent &event) {
 
 void MainFrame::undo(wxCommandEvent &event) {
     currentState--;
-    updateCropGeometry();
+    tools->setOpts(std::get<1>(*currentState));
+    updateCropGeometry(*currentState);
     if(currentState == history.begin()) mEdit->Enable(wxID_UNDO, false);
     mEdit->Enable(wxID_REDO, true);
-    tools->setOpts(std::get<1>(*currentState));
     composePreview();
     exportedImg = false;
 }
 
-void MainFrame::updateCropGeometry() {
-    wxRect g(std::get<0>(*currentState), std::get<1>(*currentState).cropSize);
+void MainFrame::updateCropGeometry(State &s) {
+    wxRect g(std::get<0>(s), std::get<1>(s).cropSize);
     canvas->cropGeometry(g);
 }
 
 void MainFrame::redo(wxCommandEvent &event) {
     if(currentState == history.begin()) mEdit->Enable(wxID_UNDO, true);
     currentState++;
-    updateCropGeometry();
-    if(currentState == --history.end()) mEdit->Enable(wxID_REDO, false);
     tools->setOpts(std::get<1>(*currentState));
+    updateCropGeometry(*currentState);
+    if(currentState == --history.end()) mEdit->Enable(wxID_REDO, false);
     composePreview();
     exportedImg = false;
 }
@@ -323,10 +324,8 @@ void MainFrame::composePreview() {
 
 void MainFrame::saveState(wxCommandEvent &event) {
     // update preview and/or update crop rectangle
-    OptionsContainer opts = tools->currentOpts();
-    canvas->cropSize(opts.cropSize);
-    if(tools->cropSize() != opts.cropSize) tools->cropSize(opts.cropSize);
-    State toSave = std::make_tuple(canvas->getCropOffset(), opts);
+    canvas->cropSize(tools->cropSize());
+    State toSave = std::make_tuple(canvas->getCropOffset(), tools->currentOpts());
     if(toSave == *currentState) return;
     updateHistory(toSave);
 }
