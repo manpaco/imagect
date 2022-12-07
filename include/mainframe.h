@@ -55,7 +55,7 @@ class MainFrame: public wxFrame {
         int showCloseMessage();
         void onAbout(wxCommandEvent &event);
         void initDimensions();
-        void onMaximize(wxMaximizeEvent &event);
+        void resetCrop(wxCommandEvent &event);
 
         CanvasPanel *canvas = nullptr;
         ToolsPanel *tools = nullptr;
@@ -65,6 +65,9 @@ class MainFrame: public wxFrame {
         wxBoxSizer *mainSizer = nullptr;
         Magick::Image *sourceImg = nullptr;
         Magick::Image *scaledImg = nullptr;
+
+        wxButton *apply;
+        wxButton *reset;
 
         wxMenuBar *topMenuBar;
         wxMenu *mFile, *mEdit, *mHelp;

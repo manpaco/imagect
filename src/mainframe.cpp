@@ -10,6 +10,8 @@
 
 using Magick::Quantum;
 
+extern const int bestSpace = 5;
+
 MainFrame::MainFrame(): 
     wxFrame(NULL, wxID_ANY, "Image Cropping Tool", wxDefaultPosition, 
             wxDefaultSize, wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | 
@@ -22,7 +24,6 @@ MainFrame::MainFrame():
     initParams();
     initDimensions();
     Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onQuitFrame, this);
-    //Bind(wxEVT_MAXIMIZE, &MainFrame::onMaximize, this);
 }
 
 MainFrame::MainFrame(const wxString &initImg): MainFrame() {
@@ -34,17 +35,12 @@ MainFrame::~MainFrame() {
     if(scaledImg) delete(scaledImg);
 }
 
-void MainFrame::onMaximize(wxMaximizeEvent &event) {
-    Fit();
-    event.Skip();
-}
-
 void MainFrame::initDimensions() {
     minMainSplitterSize = wxSystemSettings::GetMetric(wxSYS_SCREEN_X) / mainSplitterFactor;
     minSideSplitterSize = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) / sideSplitterFactor;
     mainSplitter->SetMinimumPaneSize(minMainSplitterSize);
     sideSplitter->SetMinimumPaneSize(minSideSplitterSize);
-    SetMinClientSize(wxSize(minMainSplitterSize * 2, minSideSplitterSize * 2));
+    SetMinClientSize(wxSize(minMainSplitterSize * 3.0, minSideSplitterSize * 2.5));
 }
 
 void MainFrame::allocateMem() {
@@ -53,7 +49,9 @@ void MainFrame::allocateMem() {
     canvas = new CanvasPanel(mainSplitter, ict::CANVAS);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
-    mainSizer = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer = new wxBoxSizer(wxVERTICAL);
+    apply = new wxButton(this, ict::APPLY_BT, "Apply");
+    reset = new wxButton(this, ict::RESET_CROP_BT, "Reset crop area");
 }
 
 void MainFrame::createMenuBar() {
@@ -92,6 +90,13 @@ wxBitmap MainFrame::createBitmap(Magick::Image &img) {
 void MainFrame::overlayPanels() {
     sideSplitter->SplitHorizontally(preview, tools);
     mainSplitter->SplitVertically(sideSplitter, canvas);
+    wxBoxSizer *buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
+    buttonsSizer->AddSpacer(bestSpace);
+    buttonsSizer->Add(apply);
+    buttonsSizer->AddSpacer(bestSpace);
+    buttonsSizer->Add(reset);
+    mainSizer->Add(buttonsSizer);
+    mainSizer->AddSpacer(bestSpace);
     mainSizer->Add(mainSplitter, 1, wxEXPAND);
     SetSizerAndFit(mainSizer);
 }
@@ -109,16 +114,21 @@ void MainFrame::bindMenuBar() {
 
 void MainFrame::bindElements() {
     canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
-    tools->Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
+    Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
+    Bind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
     tools->Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
 }
 
 void MainFrame::unbindElements() {
     canvas->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
-    tools->Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
+    Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
     tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
+}
+
+void MainFrame::resetCrop(wxCommandEvent &event) {
+
 }
 
 void MainFrame::onAbout(wxCommandEvent &event) {
