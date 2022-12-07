@@ -1,11 +1,9 @@
 #include "mainframe.h"
-#include "Magick++.h"
 #include "canvaspanel.h"
 #include "cropevent.h"
 #include "identifiersdef.h"
 #include "previewpanel.h"
 #include "toolspanel.h"
-#include "wx/splitter.h"
 #include "imgtools.h"
 
 using Magick::Quantum;
@@ -95,8 +93,11 @@ void MainFrame::overlayPanels() {
     buttonsSizer->Add(apply);
     buttonsSizer->AddSpacer(bestSpace);
     buttonsSizer->Add(reset);
+    mainSizer->AddSpacer(bestSpace);
     mainSizer->Add(buttonsSizer);
     mainSizer->AddSpacer(bestSpace);
+    wxStaticLine *hLine = new wxStaticLine(this);
+    mainSizer->Add(hLine, 0, wxEXPAND);
     mainSizer->Add(mainSplitter, 1, wxEXPAND);
     SetSizerAndFit(mainSizer);
 }
