@@ -2,6 +2,8 @@
 #include <string>
 #include "wx/valnum.h"
 
+extern const int bestSpace;
+
 ToolsPanel::ToolsPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
     createTools();

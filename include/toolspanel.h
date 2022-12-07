@@ -132,7 +132,6 @@ class ToolsPanel: public wxScrolledCanvas {
         wxBoxSizer *toolsSizer;
         OptionsContainer opts;
 
-        const int bestSpace = 5;
 
 };
 
