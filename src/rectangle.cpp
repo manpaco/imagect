@@ -112,7 +112,7 @@ void Rectangle::activateRestrictions(bool op) {
 void Rectangle::setGeometryInternally(const wxRect &g) {
     float prevAx = accumX, prevAy = accumY;
     setGeometry(g);
-    if(g == GetRect()) {
+    if(g.GetSize() == GetSize()) {
         accumX = prevAx;
         accumY = prevAy;
     }
@@ -124,7 +124,7 @@ void Rectangle::setGeometry(const wxRect &g) {
     accumX = 0.0; accumY = 0.0;
     wxRect prevRect = GetRect();
     modify(g);
-    if(g != prevRect) sendChangeEvent();
+    if(g != prevRect || g != GetRect()) sendChangeEvent();
 }
 
 void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
