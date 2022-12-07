@@ -1,14 +1,21 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
-#include "Magick++/Image.h"
 #include <wx/wxprec.h>
-#include "wx/splitter.h"
 
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
 #endif
 
+#if wxUSE_STATLINE
+    #include <wx/statline.h>
+#endif
+
+#if wxUSE_SPLITTER
+    #include <wx/splitter.h>
+#endif
+
+#include "Magick++/Image.h"
 #include "canvaspanel.h"
 #include "toolspanel.h"
 #include "previewpanel.h"
