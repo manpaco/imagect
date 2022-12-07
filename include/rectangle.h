@@ -26,7 +26,7 @@ class Rectangle : public wxControl {
         void setRatio(float r);
         void setRestrictions(const wxRect &r);
         void activateRestrictions(bool op);
-        void changeSize(wxSize &s);
+        void setGeometry(const wxRect &g);
         void sendChangeEvent();
         ~Rectangle();
         
@@ -35,7 +35,7 @@ class Rectangle : public wxControl {
     private:
         ict::Zone getLocation(const wxPoint);
         void changeCursor(ict::Zone type);
-        void modify(wxRect &ng);
+        void modify(const wxRect &ng);
         void resizeUsing(ict::Zone);
         void fitInRestrictions(wxRect &fixRatioRect);
         void init();
@@ -52,6 +52,7 @@ class Rectangle : public wxControl {
         void defineX(int &dxToCalc, int &dyToUse);
         void defineY(int &dyToCalc, int &dxToUse);
         void sendCollateralEvent();
+        void setGeometryInternally(const wxRect &g);
 
         wxPoint clientPressPoint;
         wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;

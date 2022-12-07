@@ -107,20 +107,7 @@ void Rectangle::setRestrictions(const wxRect &r) {
 
 void Rectangle::activateRestrictions(bool op) {
     restricted = op;
-    wxRect prevRect(GetRect());
-    wxRect actualRect(GetRect());
-    if(restricted) {
-        if(!restrictions.Contains(actualRect.GetPosition())) {
-            Move(restrictions.GetPosition());
-            actualRect = GetRect();
-        }
-        if(!restrictions.Contains(actualRect)) {
-            fixHint = ict::SE;
-            modify(actualRect);
-            actualRect = GetRect();
-        }
-    }
-    if(prevRect != actualRect) sendCollateralEvent();
+    setGeometryInternally(GetRect());
 }
 
 void Rectangle::sendCollateralEvent() {
@@ -129,15 +116,26 @@ void Rectangle::sendCollateralEvent() {
     ProcessWindowEvent(toSend);
 }
 
-void Rectangle::changeSize(wxSize &s) {
-    if(fix) {
-        fixHint = ict::SE;
-        setRatio((float)s.GetWidth() / (float)s.GetHeight());
-        accumX = 0.0; accumY = 0.0;
+void Rectangle::setGeometryInternally(const wxRect &g) {
+    float prevAx = accumX, prevAy = accumY;
+    setGeometry(g);
+    if(g == GetRect()) {
+        accumX = prevAx;
+        accumY = prevAy;
     }
-    wxRect newGeometry(GetPosition(), s);
-    modify(newGeometry);
-    s = newGeometry.GetSize();
+}
+
+void Rectangle::setGeometry(const wxRect &g) {
+    fixHint = ict::SE;
+    setRatio((float)g.GetWidth() / (float)g.GetHeight());
+    accumX = 0.0; accumY = 0.0;
+    wxRect prevRect = GetRect();
+    modify(g);
+    if(g != GetRect()) {
+        sendCollateralEvent();
+        return;
+    }
+    if(g != prevRect) sendChangeEvent();
 }
 
 void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
@@ -212,36 +210,45 @@ void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
     }
 }
 
-void Rectangle::modify(wxRect &ng) {
-    if(restricted && !restrictions.Contains(ng)) {
-        if(!fix) ng.Intersect(restrictions);
-        else fitInRestrictions(ng);
+void Rectangle::modify(const wxRect &ng) {
+    wxRect next(ng);
+    if(restricted && !restrictions.Contains(next.GetPosition())) {
+        Move(restrictions.GetPosition());
+        next.SetPosition(GetPosition());
     }
-    SetSize(ng.GetX(), ng.GetY(), ng.GetWidth(), ng.GetHeight());
+    if(restricted && !restrictions.Contains(next)) {
+        if(!fix) next.Intersect(restrictions);
+        else fitInRestrictions(next);
+    }
+    SetSize(next.GetX(), next.GetY(), next.GetWidth(), next.GetHeight());
 }
 
 void Rectangle::defineX(int &dxToCalc, int &dyToUse) {
     accumX = (float)dyToUse * ratio;
     dxToCalc = std::floor(accumX);
     accumX -= dxToCalc;
+    accumY = 0;
 }
 
 void Rectangle::defineY(int &dyToCalc, int &dxToUse) {
     accumY = (float)dxToUse / ratio;
     dyToCalc = std::floor(accumY);
     accumY -= dyToCalc;
+    accumX = 0;
 }
 
 void Rectangle::accumulateX(int &dxToCalc, int &dyToUse) {
     accumX += (float)dyToUse * ratio;
     dxToCalc = std::floor(accumX);
     accumX -= dxToCalc;
+    accumY = 0;
 }
 
 void Rectangle::accumulateY(int &dyToCalc, int &dxToUse) {
     accumY += (float)dxToUse / ratio;
     dyToCalc = std::floor(accumY);
     accumY -= dyToCalc;
+    accumX = 0;
 }
 
 void Rectangle::resizeUsing(ict::Zone zone){
