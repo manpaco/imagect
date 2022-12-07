@@ -13,6 +13,7 @@ class ImageWindow: public wxWindow {
                 const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize);
         ImageWindow(wxWindow *parent, wxWindowID id, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize);
         void updateImage(wxBitmap &bm);
+        bool AcceptsFocus() const;
         ~ImageWindow();
 
     private:

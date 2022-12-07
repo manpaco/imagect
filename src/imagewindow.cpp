@@ -11,6 +11,10 @@ ImageWindow::ImageWindow(wxWindow *parent, wxWindowID id, const wxPoint &pos, co
     setBindings();
 }
 
+bool ImageWindow::AcceptsFocus() const {
+    return false;
+}
+
 void ImageWindow::setImage(wxBitmap &bm) {
     if(!bm.IsOk()) return;
     if(img) delete img;
