@@ -28,6 +28,7 @@ class PreviewPanel: public wxPanel {
         void tryToAttachImg();
 
         wxBoxSizer *sz = nullptr;
+        wxGridSizer *imgSz = nullptr;
         ImageWindow *preview = nullptr;
         wxStaticText *title = nullptr;
 

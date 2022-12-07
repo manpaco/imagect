@@ -14,13 +14,15 @@ PreviewPanel::PreviewPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm): Previ
 void PreviewPanel::createSizer() {
     sz = new wxBoxSizer(wxVERTICAL);
     title = new wxStaticText(this, wxID_ANY, "Preview");
-    sz->Add(title, 0, wxALIGN_CENTER_HORIZONTAL);
+    sz->Add(title, 0, wxALIGN_CENTER);
+    imgSz = new wxGridSizer(1, 0, 0);
+    sz->Add(imgSz, 1, wxALIGN_CENTER);
     SetSizer(sz);
 }
 
 void PreviewPanel::clear() {
     if(preview) {
-        sz->Detach(preview);
+        imgSz->Detach(preview);
         attachedImg = false;
         preview->Destroy();
         preview = nullptr;
@@ -42,7 +44,7 @@ void PreviewPanel::updateElements(wxBitmap &bm) {
 
 void PreviewPanel::tryToAttachImg() {
     if(attachedImg) return;
-    sz->Add(preview, 0, wxALIGN_CENTER);
+    imgSz->Add(preview, 0, wxALIGN_CENTER);
     attachedImg = true;
 }
 
