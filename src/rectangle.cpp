@@ -6,7 +6,6 @@
 
 wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
 wxDEFINE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);
-wxDEFINE_EVENT(EVT_RECTANGLE_COLLATERAL, wxCommandEvent);
 
 Rectangle::Rectangle() {
     init();
@@ -110,12 +109,6 @@ void Rectangle::activateRestrictions(bool op) {
     setGeometryInternally(GetRect());
 }
 
-void Rectangle::sendCollateralEvent() {
-    wxCommandEvent toSend(EVT_RECTANGLE_COLLATERAL, GetId());
-    toSend.SetEventObject(this);
-    ProcessWindowEvent(toSend);
-}
-
 void Rectangle::setGeometryInternally(const wxRect &g) {
     float prevAx = accumX, prevAy = accumY;
     setGeometry(g);
@@ -131,10 +124,6 @@ void Rectangle::setGeometry(const wxRect &g) {
     accumX = 0.0; accumY = 0.0;
     wxRect prevRect = GetRect();
     modify(g);
-    if(g != GetRect()) {
-        sendCollateralEvent();
-        return;
-    }
     if(g != prevRect) sendChangeEvent();
 }
 
