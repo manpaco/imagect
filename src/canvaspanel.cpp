@@ -85,10 +85,10 @@ void CanvasPanel::updateCropPosition(wxSizeEvent &event) {
 }
 
 void CanvasPanel::cropGeometry(const wxRect &g) {
-    cropOffset = g.GetPosition();
-    cropArea->SetSize(g.GetSize());
-    cropArea->Move(img->GetPosition().x + cropOffset.x, img->GetPosition().y + cropOffset.y);
-    oldCropPosition = cropArea->GetPosition();
+    wxRect newG(img->GetPosition().x + g.GetX(), img->GetPosition().y + g.GetY(), g.GetWidth(), g.GetHeight());
+    if(g.GetSize().x < 0) newG.SetWidth(img->GetSize().x);
+    if(g.GetSize().y < 0) newG.SetHeight(img->GetSize().y);
+    cropArea->setGeometry(newG);
 }
 
 void CanvasPanel::fixCrop(bool op) {
@@ -103,8 +103,8 @@ wxPoint CanvasPanel::getCropOffset() const {
     return cropOffset;
 }
 
-void CanvasPanel::cropSize(wxSize &s) {
-    cropArea->changeSize(s);
+void CanvasPanel::cropSize(const wxSize &s) {
+    cropArea->setGeometry(wxRect(cropArea->GetPosition(),s));
 }
 
 wxSize CanvasPanel::cropSize() {
