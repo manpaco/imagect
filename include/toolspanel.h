@@ -111,17 +111,27 @@ class ToolsPanel: public wxScrolledCanvas {
         void growChoiceState(bool state, int choice);
         void updateGrowBlock();
         
+        class UnfocusedCheckBox : public wxCheckBox {
+            public:
+                UnfocusedCheckBox(wxWindow *parent, wxWindowID id, const wxString &label) {
+                    Create(parent, id, label);
+                }
+                bool AcceptsFocus() const {
+                    return false;
+                }
+        };
+        
         wxCollapsiblePane *aspectBlock;
         wxTextCtrl *widthCtrl;
         wxTextCtrl *heightCtrl;
-        wxCheckBox *fixRatio;
+        UnfocusedCheckBox *fixRatio;
         wxBoxSizer *aspectSizer;
         wxBoxSizer *widthSizer;
         wxBoxSizer *heightSizer;
 
         wxCollapsiblePane *growBlock;
-        wxCheckBox *growCheck;
-        wxRadioBox *growSelector;
+        UnfocusedCheckBox *growCheck;
+        wxChoice *growSelector;
         wxSlider *backBlur;
         wxFilePickerCtrl *imagePicker;
         wxColourPickerCtrl *colorPicker;
@@ -138,7 +148,6 @@ class ToolsPanel: public wxScrolledCanvas {
 
         wxBoxSizer *toolsSizer;
         OptionsContainer opts;
-
 
 };
 
