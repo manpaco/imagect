@@ -147,19 +147,19 @@ void ToolsPanel::createAspectBlock() {
             wxIntegerValidator<unsigned int>());
     fixRatio = new UnfocusedCheckBox(winAspect, ict::FIX_RATIO_CB, "Fix ratio");
 
-    widthSizer = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer *widthSizer = new wxBoxSizer(wxHORIZONTAL);
     widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Width:"), 0, 
             wxALIGN_CENTER_VERTICAL);
     widthSizer->AddSpacer(bestSpace * 2);
     widthSizer->Add(widthCtrl);
 
-    heightSizer = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer *heightSizer = new wxBoxSizer(wxHORIZONTAL);
     heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Height:"), 0, 
             wxALIGN_CENTER_VERTICAL);
     heightSizer->AddSpacer(bestSpace * 2);
     heightSizer->Add(heightCtrl);
 
-    aspectSizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer *aspectSizer = new wxBoxSizer(wxVERTICAL);
     aspectSizer->AddSpacer(bestSpace);
     aspectSizer->Add(fixRatio);
     wxStaticLine *fl = new wxStaticLine(winAspect);
@@ -192,7 +192,7 @@ void ToolsPanel::createGrowBlock() {
     backBlur = new wxSlider(winGrow, ict::BACK_BLUR_SL, 0, 0, 100);
     backBlur->Enable(false);
 
-    growSizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer *growSizer = new wxBoxSizer(wxVERTICAL);
     growSizer->AddSpacer(bestSpace);
     growSizer->Add(growCheck);
     growSizer->AddSpacer(bestSpace);
@@ -239,7 +239,7 @@ void ToolsPanel::createShapeBlock() {
             wxArrayString(ict::SHAPE_CHOICE_SIZE, shapeChoices));
     shapeSelector->SetSelection(0);
     
-    shapeSizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer *shapeSizer = new wxBoxSizer(wxVERTICAL);
     shapeSizer->AddSpacer(bestSpace);
     shapeSizer->Add(shapeSelector, 0, wxALIGN_CENTER);
     winShape->SetSizerAndFit(shapeSizer);
@@ -272,7 +272,7 @@ void ToolsPanel::initShapeChoices() {
 }
 
 void ToolsPanel::overlayTools() {
-    toolsSizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer *toolsSizer = new wxBoxSizer(wxVERTICAL);
     toolsSizer->Add(aspectBlock, 0, wxGROW | wxALL, bestSpace);
     toolsSizer->Add(shapeBlock, 0, wxGROW | wxALL, bestSpace);
     toolsSizer->Add(growBlock, 0, wxGROW | wxALL, bestSpace);

@@ -125,9 +125,6 @@ class ToolsPanel: public wxScrolledCanvas {
         wxTextCtrl *widthCtrl;
         wxTextCtrl *heightCtrl;
         UnfocusedCheckBox *fixRatio;
-        wxBoxSizer *aspectSizer;
-        wxBoxSizer *widthSizer;
-        wxBoxSizer *heightSizer;
 
         wxCollapsiblePane *growBlock;
         UnfocusedCheckBox *growCheck;
@@ -135,18 +132,15 @@ class ToolsPanel: public wxScrolledCanvas {
         wxSlider *backBlur;
         wxFilePickerCtrl *imagePicker;
         wxColourPickerCtrl *colorPicker;
-        wxBoxSizer *growSizer;
         wxString growChoices[ict::GROW_CHOICE_SIZE];
         wxStaticText *blurText;
         wxStaticText *colorText;
         wxStaticText *imageText;
 
         wxCollapsiblePane *shapeBlock;
-        wxBoxSizer *shapeSizer;
         wxChoice *shapeSelector;
         wxString shapeChoices[ict::SHAPE_CHOICE_SIZE];
 
-        wxBoxSizer *toolsSizer;
         OptionsContainer opts;
 
 };
