@@ -28,7 +28,7 @@ void ToolsPanel::setBindings() {
     Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, &ToolsPanel::updateVirtualSize, this);
     Bind(wxEVT_CHECKBOX, &ToolsPanel::growStateChange, this, 
             ict::GROW_CHECK_CB);
-    Bind(wxEVT_RADIOBOX, &ToolsPanel::growChoiceChange, this, 
+    Bind(wxEVT_CHOICE, &ToolsPanel::growChoiceChange, this, 
             ict::GROW_SELECTOR_RB);
     Bind(wxEVT_TEXT, &ToolsPanel::widthChange, this, ict::WIDTH_TC);
     Bind(wxEVT_TEXT, &ToolsPanel::heightChange, this, ict::HEIGHT_TC);
@@ -40,7 +40,7 @@ void ToolsPanel::setBindings() {
 }
 
 void ToolsPanel::setOpts(const OptionsContainer &oc) {
-    wxCommandEvent h(wxEVT_RADIOBOX, growSelector->GetId());
+    wxCommandEvent h(wxEVT_CHOICE, growSelector->GetId());
     h.SetEventObject(growSelector);
     h.SetInt(oc.growChoice);
     ProcessWindowEvent(h);
@@ -145,7 +145,7 @@ void ToolsPanel::createAspectBlock() {
     heightCtrl = new wxTextCtrl(winAspect, ict::HEIGHT_TC, wxEmptyString, 
             wxDefaultPosition, wxDefaultSize, 0,
             wxIntegerValidator<unsigned int>());
-    fixRatio = new wxCheckBox(winAspect, ict::FIX_RATIO_CB, "Fix ratio");
+    fixRatio = new UnfocusedCheckBox(winAspect, ict::FIX_RATIO_CB, "Fix ratio");
 
     widthSizer = new wxBoxSizer(wxHORIZONTAL);
     widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Width:"), 0, 
@@ -179,9 +179,9 @@ void ToolsPanel::createGrowBlock() {
     wxWindow *winGrow = growBlock->GetPane();
 
     initGrowChoices();
-    growCheck = new wxCheckBox(winGrow, ict::GROW_CHECK_CB, "Allow growing");
-    growSelector = new wxRadioBox(winGrow, ict::GROW_SELECTOR_RB, 
-            "Options", wxDefaultPosition, wxDefaultSize, 
+    growCheck = new UnfocusedCheckBox(winGrow, ict::GROW_CHECK_CB, "Allow growing");
+    growSelector = new wxChoice(winGrow, ict::GROW_SELECTOR_RB, 
+            wxDefaultPosition, wxDefaultSize, 
             wxArrayString(ict::GROW_CHOICE_SIZE, growChoices));
     growSelector->Enable(false);
     colorPicker = new wxColourPickerCtrl(winGrow, ict::PICK_COLOUR_BT, 
