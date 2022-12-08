@@ -29,7 +29,7 @@ void ToolsPanel::setBindings() {
     Bind(wxEVT_CHECKBOX, &ToolsPanel::growStateChange, this, 
             ict::GROW_CHECK_CB);
     Bind(wxEVT_CHOICE, &ToolsPanel::growChoiceChange, this, 
-            ict::GROW_SELECTOR_RB);
+            ict::GROW_SELECTOR_CH);
     Bind(wxEVT_TEXT, &ToolsPanel::widthChange, this, ict::WIDTH_TC);
     Bind(wxEVT_TEXT, &ToolsPanel::heightChange, this, ict::HEIGHT_TC);
     Bind(wxEVT_CHECKBOX, &ToolsPanel::fixRatioChange, this, ict::FIX_RATIO_CB);
@@ -180,7 +180,7 @@ void ToolsPanel::createGrowBlock() {
 
     initGrowChoices();
     growCheck = new UnfocusedCheckBox(winGrow, ict::GROW_CHECK_CB, "Allow growing");
-    growSelector = new wxChoice(winGrow, ict::GROW_SELECTOR_RB, 
+    growSelector = new wxChoice(winGrow, ict::GROW_SELECTOR_CH, 
             wxDefaultPosition, wxDefaultSize, 
             wxArrayString(ict::GROW_CHOICE_SIZE, growChoices));
     growSelector->Enable(false);

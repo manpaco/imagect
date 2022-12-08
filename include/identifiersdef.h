@@ -11,7 +11,7 @@ enum ControlID {
     FIX_RATIO_CB,
 
     GROW_CHECK_CB,
-    GROW_SELECTOR_RB,
+    GROW_SELECTOR_CH,
     PICK_COLOUR_BT,
     BACK_BLUR_SL,
     PICK_IMG_FP,
