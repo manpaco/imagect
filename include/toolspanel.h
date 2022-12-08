@@ -99,6 +99,8 @@ class ToolsPanel: public wxScrolledCanvas {
         void growChoiceChange(wxCommandEvent &event);
         void growStateChange(wxCommandEvent &event);
         void updateVirtualSize(wxCollapsiblePaneEvent &event);
+        void strokeColorChange(wxColourPickerEvent &event);
+        void strokeWidthChange(wxCommandEvent &event);
 
         void setBindings();
         void createTools();

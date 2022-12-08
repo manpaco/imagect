@@ -37,6 +37,8 @@ void ToolsPanel::setBindings() {
     Bind(wxEVT_COLOURPICKER_CHANGED, &ToolsPanel::colourChange, this, ict::PICK_COLOUR_BT);
     Bind(wxEVT_FILEPICKER_CHANGED, &ToolsPanel::imageChange, this, ict::PICK_IMG_FP);
     Bind(wxEVT_SCROLL_THUMBRELEASE, &ToolsPanel::blurChange, this, ict::BACK_BLUR_SL);
+    Bind(wxEVT_COLOURPICKER_CHANGED, &ToolsPanel::strokeColorChange, this, ict::PICK_STROKE_COLOUR_BT);
+    Bind(wxEVT_TEXT, &ToolsPanel::strokeWidthChange, this, ict::STROKE_WIDTH_TC);
 }
 
 void ToolsPanel::setOpts(const OptionsContainer &oc) {
@@ -56,11 +58,23 @@ void ToolsPanel::setOpts(const OptionsContainer &oc) {
     e.SetInt(opts.fixRatio);
     ProcessWindowEvent(e);
     shapeSelector->SetSelection(opts.shapeChoice);
+    strokeWidthCtrl->SetValue(std::to_string(opts.strokeWidth));
+    strokeColorPicker->SetColour(opts.strokeColour);
     backBlur->SetValue(opts.backBlur);
     imagePicker->SetPath(opts.backImage);
     colorPicker->SetColour(opts.backColour);
     growSelector->SetSelection(opts.growChoice);
     growCheck->SetValue(opts.allowGrow);
+}
+
+void ToolsPanel::strokeWidthChange(wxCommandEvent &event) {
+    std::string text = event.GetString().ToStdString();
+    if(text.empty()) return;
+    opts.strokeWidth = std::stoi(text);
+}
+
+void ToolsPanel::strokeColorChange(wxColourPickerEvent &event) {
+    opts.strokeColour = event.GetColour();
 }
 
 void ToolsPanel::cropSize(const wxSize &s) {
@@ -245,7 +259,7 @@ void ToolsPanel::createShapeBlock() {
     strokeWidthCtrl = new wxTextCtrl(winShape, ict::STROKE_WIDTH_TC, wxEmptyString, 
             wxDefaultPosition, wxDefaultSize, 0,
             wxIntegerValidator<unsigned int>());
-    strokeColorPicker = new wxColourPickerCtrl(winShape, ict::PICK_COLOUR_BT, 
+    strokeColorPicker = new wxColourPickerCtrl(winShape, ict::PICK_STROKE_COLOUR_BT, 
             *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL);
     
     wxBoxSizer *shapeSizer = new wxBoxSizer(wxVERTICAL);
