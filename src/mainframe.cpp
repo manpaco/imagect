@@ -57,10 +57,10 @@ void MainFrame::createMenuBar() {
 
     mFile = new wxMenu;
     mFile->Append(wxID_OPEN);
+    mFile->Append(wxID_CLOSE);
     mFile->AppendSeparator();
     mFile->Append(ict::EXPORT_MI, "Export");
     mFile->AppendSeparator();
-    mFile->Append(wxID_CLOSE);
     mFile->Append(wxID_EXIT);
 
     mEdit = new wxMenu;
