@@ -1,6 +1,8 @@
 #include "previewpanel.h"
 #include "imgtools.h"
 
+extern const int bestSpace;
+
 PreviewPanel::PreviewPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
     createSizer();
@@ -15,6 +17,8 @@ void PreviewPanel::createSizer() {
     sz = new wxBoxSizer(wxVERTICAL);
     title = new wxStaticText(this, wxID_ANY, "Preview");
     sz->Add(title, 0, wxALIGN_CENTER);
+    sz->AddSpacer(bestSpace);
+    sz->Add(new wxStaticLine(this), 0, wxEXPAND);
     imgSz = new wxGridSizer(1, 0, 0);
     sz->Add(imgSz, 1, wxALIGN_CENTER);
     SetSizer(sz);

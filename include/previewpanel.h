@@ -7,6 +7,10 @@
     #include <wx/wx.h>
 #endif
 
+#if wxUSE_STATLINE
+    #include <wx/statline.h>
+#endif
+
 #include "imagewindow.h"
 
 class PreviewPanel: public wxPanel {
