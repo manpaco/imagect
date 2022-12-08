@@ -197,7 +197,7 @@ void ToolsPanel::createGrowBlock() {
     wxWindow *winGrow = growBlock->GetPane();
 
     initGrowChoices();
-    growCheck = new UnfocusedCheckBox(winGrow, ict::GROW_CHECK_CB, "Allow growing");
+    growCheck = new UnfocusedCheckBox(winGrow, ict::GROW_CHECK_CB, "Allow growing with:");
     growSelector = new wxChoice(winGrow, ict::GROW_SELECTOR_CH, 
             wxDefaultPosition, wxDefaultSize, 
             wxArrayString(ict::GROW_CHOICE_SIZE, growChoices));
@@ -212,11 +212,13 @@ void ToolsPanel::createGrowBlock() {
 
     wxBoxSizer *growSizer = new wxBoxSizer(wxVERTICAL);
     growSizer->AddSpacer(bestSpace);
-    growSizer->Add(growCheck);
-    growSizer->AddSpacer(bestSpace);
-    growSizer->Add(growSelector, 0, wxALIGN_CENTER);
-    growSizer->AddSpacer(bestSpace);
+    wxBoxSizer *hGrowSelecSizer = new wxBoxSizer(wxHORIZONTAL);
+    hGrowSelecSizer->Add(growCheck, 0, wxALIGN_CENTER);
+    hGrowSelecSizer->AddSpacer(bestSpace);
+    hGrowSelecSizer->Add(growSelector, 0, wxALIGN_CENTER);
+    growSizer->Add(hGrowSelecSizer);
     wxStaticLine *fl = new wxStaticLine(winGrow);
+    growSizer->AddSpacer(bestSpace);
     growSizer->Add(fl, 0, wxEXPAND);
     growSizer->AddSpacer(bestSpace);
     colorText = new wxStaticText(winGrow, wxID_ANY, "Color:");
@@ -304,6 +306,7 @@ void ToolsPanel::growChoiceState(bool state, int choice) {
 void ToolsPanel::initGrowChoices() {
     growChoices[ict::COLOR] = wxString("Color");
     growChoices[ict::IMAGE] = wxString("Image");
+    growChoices[ict::VOID] = wxString("Void");
 }
 
 void ToolsPanel::initShapeChoices() {

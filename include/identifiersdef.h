@@ -52,6 +52,7 @@ enum SplitterID {
 enum GrowChoice {
     COLOR = 0,
     IMAGE,
+    VOID,
     GROW_CHOICE_SIZE
 };
 
