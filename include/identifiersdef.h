@@ -17,6 +17,8 @@ enum ControlID {
     PICK_IMG_FP,
 
     SHAPE_CH,
+    STROKE_WIDTH_TC,
+    PICK_STROKE_COLOUR_BT,
 
     APPLY_BT,
     RESET_CROP_BT,
