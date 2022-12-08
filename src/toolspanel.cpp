@@ -150,14 +150,18 @@ void ToolsPanel::createAspectBlock() {
     wxBoxSizer *widthSizer = new wxBoxSizer(wxHORIZONTAL);
     widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Width:"), 0, 
             wxALIGN_CENTER_VERTICAL);
-    widthSizer->AddSpacer(bestSpace * 2);
+    widthSizer->AddSpacer(bestSpace);
     widthSizer->Add(widthCtrl);
+    widthSizer->AddSpacer(bestSpace);
+    widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "px"), 0, wxALIGN_CENTER);
 
     wxBoxSizer *heightSizer = new wxBoxSizer(wxHORIZONTAL);
     heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Height:"), 0, 
             wxALIGN_CENTER_VERTICAL);
-    heightSizer->AddSpacer(bestSpace * 2);
+    heightSizer->AddSpacer(bestSpace);
     heightSizer->Add(heightCtrl);
+    heightSizer->AddSpacer(bestSpace);
+    heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "px"), 0, wxALIGN_CENTER);
 
     wxBoxSizer *aspectSizer = new wxBoxSizer(wxVERTICAL);
     aspectSizer->AddSpacer(bestSpace);
@@ -201,7 +205,7 @@ void ToolsPanel::createGrowBlock() {
     wxStaticLine *fl = new wxStaticLine(winGrow);
     growSizer->Add(fl, 0, wxEXPAND);
     growSizer->AddSpacer(bestSpace);
-    colorText = new wxStaticText(winGrow, wxID_ANY, "Color :");
+    colorText = new wxStaticText(winGrow, wxID_ANY, "Color:");
     colorText->Enable(false);
     wxBoxSizer *hColorSizer = new wxBoxSizer(wxHORIZONTAL);
     hColorSizer->Add(colorText, 0, wxALIGN_CENTER);
@@ -212,7 +216,7 @@ void ToolsPanel::createGrowBlock() {
     wxStaticLine *sl = new wxStaticLine(winGrow);
     growSizer->Add(sl, 0, wxEXPAND);
     growSizer->AddSpacer(bestSpace);
-    imageText = new wxStaticText(winGrow, wxID_ANY, "Image :");
+    imageText = new wxStaticText(winGrow, wxID_ANY, "Image:");
     imageText->Enable(false);
     wxBoxSizer *hImageSizer = new wxBoxSizer(wxHORIZONTAL);
     hImageSizer->Add(imageText, 0, wxALIGN_CENTER);
@@ -238,10 +242,33 @@ void ToolsPanel::createShapeBlock() {
             wxDefaultSize, 
             wxArrayString(ict::SHAPE_CHOICE_SIZE, shapeChoices));
     shapeSelector->SetSelection(0);
+    strokeWidthCtrl = new wxTextCtrl(winShape, ict::STROKE_WIDTH_TC, wxEmptyString, 
+            wxDefaultPosition, wxDefaultSize, 0,
+            wxIntegerValidator<unsigned int>());
+    strokeColorPicker = new wxColourPickerCtrl(winShape, ict::PICK_COLOUR_BT, 
+            *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL);
     
     wxBoxSizer *shapeSizer = new wxBoxSizer(wxVERTICAL);
     shapeSizer->AddSpacer(bestSpace);
     shapeSizer->Add(shapeSelector, 0, wxALIGN_CENTER);
+    wxStaticLine *fl = new wxStaticLine(winShape);
+    shapeSizer->AddSpacer(bestSpace);
+    shapeSizer->Add(fl, 0, wxEXPAND);
+    wxBoxSizer *hStrokeWidthSizer = new wxBoxSizer(wxHORIZONTAL);
+    hStrokeWidthSizer->Add(new wxStaticText(winShape, wxID_ANY, "Stroke width:"), 0, wxALIGN_CENTER);
+    hStrokeWidthSizer->AddSpacer(bestSpace);
+    hStrokeWidthSizer->Add(strokeWidthCtrl);
+    hStrokeWidthSizer->AddSpacer(bestSpace);
+    hStrokeWidthSizer->Add(new wxStaticText(winShape, wxID_ANY, "px"), 0, wxALIGN_CENTER);
+    shapeSizer->AddSpacer(bestSpace);
+    shapeSizer->Add(hStrokeWidthSizer, 0, wxALIGN_CENTER);
+    wxBoxSizer *hStrokeColorSizer = new wxBoxSizer(wxHORIZONTAL);
+    hStrokeColorSizer->Add(new wxStaticText(winShape, wxID_ANY, "Stroke color:"), 0, wxALIGN_CENTER);
+    hStrokeColorSizer->AddSpacer(bestSpace);
+    hStrokeColorSizer->Add(strokeColorPicker);
+    shapeSizer->AddSpacer(bestSpace);
+    shapeSizer->Add(hStrokeColorSizer, 0, wxALIGN_CENTER);
+    shapeSizer->AddSpacer(bestSpace);
     winShape->SetSizerAndFit(shapeSizer);
 }
 

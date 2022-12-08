@@ -139,6 +139,8 @@ class ToolsPanel: public wxScrolledCanvas {
 
         wxCollapsiblePane *shapeBlock;
         wxChoice *shapeSelector;
+        wxTextCtrl *strokeWidthCtrl;
+        wxColourPickerCtrl *strokeColorPicker;
         wxString shapeChoices[ict::SHAPE_CHOICE_SIZE];
 
         OptionsContainer opts;
