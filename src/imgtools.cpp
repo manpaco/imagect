@@ -46,12 +46,12 @@ Magick::Image extractArea(const Magick::Geometry area, Magick::Image target) {
 }
 
 bool emptyIntersection(const Magick::Geometry &area, const Magick::Image &image) {
-    bool outX = false, outY = false;
-    outX = area.xOff() >= image.columns();
-    if(area.xOff() < 0) outX = abs(area.xOff()) >= area.width();
-    outY = area.yOff() >= image.rows();
-    if(area.yOff() < 0) outY = abs(area.yOff()) >= area.height();
-    return outX || outY;
+    bool mtX = false, mtY = false;
+    mtX = area.xOff() >= image.columns();
+    if(area.xOff() < 0) mtX = abs(area.xOff()) >= area.width();
+    mtY = area.yOff() >= image.rows();
+    if(area.yOff() < 0) mtY = abs(area.yOff()) >= area.height();
+    return mtX || mtY;
 }
 
 bool contains(const Magick::Geometry &area, const Magick::Image &image) {
