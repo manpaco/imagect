@@ -40,11 +40,11 @@ struct OptionsContainer {
     int backBlur;
 
     OptionsContainer() : 
-        cropSize(0, 0),
+        cropSize(1, 1),
         fixRatio(false),
         ratio(0.0),
         shapeChoice(0),
-        strokeWidth(1),
+        strokeWidth(0),
         strokeColour(*wxBLACK),
         strokeOff(0),
         allowGrow(false),
@@ -82,7 +82,9 @@ class ToolsPanel: public wxScrolledCanvas {
         void widthCrop(unsigned int width);
         void heightCrop(unsigned int height);
         void cropSize(const wxSize &s);
-        wxSize cropSize() const;
+        wxSize optsCropSize() const;
+        void checkValues();
+        void strokeWidth(unsigned int sw);
         OptionsContainer currentOpts() const;
         void setOpts(const OptionsContainer &oc);
         void clear(bool enableOp);

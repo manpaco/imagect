@@ -73,6 +73,11 @@ void ToolsPanel::strokeWidthChange(wxCommandEvent &event) {
     opts.strokeWidth = std::stoi(text);
 }
 
+void ToolsPanel::strokeWidth(unsigned int sw) {
+    strokeWidthCtrl->SetValue(std::to_string(sw));
+    opts.strokeWidth = sw;
+}
+
 void ToolsPanel::strokeColorChange(wxColourPickerEvent &event) {
     opts.strokeColour = event.GetColour();
 }
@@ -82,7 +87,16 @@ void ToolsPanel::cropSize(const wxSize &s) {
     heightCrop(s.GetHeight());
 }
 
-wxSize ToolsPanel::cropSize() const {
+void ToolsPanel::checkValues() {
+    std::string checking = widthCtrl->GetValue().ToStdString();
+    if(checking.empty()) widthCrop(1);
+    checking = heightCtrl->GetValue().ToStdString();
+    if(checking.empty()) heightCrop(1);
+    checking = strokeWidthCtrl->GetValue().ToStdString();
+    if(checking.empty()) strokeWidth(0);
+}
+
+wxSize ToolsPanel::optsCropSize() const {
     return opts.cropSize;
 }
 
@@ -149,16 +163,17 @@ void ToolsPanel::createTools() {
 
 void ToolsPanel::createAspectBlock() {
     aspectBlock = new wxCollapsiblePane(this, ict::ASPECT_RATIO, 
-            "Aspect ratio", wxDefaultPosition, wxDefaultSize, 
+            "Aspect", wxDefaultPosition, wxDefaultSize, 
             wxCP_NO_TLW_RESIZE);
     wxWindow *winAspect = aspectBlock->GetPane();
 
+    wxIntegerValidator<unsigned int> validator;
+    validator.SetMin(1);
+
     widthCtrl = new wxTextCtrl(winAspect, ict::WIDTH_TC, wxEmptyString, 
-            wxDefaultPosition, wxDefaultSize, 0,
-            wxIntegerValidator<unsigned int>());
+            wxDefaultPosition, wxDefaultSize, 0, validator);
     heightCtrl = new wxTextCtrl(winAspect, ict::HEIGHT_TC, wxEmptyString, 
-            wxDefaultPosition, wxDefaultSize, 0,
-            wxIntegerValidator<unsigned int>());
+            wxDefaultPosition, wxDefaultSize, 0, validator);
     fixRatio = new UnfocusedCheckBox(winAspect, ict::FIX_RATIO_CB, "Fix ratio");
 
     wxBoxSizer *widthSizer = new wxBoxSizer(wxHORIZONTAL);

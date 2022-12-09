@@ -299,7 +299,7 @@ void MainFrame::updateHistory(State toSave) {
 }
 
 void MainFrame::onCropChange(CropEvent &event) {
-    if(tools->cropSize() != event.getSize()) tools->cropSize(event.getSize());
+    tools->cropSize(event.getSize());
 }
 
 Magick::Image MainFrame::composeState(const Magick::Image &img, const State &s) {
@@ -328,7 +328,8 @@ void MainFrame::composePreview() {
 
 void MainFrame::saveState(wxCommandEvent &event) {
     // update preview and/or update crop rectangle
-    canvas->cropSize(tools->cropSize());
+    tools->checkValues();
+    canvas->cropSize(tools->optsCropSize());
     State toSave = std::make_tuple(canvas->getCropOffset(), tools->currentOpts());
     if(toSave == *currentState) return;
     updateHistory(toSave);
