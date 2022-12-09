@@ -143,14 +143,14 @@ void MainFrame::onAbout(wxCommandEvent &event) {
 void MainFrame::onClose(wxCommandEvent &event) {
     if(!openedImg) return;
     if(!exportedImg) {
-        if(showProceedMessage() == wxNO) return;
+        if(showProceedMessage() != wxYES) return;
     }
     clear();
 }
 
 void MainFrame::onOpen(wxCommandEvent &event) {
     if(openedImg && !exportedImg) {
-        if(showProceedMessage() == wxNO) return;
+        if(showProceedMessage() != wxYES) return;
     }
     wxFileDialog openDlg(this, _("Open image"), "", "", 
             _("PNG (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*jpeg;*.jpg"), 
@@ -171,12 +171,12 @@ void MainFrame::onQuit(wxCommandEvent &event) {
 void MainFrame::onQuitFrame(wxCloseEvent &event) {
     if(event.CanVeto() && openedImg) {
         if(!exportedImg) {
-            if(showProceedMessage() == wxNO) {
+            if(showProceedMessage() != wxYES) {
                 event.Veto();
                 return;
             }
         } else {
-            if(showCloseMessage() == wxNO) {
+            if(showCloseMessage() != wxYES) {
                 event.Veto();
                 return;
             }
