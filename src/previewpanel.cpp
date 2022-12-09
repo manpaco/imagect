@@ -20,7 +20,7 @@ void PreviewPanel::createSizer() {
     sz->AddSpacer(bestSpace);
     sz->Add(new wxStaticLine(this), 0, wxEXPAND);
     imgSz = new wxGridSizer(1, 0, 0);
-    sz->Add(imgSz, 1, wxALIGN_CENTER);
+    sz->Add(imgSz, 1, wxEXPAND);
     SetSizer(sz);
 }
 
