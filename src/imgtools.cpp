@@ -30,7 +30,7 @@ void overlap(const Magick::Image &overlay, Magick::Image &background, bool fit,
 
 Magick::Image extractArea(const Magick::Geometry area, Magick::Image target) {
     Magick::Image extracted(area, Magick::Color(0, 0, 0, QuantumRange));
-    if(!isContained(area, target)) return extracted;
+    if(emptyIntersection(area, target)) return extracted;
     target.crop(area);
 
     int xOff, yOff;
@@ -45,16 +45,16 @@ Magick::Image extractArea(const Magick::Geometry area, Magick::Image target) {
     return extracted;
 }
 
-bool isContained(const Magick::Geometry &area, const Magick::Image &image) {
+bool emptyIntersection(const Magick::Geometry &area, const Magick::Image &image) {
     bool outX = false, outY = false;
     outX = area.xOff() >= image.columns();
     if(area.xOff() < 0) outX = abs(area.xOff()) >= area.width();
     outY = area.yOff() >= image.rows();
     if(area.yOff() < 0) outY = abs(area.yOff()) >= area.height();
-    return !outX && !outY;
+    return outX || outY;
 }
 
-bool isFullyContained(const Magick::Geometry &area, const Magick::Image &image) {
+bool contains(const Magick::Geometry &area, const Magick::Image &image) {
     if((area.xOff() <= 0) && (area.yOff() <= 0)) {
         int right = area.width() + area.xOff();
         int down = area.height() + area.yOff();
@@ -99,7 +99,7 @@ unsigned char * extractDepth8Channel(Magick::Image &img, ict::Channel ch, bool o
 #if MAGICKCORE_QUANTUM_DEPTH == 16
         if(opaqueAtHigh) {
             for(int p = 0; p < n; p++) {
-                pExt[p] = 255 - toDepth8(pixels[p].opacity);
+                pExt[p] = depth8 - toDepth8(pixels[p].opacity);
             }
         } else {
             for(int p = 0; p < n; p++) {
@@ -109,7 +109,7 @@ unsigned char * extractDepth8Channel(Magick::Image &img, ict::Channel ch, bool o
 #elif MAGICKCORE_QUANTUM_DEPTH == 8
         if(opaqueAtHigh) {
             for(int p = 0; p < n; p++) {
-                pExt[p] = 255 - pixels[ṕ].opacity;
+                pExt[p] = depth8 - pixels[ṕ].opacity;
             }
         } else {
             for(int p = 0; p < n; p++) {
