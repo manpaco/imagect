@@ -82,7 +82,7 @@ void MainFrame::createMenuBar() {
 
 wxBitmap MainFrame::createBitmap(Magick::Image &img) {
     return wxBitmap(wxImage(img.columns(), img.rows(), 
-            extractRgb(img), extractAlpha(img)));
+            extractDepth8Channel(img, ict::RGB, true), extractDepth8Channel(img, ict::ALPHA, true)));
 }
 
 void MainFrame::overlayPanels() {
