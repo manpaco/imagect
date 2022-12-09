@@ -28,10 +28,11 @@ void overlap(const Magick::Image &overlay, Magick::Image &background, bool fit,
             Magick::OverCompositeOp);
 }
 
-Magick::Image extractArea(const Magick::Geometry area, Magick::Image target) {
+Magick::Image extractArea(const Magick::Geometry &area, const Magick::Image &target) {
     Magick::Image extracted(area, Magick::Color(0, 0, 0, QuantumRange));
-    if(emptyIntersection(area, target)) return extracted;
-    target.crop(area);
+    Magick::Image tCopy(target);
+    if(emptyIntersection(area, tCopy)) return extracted;
+    tCopy.crop(area);
 
     int xOff, yOff;
     if(area.xOff() < 0) xOff = abs(area.xOff());
@@ -40,7 +41,7 @@ Magick::Image extractArea(const Magick::Geometry area, Magick::Image target) {
     else yOff = 0;
 
     Magick::Geometry compOff(0, 0, xOff, yOff);
-    extracted.composite(target, compOff, Magick::OverCompositeOp);
+    extracted.composite(tCopy, compOff, Magick::OverCompositeOp);
 
     return extracted;
 }
@@ -65,9 +66,10 @@ bool contains(const Magick::Geometry &area, const Magick::Image &image) {
     return false;
 }
 
-unsigned char * extractDepth8Channel(Magick::Image &img, ict::Channel ch, bool opaqueAtHigh) {
-    img.modifyImage();
-    Magick::Pixels cache(img);
+unsigned char * extractDepth8Channel(const Magick::Image &img, ict::Channel ch, bool opaqueAtHigh) {
+    Magick::Image iCopy(img);
+    iCopy.modifyImage();
+    Magick::Pixels cache(iCopy);
     Magick::PixelPacket *pixels = cache.get(0, 0, img.columns(), img.rows());
     int n = img.columns() * img.rows();
     unsigned char *pExt;
