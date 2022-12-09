@@ -93,8 +93,11 @@ void MainFrame::overlayPanels() {
     buttonsSizer->Add(apply);
     buttonsSizer->AddSpacer(bestSpace);
     buttonsSizer->Add(reset);
+    buttonsSizer->AddStretchSpacer();
+    buttonsSizer->Add(new wxButton(this, wxID_ANY, "Zoom"));
+    buttonsSizer->AddSpacer(bestSpace);
     mainSizer->AddSpacer(bestSpace);
-    mainSizer->Add(buttonsSizer);
+    mainSizer->Add(buttonsSizer, 0, wxEXPAND);
     mainSizer->AddSpacer(bestSpace);
     wxStaticLine *hLine = new wxStaticLine(this);
     mainSizer->Add(hLine, 0, wxEXPAND);
