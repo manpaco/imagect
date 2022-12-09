@@ -76,6 +76,16 @@ enum Zone {
     W
 };
 
+enum Channel {
+    RGB,
+    ALPHA
+};
+
+enum Depth {
+    DEPTH8,
+    DEPTH16
+};
+
 };
 
 #endif // DEFS_H
