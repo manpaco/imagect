@@ -80,11 +80,6 @@ void MainFrame::createMenuBar() {
     SetMenuBar(topMenuBar);
 }
 
-wxBitmap MainFrame::createBitmap(Magick::Image &img) {
-    return wxBitmap(wxImage(img.columns(), img.rows(), 
-            extractDepth8Channel(img, ict::RGB, true), extractDepth8Channel(img, ict::ALPHA, true)));
-}
-
 void MainFrame::overlayPanels() {
     sideSplitter->SplitHorizontally(preview, tools);
     mainSplitter->SplitVertically(sideSplitter, canvas);
@@ -215,7 +210,7 @@ void MainFrame::openImage(const wxString &p) {
     sourceImg = new Magick::Image(p.ToStdString());
     scaledImg = new Magick::Image(*sourceImg);
     scaledImg->zoom(Magick::Geometry(scaledImg->columns() * 0.3, scaledImg->rows() * 0.3));
-    wxBitmap newBmp = createBitmap(*scaledImg);
+    wxBitmap newBmp(createImage(*scaledImg));
     preview->updatePreview(newBmp);
     canvas->updateCanvas(newBmp);
     tools->clear(true);
@@ -302,27 +297,9 @@ void MainFrame::onCropChange(CropEvent &event) {
     tools->cropSize(event.getSize());
 }
 
-Magick::Image MainFrame::composeState(const Magick::Image &img, const State &s) {
-    int w = std::get<1>(s).cropSize.GetWidth();
-    int h = std::get<1>(s).cropSize.GetHeight();
-    int xo = std::get<0>(s).x;
-    int yo = std::get<0>(s).y;
-    Magick::Geometry crop(w, h, xo, yo);
-    Magick::Image comp(extractArea(crop, img));
-    if(std::get<1>(s).allowGrow) {
-        //Magick::Image back(img.geometry(), Magick::Color(0, 0, 0, QuantumRange / 2));
-        //if(std::get<1>(s).growChoice == ict::IMAGE) 
-        //    if(!std::get<1>(s).backImage.ToStdString().empty())
-        //        back.read(std::get<1>(s).backImage.ToStdString());
-        //overlap(comp, back, true, true);
-        //return back;
-    }
-    return comp;
-}
-
 void MainFrame::composePreview() {
     Magick::Image newImg = composeState(*scaledImg, *currentState);
-    wxBitmap newPreview = createBitmap(newImg);
+    wxBitmap newPreview(createImage(newImg));
     updatePreview(newPreview);
 }
 

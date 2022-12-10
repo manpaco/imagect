@@ -134,3 +134,26 @@ unsigned char toDepth8(const unsigned short value) {
     return n;
 }
 
+Magick::Image composeState(const Magick::Image &img, const State &s) {
+    int w = std::get<1>(s).cropSize.GetWidth();
+    int h = std::get<1>(s).cropSize.GetHeight();
+    int xo = std::get<0>(s).x;
+    int yo = std::get<0>(s).y;
+    Magick::Geometry crop(w, h, xo, yo);
+    Magick::Image comp(extractArea(crop, img));
+    if(std::get<1>(s).allowGrow) {
+        //Magick::Image back(img.geometry(), Magick::Color(0, 0, 0, QuantumRange / 2));
+        //if(std::get<1>(s).growChoice == ict::IMAGE) 
+        //    if(!std::get<1>(s).backImage.ToStdString().empty())
+        //        back.read(std::get<1>(s).backImage.ToStdString());
+        //overlap(comp, back, true, true);
+        //return back;
+    }
+    return comp;
+}
+
+wxImage createImage(const Magick::Image &img) {
+    return wxImage(img.columns(), img.rows(), 
+            extractDepth8Channel(img, ict::RGB), extractDepth8Channel(img, ict::ALPHA));
+}
+
