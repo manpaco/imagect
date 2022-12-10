@@ -86,6 +86,20 @@ enum Depth {
     DEPTH16
 };
 
+enum Wildcard {
+    PNG_WC,
+    JPG_WC,
+    WILDCARD_SIZE
+};
+
+enum Extension {
+    INVALID_EXT = -1,
+    NONE_EXT,
+    PNG_EXT,
+    JPG_EXT,
+    JPEG_EXT
+};
+
 };
 
 #endif // DEFS_H
