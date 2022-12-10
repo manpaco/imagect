@@ -24,7 +24,7 @@
 #endif
 
 #include "identifiersdef.h"
-#include "optscontainer.h"
+#include "statedef.h"
 
 class ToolsPanel: public wxScrolledCanvas {
     public:

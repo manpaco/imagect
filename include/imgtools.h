@@ -3,7 +3,7 @@
 
 #include <Magick++.h>
 #include "identifiersdef.h"
-#include "optscontainer.h"
+#include "statedef.h"
 
 const unsigned char depth8 = 255;
 const unsigned short depth16 = 65535;
