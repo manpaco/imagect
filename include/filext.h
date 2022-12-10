@@ -1,5 +1,5 @@
-#ifndef FILEVALID_H
-#define FILEVALID_H
+#ifndef FILEXT_H
+#define FILEXT_H
 
 #include <string>
 #include "identifiersdef.h"
@@ -19,4 +19,4 @@ const std::string importWc = "Image files (*" +
 
 ict::Extension extension(const std::string &filename);
 
-#endif // FILEVALID_H
+#endif // FILEXT_H
