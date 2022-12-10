@@ -18,6 +18,5 @@ const std::string importWc = "Image files (*" +
         jpegExt;
 
 ict::Extension extension(const std::string &filename);
-bool valid(const std::string &filepath);
 
 #endif // FILEVALID_H
