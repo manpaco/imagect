@@ -1,5 +1,5 @@
-#ifndef OPTSCONTAINER_H
-#define OPTSCONTAINER_H
+#ifndef STATEDEF_H
+#define STATEDEF_H
 
 #include <wx/wxprec.h>
 
@@ -58,4 +58,4 @@ struct OptionsContainer {
 
 typedef std::tuple<wxPoint, OptionsContainer> State;
 
-#endif // OPTSCONTAINER_H
+#endif // STATEDEF_H
