@@ -40,6 +40,7 @@ class ToolsPanel: public wxScrolledCanvas {
         OptionsContainer currentOpts() const;
         void setOpts(const OptionsContainer &oc);
         void clear(bool enableOp);
+        void collapseBlocks();
         ~ToolsPanel();
 
     private:

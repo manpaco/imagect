@@ -20,6 +20,10 @@ ToolsPanel::~ToolsPanel() {
 void ToolsPanel::clear(bool enableOp) {
     Enable(enableOp);
     setOpts(OptionsContainer());
+    collapseBlocks();
+}
+
+void ToolsPanel::collapseBlocks() {
     shapeBlock->Collapse();
     growBlock->Collapse();
     aspectBlock->Collapse();
