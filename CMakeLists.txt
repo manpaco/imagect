@@ -5,16 +5,17 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 project(ImageCroppingTool)
 
 list(APPEND SRC_FILES
-	"imgcropapp.cpp"
-	"mainframe.cpp"
-	"previewpanel.cpp"
-	"toolspanel.cpp"
-	"canvaspanel.cpp"
-	"imgtools.cpp"
-	"rectangle.cpp"
-	"cropevent.cpp"
-	"imagewindow.cpp"
+    "imgcropapp.cpp"
+    "mainframe.cpp"
+    "previewpanel.cpp"
+    "toolspanel.cpp"
+    "canvaspanel.cpp"
+    "imgtools.cpp"
+    "rectangle.cpp"
+    "cropevent.cpp"
+    "imagewindow.cpp"
     "filext.cpp"
+    "exportdlg.cpp"
 )
 list(TRANSFORM SRC_FILES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 add_executable(imgcrop ${SRC_FILES})
