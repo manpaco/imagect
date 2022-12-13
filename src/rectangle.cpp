@@ -1,5 +1,4 @@
 #include "rectangle.h"
-#include "exceptionsdef.h"
 #include <iterator>
 #include <wx/graphics.h>
 #include <wx/gtk/colour.h>
