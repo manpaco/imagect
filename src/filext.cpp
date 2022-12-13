@@ -2,18 +2,11 @@
 #include "identifiersdef.h"
 
 ict::Extension extension(const std::string &filename) {
-    bool ext = false;
-    std::string reading = "";
-    for(int i = 0; i < filename.size(); i++) {
-        if(filename[i] == '.' || ext) {
-            reading += filename[i];
-            ext = true;
-        }
-    }
-    if(reading == pngExt) return ict::PNG_EXT;
-    if(reading == jpgExt) return ict::JPG_EXT;
-    if(reading == jpegExt) return ict::JPEG_EXT;
-    if(reading == "") return ict::NONE_EXT;
-    return ict::INVALID_EXT;
+    int dotPos = filename.rfind('.');
+    std::string s = filename.substr(dotPos);
+    if(s == pngExt) return ict::PNG_EXT;
+    if(s == jpgExt) return ict::JPG_EXT;
+    if(s == jpegExt) return ict::JPEG_EXT;
+    return ict::NONE_EXT;
 }
 
