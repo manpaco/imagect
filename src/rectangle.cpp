@@ -354,24 +354,14 @@ void Rectangle::changeCursor(ict::Zone type) {
 }
 
 void Rectangle::mousePress(wxMouseEvent &event) {
-    try {
-        if(!HasCapture()) CaptureMouse();
-        else throw std::runtime_error("Error code: ");
-    } catch (std::runtime_error &e) {
-        std::cout << e.what() << MOUSE_ALREDY_CAPTURED << std::endl;
-    }
+    if(!HasCapture()) CaptureMouse();
     clientPressPoint = event.GetPosition();
     zonePressed = getLocation(event.GetPosition());
     rectInPress = GetRect();
 }
 
 void Rectangle::mouseRelease(wxMouseEvent &event) {
-    try {
-        if(HasCapture()) ReleaseMouse();
-        else throw std::runtime_error("Error code: ");
-    } catch (std::runtime_error &e) {
-        std::cout << e.what() << MOUSE_NEVER_CAPTURED << std::endl;
-    }
+    if(HasCapture()) ReleaseMouse();
     if(rectInPress != GetRect()) sendChangeEvent();
     zonePressed = ict::NONE;
     if(mouseLeftWin) changeCursor(ict::NONE);
