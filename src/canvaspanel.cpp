@@ -18,10 +18,10 @@ void CanvasPanel::createSizer() {
 }
 
 void CanvasPanel::clear() {
-    unbindCrop();
-    if(shadow) {
-        shadow->Destroy();
-        shadow = nullptr;
+    if(cropArea) {
+        unbindCrop();
+        cropArea->Destroy();
+        cropArea = nullptr;
     }
     if(img) {
         sz->Detach(img);
@@ -29,9 +29,9 @@ void CanvasPanel::clear() {
         img->Destroy();
         img = nullptr;
     }
-    if(cropArea) {
-        cropArea->Destroy();
-        cropArea = nullptr;
+    if(shadow) {
+        shadow->Destroy();
+        shadow = nullptr;
     }
 }
 
