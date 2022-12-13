@@ -1,6 +1,7 @@
 #include "toolspanel.h"
 #include <string>
 #include "wx/valnum.h"
+#include "filext.h"
 
 extern const int bestSpace;
 
@@ -220,7 +221,8 @@ void ToolsPanel::createGrowBlock() {
     colorPicker = new wxColourPickerCtrl(winGrow, ict::PICK_COLOUR_BT, 
             *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL);
     colorPicker->Enable(false);
-    imagePicker = new wxFilePickerCtrl(winGrow, ict::PICK_IMG_FP);
+    imagePicker = new wxFilePickerCtrl(winGrow, ict::PICK_IMG_FP, 
+            wxEmptyString, "Background image", importWc);
     imagePicker->Enable(false);
     backBlur = new wxSlider(winGrow, ict::BACK_BLUR_SL, 0, 0, 100);
     backBlur->Enable(false);
