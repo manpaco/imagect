@@ -13,16 +13,14 @@ wxString ExportDialog::validPath() {
     wxString fn = GetFilename();
     wxString p = GetPath();
     if(!extension(fn.ToStdString())) {
-        p = GetDirectory();
         switch(GetFilterIndex()) {
         case ict::PNG_WC:
-            fn.Append(pngExt);
+            p.Append(pngExt);
             break;
         case ict::JPEG_WC:
-            fn.Append(jpgExt);
+            p.Append(jpgExt);
             break;
         }
-        p.Append(fn);
     }
     return p;
 }

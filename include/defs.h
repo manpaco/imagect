@@ -87,13 +87,13 @@ enum Depth {
 };
 
 enum Wildcard {
-    PNG_WC,
+    PNG_WC = 0,
     JPEG_WC,
     WILDCARD_SIZE
 };
 
 enum Extension {
-    NONE_EXT,
+    NONE_EXT = 0,
     PNG_EXT,
     JPG_EXT,
     JPEG_EXT
