@@ -7,7 +7,7 @@
     #include <wx/wx.h>
 #endif
 
-#include "identifiersdef.h"
+#include "defs.h"
 
 const int bestWidth = 1;
 const int corner = 10;

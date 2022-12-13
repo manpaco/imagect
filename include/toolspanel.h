@@ -23,7 +23,7 @@
     #include <wx/statline.h>
 #endif
 
-#include "identifiersdef.h"
+#include "defs.h"
 #include "statedef.h"
 
 class ToolsPanel: public wxScrolledCanvas {

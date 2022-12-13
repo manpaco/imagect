@@ -2,7 +2,7 @@
 #define IMGTOOLS_H
 
 #include <Magick++.h>
-#include "identifiersdef.h"
+#include "defs.h"
 #include "statedef.h"
 
 const unsigned char depth8 = 255;
