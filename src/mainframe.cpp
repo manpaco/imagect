@@ -157,7 +157,9 @@ void MainFrame::onOpen(wxCommandEvent &event) {
 
 void MainFrame::onExport(wxCommandEvent &event) {
     if(!openedImg) return;
-    exportImage();
+    ExportDialog expImg(this);
+    if(expImg.ShowModal() == wxID_CANCEL) return;
+    exportImage(expImg.validPath());
 }
 
 void MainFrame::onQuit(wxCommandEvent &event) {
@@ -191,21 +193,16 @@ int MainFrame::showProceedMessage() {
             _("Please confirm"), wxICON_QUESTION | wxYES_NO, this);
 }
 
-void MainFrame::exportImage() {
-    ExportDialog expImg(this);
-    if(expImg.ShowModal() == wxID_CANCEL) return;
+void MainFrame::exportImage(const wxString &p) {
+    if(!openedImg) return;
     Magick::Image out(composeState(*sourceImg, *currentState));
-    out.write(expImg.validPath().ToStdString());
+    out.write(p.ToStdString());
     exportedImg = true;
 }
 
 void MainFrame::openImage(const wxString &p) {
-    if(openedImg) {
-        delete sourceImg;
-        delete scaledImg;
-        history.clear();
-        currentState = history.begin();
-    } else bindElements();
+    if(openedImg) clear();
+    bindElements();
     sourceImg = new Magick::Image(p.ToStdString());
     scaledImg = new Magick::Image(*sourceImg);
     scaledImg->zoom(Magick::Geometry(scaledImg->columns() * 0.3, scaledImg->rows() * 0.3));
@@ -242,7 +239,8 @@ void MainFrame::clear() {
     }
     history.clear();
     initParams();
-    tools->clear(false);
+    tools->Enable(false);
+    tools->collapseBlocks();
     canvas->clear();
     preview->clear();
 }

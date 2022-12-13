@@ -50,7 +50,7 @@ class MainFrame: public wxFrame {
         void onOpen(wxCommandEvent &event);
         void onExport(wxCommandEvent &event);
         void onQuit(wxCommandEvent &event);
-        void exportImage();
+        void exportImage(const wxString &p);
         void openImage(const wxString &p);
         void clear();
         void onQuitFrame(wxCloseEvent &event);
