@@ -6,8 +6,9 @@ using Magick::Quantum;
 
 void overlap(const Magick::Image &overlay, Magick::Image &background, bool fit, 
         bool crop) {
-    if(fit) {
-        Magick::Geometry geoBack(background.columns(), background.rows());
+    Magick::Geometry geoBack(background.columns(), background.rows());
+    Magick::Geometry geoOver(overlay.columns(), overlay.rows());
+    if(fit && (geoOver != geoBack)) {
         float backRatio = (float)background.columns() / (float)background.rows();
         float overRatio = (float)overlay.columns() / (float)overlay.rows();
         if(backRatio > overRatio) {
@@ -34,11 +35,9 @@ Magick::Image extractArea(const Magick::Geometry &area, const Magick::Image &tar
     if(emptyIntersection(area, tCopy)) return extracted;
     tCopy.crop(area);
 
-    int xOff, yOff;
+    int xOff = 0, yOff = 0;
     if(area.xOff() < 0) xOff = abs(area.xOff());
-    else xOff = 0;
     if(area.yOff() < 0) yOff = abs(area.yOff());
-    else yOff = 0;
 
     Magick::Geometry compOff(0, 0, xOff, yOff);
     extracted.composite(tCopy, compOff, Magick::OverCompositeOp);
@@ -74,52 +73,54 @@ unsigned char * extractDepth8Channel(const Magick::Image &img, ict::Channel ch, 
     int n = img.columns() * img.rows();
     unsigned char *pExt;
     switch(ch) {
-    case ict::RGB:
-        pExt = new unsigned char[n*3];
+        case ict::RGB: {
+            pExt = new unsigned char[n*3];
 #if MAGICKCORE_QUANTUM_DEPTH == 16
-        for(int p = 0; p < n; p++) {
-            int offset = p * 3;
-            pExt[offset] = toDepth8(pixels[p].red);
-            offset++;
-            pExt[offset] = toDepth8(pixels[p].green);
-            offset++;
-            pExt[offset] = toDepth8(pixels[p].blue);
-        }
-#elif MAGICKCORE_QUANTUM_DEPTH == 8
-        for(int p = 0; p < n; p++) {
-            int offset = p * 3;
-            pExt[offset] = pixels[p].red;
-            offset++;
-            pExt[offset] = pixels[p].green;
-            offset++;
-            pExt[offset] = pixels[p].blue;
-        }
+            for(int p = 0; p < n; p++) {
+                int offset = p * 3;
+                pExt[offset] = toDepth8(pixels[p].red);
+                offset++;
+                pExt[offset] = toDepth8(pixels[p].green);
+                offset++;
+                pExt[offset] = toDepth8(pixels[p].blue);
+            }
+#else
+            for(int p = 0; p < n; p++) {
+                int offset = p * 3;
+                pExt[offset] = pixels[p].red;
+                offset++;
+                pExt[offset] = pixels[p].green;
+                offset++;
+                pExt[offset] = pixels[p].blue;
+            }
 #endif
-        break;
-    case ict::ALPHA:
-        pExt = new unsigned char[n];
+            break;
+        }
+        case ict::ALPHA: {
+            pExt = new unsigned char[n];
 #if MAGICKCORE_QUANTUM_DEPTH == 16
-        if(opaqueAtHigh) {
-            for(int p = 0; p < n; p++) {
-                pExt[p] = depth8 - toDepth8(pixels[p].opacity);
+            if(opaqueAtHigh) {
+                for(int p = 0; p < n; p++) {
+                    pExt[p] = depth8 - toDepth8(pixels[p].opacity);
+                }
+            } else {
+                for(int p = 0; p < n; p++) {
+                    pExt[p] = toDepth8(pixels[p].opacity);
+                }
             }
-        } else {
-            for(int p = 0; p < n; p++) {
-                pExt[p] = toDepth8(pixels[p].opacity);
+#else
+            if(opaqueAtHigh) {
+                for(int p = 0; p < n; p++) {
+                    pExt[p] = depth8 - pixels[p].opacity;
+                }
+            } else {
+                for(int p = 0; p < n; p++) {
+                    pExt[p] = pixels[p].opacity;
+                }
             }
-        }
-#elif MAGICKCORE_QUANTUM_DEPTH == 8
-        if(opaqueAtHigh) {
-            for(int p = 0; p < n; p++) {
-                pExt[p] = depth8 - pixels[ṕ].opacity;
-            }
-        } else {
-            for(int p = 0; p < n; p++) {
-                pExt[p] = pixels[p].opacity;
-            }
-        }
 #endif
-        break;
+            break;
+        }
     }
     return pExt;
 }
@@ -142,12 +143,31 @@ Magick::Image composeState(const Magick::Image &img, const State &s) {
     Magick::Geometry crop(w, h, xo, yo);
     Magick::Image comp(extractArea(crop, img));
     if(std::get<1>(s).allowGrow) {
-        //Magick::Image back(img.geometry(), Magick::Color(0, 0, 0, QuantumRange / 2));
-        //if(std::get<1>(s).growChoice == ict::IMAGE) 
-        //    if(!std::get<1>(s).backImage.ToStdString().empty())
-        //        back.read(std::get<1>(s).backImage.ToStdString());
-        //overlap(comp, back, true, true);
-        //return back;
+        switch(std::get<1>(s).growChoice) {
+            case ict::IMAGE: {
+                Magick::Image back(std::get<1>(s).backImage.ToStdString());
+                overlap(comp, back);
+                return back;
+                break;
+            }
+            case ict::COLOR: {
+                wxColour c = std::get<1>(s).backColour;
+#if MAGICKCORE_QUANTUM_DEPTH == 16
+                unsigned short r = toDepth16(c.Red());
+                unsigned short g = toDepth16(c.Green());
+                unsigned short b = toDepth16(c.Blue());
+#else
+                unsigned char r = c.Red();
+                unsigned char g = c.Green();
+                unsigned char b = c.Blue();
+#endif
+                Magick::Color bc(r, g, b);
+                Magick::Image back(Magick::Geometry(comp.columns(), comp.rows()), bc);
+                overlap(comp, back);
+                return back;
+                break;
+            }
+        }
     }
     return comp;
 }

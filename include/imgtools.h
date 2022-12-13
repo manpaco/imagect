@@ -9,7 +9,7 @@ const unsigned char depth8 = 255;
 const unsigned short depth16 = 65535;
 const unsigned short depthFactor = depth8 + 2;
 
-void overlap(const Magick::Image &, Magick::Image &, bool, bool);
+void overlap(const Magick::Image &, Magick::Image &, bool = true, bool = true);
 Magick::Image extractArea(const Magick::Geometry &, const Magick::Image &);
 bool emptyIntersection(const Magick::Geometry &area, const Magick::Image &image);
 bool contains(const Magick::Geometry &, const Magick::Image &);
