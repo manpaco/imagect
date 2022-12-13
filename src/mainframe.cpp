@@ -1,10 +1,12 @@
 #include "mainframe.h"
 #include "canvaspanel.h"
 #include "cropevent.h"
-#include "identifiersdef.h"
+#include "defs.h"
 #include "previewpanel.h"
 #include "toolspanel.h"
 #include "imgtools.h"
+#include "filext.h"
+#include "exportdlg.h"
 
 using Magick::Quantum;
 
@@ -147,8 +149,7 @@ void MainFrame::onOpen(wxCommandEvent &event) {
     if(openedImg && !exportedImg) {
         if(showProceedMessage() != wxYES) return;
     }
-    wxFileDialog openDlg(this, _("Open image"), "", "", 
-            _("PNG (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*jpeg;*.jpg"), 
+    wxFileDialog openDlg(this, _("Open image"), "", "", _(importWc), 
             wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     if(openDlg.ShowModal() == wxID_CANCEL) return;
     openImage(openDlg.GetPath());
@@ -191,12 +192,10 @@ int MainFrame::showProceedMessage() {
 }
 
 void MainFrame::exportImage() {
-    wxFileDialog exportDlg(this, _("Export image"),wxEmptyString, wxEmptyString, 
-            "PNG (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*jpeg;*.jpg", 
-            wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-    if(exportDlg.ShowModal() == wxID_CANCEL) return;
+    ExportDialog expImg(this);
+    if(expImg.ShowModal() == wxID_CANCEL) return;
     Magick::Image out(composeState(*sourceImg, *currentState));
-    out.write(exportDlg.GetPath().ToStdString());
+    out.write(expImg.validPath().ToStdString());
     exportedImg = true;
 }
 
