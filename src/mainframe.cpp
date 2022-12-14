@@ -7,6 +7,7 @@
 #include "imgtools.h"
 #include "filext.h"
 #include "exportdlg.h"
+#include <iostream>
 
 using Magick::Quantum;
 
@@ -195,27 +196,38 @@ int MainFrame::showProceedMessage() {
 
 void MainFrame::exportImage(const wxString &p) {
     if(!openedImg) return;
-    Magick::Image out(composeState(*sourceImg, *currentState));
-    out.write(p.ToStdString());
-    exportedImg = true;
+    try {
+        Magick::Image out(composeState(*sourceImg, *currentState));
+        out.write(p.ToStdString());
+        exportedImg = true;
+    }
+    catch(Magick::Exception &e) {
+        wxMessageBox(e.what(), "Error exporting image");
+    }
 }
 
 void MainFrame::openImage(const wxString &p) {
     if(openedImg) clear();
-    bindElements();
-    sourceImg = new Magick::Image(p.ToStdString());
-    scaledImg = new Magick::Image(*sourceImg);
-    scaledImg->zoom(Magick::Geometry(scaledImg->columns() * 0.3, scaledImg->rows() * 0.3));
-    wxBitmap newBmp(createImage(*scaledImg));
-    preview->updatePreview(newBmp);
-    canvas->updateCanvas(newBmp);
-    tools->clear(true);
-    tools->cropSize(canvas->cropSize());
-    OptionsContainer opts = tools->currentOpts();
-    State toSave = std::make_tuple(canvas->getCropOffset(), opts);
-    updateHistory(toSave);
-    mEdit->Enable(wxID_APPLY, true);
-    openedImg = true;
+    try {
+        sourceImg = new Magick::Image(p.ToStdString());
+        scaledImg = new Magick::Image(*sourceImg);
+        scaledImg->zoom(Magick::Geometry(scaledImg->columns() * 0.3, scaledImg->rows() * 0.3));
+        wxBitmap newBmp(createImage(*scaledImg));
+        bindElements();
+        preview->updatePreview(newBmp);
+        canvas->updateCanvas(newBmp);
+        tools->clear(true);
+        tools->cropSize(canvas->cropSize());
+        OptionsContainer opts = tools->currentOpts();
+        State toSave = std::make_tuple(canvas->getCropOffset(), opts);
+        updateHistory(toSave);
+        mEdit->Enable(wxID_APPLY, true);
+        openedImg = true;
+    }
+    catch(Magick::Exception &e) {
+        std::cerr << e.what() << std::endl;
+        wxMessageBox(e.what(), "Error opening image");
+    }
 }
 
 void MainFrame::initParams() {
@@ -302,7 +314,7 @@ void MainFrame::composePreview() {
 
 void MainFrame::saveState(wxCommandEvent &event) {
     // update preview and/or update crop rectangle
-    tools->checkValues();
+    if(!tools->checkValues()) return;
     canvas->cropSize(tools->optsCropSize());
     State toSave = std::make_tuple(canvas->getCropOffset(), tools->currentOpts());
     if(toSave == *currentState) return;
