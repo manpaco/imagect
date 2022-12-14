@@ -135,6 +135,22 @@ unsigned char toDepth8(const unsigned short value) {
     return n;
 }
 
+bool tryOpen(const wxString &imgFile, const wxString &msgTitle) {
+    try {
+        if(imgFile.IsEmpty()) throw std::invalid_argument("No image selected! Please, select a valid one to continue...");
+        Magick::Image test(imgFile.ToStdString());
+    }
+    catch(Magick::Exception &e) {
+        wxMessageBox(e.what(), msgTitle);
+        return false;
+    }
+    catch(std::invalid_argument &a) {
+        wxMessageBox(a.what(), msgTitle);
+        return false;
+    }
+    return true;
+}
+
 Magick::Image composeState(const Magick::Image &img, const State &s) {
     int w = std::get<1>(s).cropSize.GetWidth();
     int h = std::get<1>(s).cropSize.GetHeight();
@@ -145,9 +161,14 @@ Magick::Image composeState(const Magick::Image &img, const State &s) {
     if(std::get<1>(s).allowGrow) {
         switch(std::get<1>(s).growChoice) {
             case ict::IMAGE: {
-                Magick::Image back(std::get<1>(s).backImage.ToStdString());
-                overlap(comp, back);
-                return back;
+                try {
+                    Magick::Image back(std::get<1>(s).backImage.ToStdString());
+                    overlap(comp, back);
+                    return back;
+                }
+                catch(Magick::Exception &e) {
+                    std::cerr << e.what() << std::endl;
+                }
                 break;
             }
             case ict::COLOR: {

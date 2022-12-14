@@ -18,5 +18,6 @@ unsigned char toDepth8(const unsigned short);
 unsigned short toDepth16(const unsigned char);
 Magick::Image composeState(const Magick::Image &img, const State &s);
 wxImage createImage(const Magick::Image &img);
+bool tryOpen(const wxString &imgFile, const wxString &msgTitle);
 
 #endif // IMGTOOLS_H
