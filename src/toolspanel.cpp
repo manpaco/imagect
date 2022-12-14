@@ -2,6 +2,7 @@
 #include <string>
 #include "wx/valnum.h"
 #include "filext.h"
+#include "imgtools.h"
 
 extern const int bestSpace;
 
@@ -92,13 +93,17 @@ void ToolsPanel::cropSize(const wxSize &s) {
     heightCrop(s.GetHeight());
 }
 
-void ToolsPanel::checkValues() {
+bool ToolsPanel::checkValues() {
     std::string checking = widthCtrl->GetValue().ToStdString();
     if(checking.empty()) widthCrop(1);
     checking = heightCtrl->GetValue().ToStdString();
     if(checking.empty()) heightCrop(1);
     checking = strokeWidthCtrl->GetValue().ToStdString();
     if(checking.empty()) strokeWidth(0);
+    if(opts.growChoice == ict::IMAGE) {
+        return tryOpen(opts.backImage, "Background image");
+    }
+    return true;
 }
 
 wxSize ToolsPanel::optsCropSize() const {
