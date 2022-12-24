@@ -329,7 +329,7 @@ void MainFrame::composePreview() {
 
 void MainFrame::saveState(wxCommandEvent &event) {
     if(!tools->checkValues()) return;
-    canvas->cropSize(tools->optsCropSize());
+    canvas->cropSize(tools->cropSize());
     OptionsContainer toSave = tools->currentOpts();
     if(toSave == *currentState) return;
     updateHistory(toSave);

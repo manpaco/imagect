@@ -134,7 +134,7 @@ bool ToolsPanel::checkValues() {
     return true;
 }
 
-wxSize ToolsPanel::optsCropSize() const {
+wxSize ToolsPanel::cropSize() const {
     return opts.cropSize;
 }
 

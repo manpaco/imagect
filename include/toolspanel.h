@@ -27,7 +27,7 @@ class ToolsPanel: public wxScrolledCanvas {
         void heightCrop(unsigned int height);
         void cropSize(const wxSize &s);
         void cropGeometry(const wxRect &r);
-        wxSize optsCropSize() const;
+        wxSize cropSize() const;
         bool checkValues();
         void strokeWidth(unsigned int sw);
         OptionsContainer currentOpts() const;
