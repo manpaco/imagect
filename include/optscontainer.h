@@ -1,14 +1,13 @@
-#ifndef STATEDEF_H
-#define STATEDEF_H
+#ifndef OPTSCONTAINER_H
+#define OPTSCONTAINER_H
 
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
+#include "wx/gdicmn.h"
+#include "wx/colour.h"
+#include "wx/string.h"
 
 struct OptionsContainer {
     wxSize cropSize;
+    wxPoint cropOff;
     bool fixRatio;
     float ratio;
     int shapeChoice;
@@ -23,6 +22,7 @@ struct OptionsContainer {
 
     OptionsContainer() : 
         cropSize(1, 1),
+        cropOff(0, 0),
         fixRatio(false),
         ratio(0.0),
         shapeChoice(0),
@@ -39,6 +39,7 @@ struct OptionsContainer {
 
     bool operator==(const OptionsContainer &oc) const {
         return cropSize == oc.cropSize &&
+            cropOff == oc.cropOff &&
             fixRatio == oc.fixRatio &&
             shapeChoice == oc.shapeChoice &&
             strokeWidth == oc.strokeWidth &&
@@ -56,6 +57,4 @@ struct OptionsContainer {
     }
 };
 
-typedef std::tuple<wxPoint, OptionsContainer> State;
-
-#endif // STATEDEF_H
+#endif // OPTSCONTAINER_H
