@@ -1,8 +1,31 @@
 #include "toolspanel.h"
 #include <string>
-#include "wx/valnum.h"
 #include "filext.h"
 #include "imgtools.h"
+
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
+
+#if wxUSE_COLOURPICKERCTRL
+    #include <wx/clrpicker.h>
+#endif
+
+#if wxUSE_FILEPICKERCTRL
+    #include <wx/filepicker.h>
+#endif
+
+#if wxUSE_COLLPANE
+    #include <wx/collpane.h>
+#endif
+
+#if wxUSE_STATLINE
+    #include <wx/statline.h>
+#endif
+
+#include "wx/valnum.h"
 
 extern const int bestSpace;
 
@@ -71,6 +94,11 @@ void ToolsPanel::setOpts(const OptionsContainer &oc) {
     colorPicker->SetColour(opts.backColour);
     growSelector->SetSelection(opts.growChoice);
     growCheck->SetValue(opts.allowGrow);
+}
+
+void ToolsPanel::cropGeometry(const wxRect &r) {
+    cropSize(r.GetSize());
+    opts.cropOff = r.GetPosition();
 }
 
 void ToolsPanel::strokeWidthChange(wxCommandEvent &event) {

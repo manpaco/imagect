@@ -1,30 +1,22 @@
 #ifndef TOOLSPANEL_H
 #define TOOLSPANEL_H
 
-#include <wx/wxprec.h>
+class wxColourPickerEvent;
+class wxFileDirPickerEvent;
+class wxCollapsiblePaneEvent;
+class wxCollapsiblePane;
+class wxChoice;
+class wxTextCtrl;
+class wxSlider;
+class wxFilePickerCtrl;
+class wxColourPickerCtrl;
+class wxStaticText;
 
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
+#include "wx/scrolwin.h"
+#include "wx/checkbox.h"
 
-#if wxUSE_COLOURPICKERCTRL
-    #include <wx/clrpicker.h>
-#endif
-
-#if wxUSE_FILEPICKERCTRL
-    #include <wx/filepicker.h>
-#endif
-
-#if wxUSE_COLLPANE
-    #include <wx/collpane.h>
-#endif
-
-#if wxUSE_STATLINE
-    #include <wx/statline.h>
-#endif
-
+#include "optscontainer.h"
 #include "defs.h"
-#include "statedef.h"
 
 class ToolsPanel: public wxScrolledCanvas {
     public:
@@ -34,6 +26,7 @@ class ToolsPanel: public wxScrolledCanvas {
         void widthCrop(unsigned int width);
         void heightCrop(unsigned int height);
         void cropSize(const wxSize &s);
+        void cropGeometry(const wxRect &r);
         wxSize optsCropSize() const;
         bool checkValues();
         void strokeWidth(unsigned int sw);
