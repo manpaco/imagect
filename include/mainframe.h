@@ -1,6 +1,11 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
+class CanvasPanel;
+class ToolsPanel;
+class PreviewPanel;
+class CropEvent;
+
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP
@@ -16,10 +21,7 @@
 #endif
 
 #include "Magick++/Image.h"
-#include "canvaspanel.h"
-#include "toolspanel.h"
-#include "previewpanel.h"
-#include "cropevent.h"
+#include "statedef.h"
 
 class MainFrame: public wxFrame {
     
