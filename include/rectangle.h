@@ -1,12 +1,9 @@
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
 
-#include <wx/wxprec.h>
+class wxGraphicsContext;
 
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
-
+#include "wx/control.h"
 #include "defs.h"
 
 class DuctileRectangle : public wxControl {

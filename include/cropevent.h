@@ -1,11 +1,7 @@
 #ifndef CROPEVENT_H
 #define CROPEVENT_H
 
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
+#include "wx/event.h"
 
 class CropEvent : public wxEvent {
     public:

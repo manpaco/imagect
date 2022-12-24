@@ -1,7 +1,11 @@
 #include "rectangle.h"
-#include <iterator>
 #include <wx/graphics.h>
-#include <wx/gtk/colour.h>
+
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
 
 wxIMPLEMENT_DYNAMIC_CLASS(DuctileRectangle, wxControl);
 wxDEFINE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);

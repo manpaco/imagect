@@ -3,12 +3,10 @@
 
 class DuctileRectangle;
 class ImageWindow;
+class wxGridSizer;
+class wxGraphicsContext;
 
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
+#include "wx/scrolwin.h"
 
 class CanvasPanel: public wxScrolledCanvas {
     public:

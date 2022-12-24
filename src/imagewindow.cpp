@@ -1,5 +1,11 @@
 #include "imagewindow.h"
 
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
+
 ImageWindow::ImageWindow(wxWindow *parent, wxWindowID id, wxBitmap &bm, const wxPoint &pos, const wxSize &size) {
     Create(parent, id, pos, size);
     updateImage(bm);
