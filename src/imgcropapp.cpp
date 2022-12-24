@@ -1,4 +1,5 @@
 #include "imgcropapp.h"
+#include "wx/string.h"
 #include "mainframe.h"
 
 wxIMPLEMENT_APP(ImgCropApp);

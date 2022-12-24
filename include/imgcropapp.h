@@ -1,11 +1,9 @@
 #ifndef ICTAPP_H
 #define ICTAPP_H
 
-#include <wx/wxprec.h>
+class wxString;
 
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
+#include "wx/app.h"
 
 #if wxUSE_CMDLINE_PARSER
     #include <wx/cmdline.h>
