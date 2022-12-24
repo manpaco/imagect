@@ -9,14 +9,10 @@
 
 #include "defs.h"
 
-const int bestWidth = 1;
-const int corner = 10;
-const int resizeLimit = corner * 3;
-
-class Rectangle : public wxControl {
+class DuctileRectangle : public wxControl {
     public:
-        Rectangle();
-        Rectangle(wxWindow *parent, wxWindowID id, 
+        DuctileRectangle();
+        DuctileRectangle(wxWindow *parent, wxWindowID id, 
                 const wxPoint &pos=wxDefaultPosition, 
                 const wxSize &size=wxDefaultSize, long style=wxBORDER_NONE, 
                 const wxValidator &validator=wxDefaultValidator, 
@@ -28,9 +24,9 @@ class Rectangle : public wxControl {
         void activateRestrictions(bool op);
         void setGeometry(const wxRect &g);
         void sendChangeEvent();
-        ~Rectangle();
+        ~DuctileRectangle();
         
-        wxDECLARE_DYNAMIC_CLASS(Rectangle);
+        wxDECLARE_DYNAMIC_CLASS(DuctileRectangle);
 
     private:
         ict::Zone getLocation(const wxPoint);
@@ -65,6 +61,11 @@ class Rectangle : public wxControl {
         wxRect restrictions;
         bool restricted = false;
         ict::Zone fixHint;
+        
+        const int bestWidth = 1;
+        const int corner = 10;
+        const int resizeLimit = corner * 3;
+
 };
 
 wxDECLARE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);

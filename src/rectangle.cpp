@@ -3,14 +3,14 @@
 #include <wx/graphics.h>
 #include <wx/gtk/colour.h>
 
-wxIMPLEMENT_DYNAMIC_CLASS(Rectangle, wxControl);
+wxIMPLEMENT_DYNAMIC_CLASS(DuctileRectangle, wxControl);
 wxDEFINE_EVENT(EVT_RECTANGLE_CHANGE, wxCommandEvent);
 
-Rectangle::Rectangle() {
+DuctileRectangle::DuctileRectangle() {
     init();
 }
 
-Rectangle::Rectangle(wxWindow *parent, wxWindowID id, 
+DuctileRectangle::DuctileRectangle(wxWindow *parent, wxWindowID id, 
                 const wxPoint &pos, 
                 const wxSize &size, long style, 
                 const wxValidator &validator, 
@@ -19,17 +19,17 @@ Rectangle::Rectangle(wxWindow *parent, wxWindowID id,
     Create(parent, id, pos, size, style, validator, name);
 }
 
-void Rectangle::init() {
-    Bind(wxEVT_MOTION, &Rectangle::mouseMotion, this);
-    Bind(wxEVT_LEFT_DOWN, &Rectangle::mousePress, this);
-    Bind(wxEVT_LEFT_UP, &Rectangle::mouseRelease, this);
-    Bind(wxEVT_LEAVE_WINDOW, &Rectangle::leaveWinHandler, this);
-    Bind(wxEVT_ENTER_WINDOW, &Rectangle::enterWinHandler, this);
-    Bind(wxEVT_PAINT, &Rectangle::onPaint, this);
-    Bind(wxEVT_SIZE, &Rectangle::updateSizes, this);
+void DuctileRectangle::init() {
+    Bind(wxEVT_MOTION, &DuctileRectangle::mouseMotion, this);
+    Bind(wxEVT_LEFT_DOWN, &DuctileRectangle::mousePress, this);
+    Bind(wxEVT_LEFT_UP, &DuctileRectangle::mouseRelease, this);
+    Bind(wxEVT_LEAVE_WINDOW, &DuctileRectangle::leaveWinHandler, this);
+    Bind(wxEVT_ENTER_WINDOW, &DuctileRectangle::enterWinHandler, this);
+    Bind(wxEVT_PAINT, &DuctileRectangle::onPaint, this);
+    Bind(wxEVT_SIZE, &DuctileRectangle::updateSizes, this);
 }
 
-void Rectangle::updateSizes(wxSizeEvent &event) {
+void DuctileRectangle::updateSizes(wxSizeEvent &event) {
     iz = wxRect(0, 0, event.GetSize().GetWidth(), event.GetSize().GetHeight());
     nz = wxRect(0, 0, event.GetSize().GetWidth(), corner);
     sz = wxRect(0, event.GetSize().GetHeight() - corner, event.GetSize().GetWidth(), corner);
@@ -43,26 +43,26 @@ void Rectangle::updateSizes(wxSizeEvent &event) {
     event.Skip();
 }
 
-void Rectangle::sendChangeEvent() {
+void DuctileRectangle::sendChangeEvent() {
     wxCommandEvent toSend(EVT_RECTANGLE_CHANGE, GetId());
     toSend.SetEventObject(this);
     ProcessWindowEvent(toSend);
 }
 
-void Rectangle::setRatio(float r) {
+void DuctileRectangle::setRatio(float r) {
     ratio = r;
 }
 
-void Rectangle::leaveWinHandler(wxMouseEvent &event) {
+void DuctileRectangle::leaveWinHandler(wxMouseEvent &event) {
     if(!zonePressed) changeCursor(ict::NONE);
     mouseLeftWin = true;
 }
 
-void Rectangle::enterWinHandler(wxMouseEvent &event) {
+void DuctileRectangle::enterWinHandler(wxMouseEvent &event) {
     mouseLeftWin = false;
 }
 
-void Rectangle::mouseMotion(wxMouseEvent &event) {
+void DuctileRectangle::mouseMotion(wxMouseEvent &event) {
     if(!zonePressed) {
         changeCursor(getLocation(event.GetPosition()));
         event.Skip();
@@ -90,25 +90,25 @@ void Rectangle::mouseMotion(wxMouseEvent &event) {
     event.Skip();
 }
 
-void Rectangle::fixRatio(bool op) {
+void DuctileRectangle::fixRatio(bool op) {
     fix = op;
     if(fix) setRatio((float)GetSize().GetWidth() / (float)GetSize().GetHeight());
 }
 
-bool Rectangle::fixRatio() const {
+bool DuctileRectangle::fixRatio() const {
     return fix;
 }
 
-void Rectangle::setRestrictions(const wxRect &r) {
+void DuctileRectangle::setRestrictions(const wxRect &r) {
     restrictions = r;
 }
 
-void Rectangle::activateRestrictions(bool op) {
+void DuctileRectangle::activateRestrictions(bool op) {
     restricted = op;
     setGeometryInternally(GetRect());
 }
 
-void Rectangle::setGeometryInternally(const wxRect &g) {
+void DuctileRectangle::setGeometryInternally(const wxRect &g) {
     float prevAx = accumX, prevAy = accumY;
     setGeometry(g);
     if(g.GetSize() == GetSize()) {
@@ -117,7 +117,7 @@ void Rectangle::setGeometryInternally(const wxRect &g) {
     }
 }
 
-void Rectangle::setGeometry(const wxRect &g) {
+void DuctileRectangle::setGeometry(const wxRect &g) {
     wxRect next(g);
     wxRect prevRect = GetRect();
     fixHint = ict::SE;
@@ -130,7 +130,7 @@ void Rectangle::setGeometry(const wxRect &g) {
     if(prevRect != GetRect() || g != GetRect()) sendChangeEvent();
 }
 
-void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
+void DuctileRectangle::fitInRestrictions(wxRect &fixRatioRect) {
     bool exceedsTopY = fixRatioRect.GetY() < restrictions.GetY();
     bool exceedsBottomY = (fixRatioRect.GetY() + fixRatioRect.GetHeight()) > (restrictions.GetY() + restrictions.GetHeight());
     bool exceedsLeftX = fixRatioRect.GetX() < restrictions.GetX();
@@ -202,7 +202,7 @@ void Rectangle::fitInRestrictions(wxRect &fixRatioRect) {
     }
 }
 
-void Rectangle::modify(const wxRect &ng) {
+void DuctileRectangle::modify(const wxRect &ng) {
     wxRect next(ng);
     if(restricted && !restrictions.Contains(next)) {
         if(!fix) next.Intersect(restrictions);
@@ -211,35 +211,35 @@ void Rectangle::modify(const wxRect &ng) {
     SetSize(next.GetX(), next.GetY(), next.GetWidth(), next.GetHeight());
 }
 
-void Rectangle::defineX(int &dxToCalc, int &dyToUse) {
+void DuctileRectangle::defineX(int &dxToCalc, int &dyToUse) {
     accumX = (float)dyToUse * ratio;
     dxToCalc = std::floor(accumX);
     accumX -= dxToCalc;
     accumY = 0;
 }
 
-void Rectangle::defineY(int &dyToCalc, int &dxToUse) {
+void DuctileRectangle::defineY(int &dyToCalc, int &dxToUse) {
     accumY = (float)dxToUse / ratio;
     dyToCalc = std::floor(accumY);
     accumY -= dyToCalc;
     accumX = 0;
 }
 
-void Rectangle::accumulateX(int &dxToCalc, int &dyToUse) {
+void DuctileRectangle::accumulateX(int &dxToCalc, int &dyToUse) {
     accumX += (float)dyToUse * ratio;
     dxToCalc = std::floor(accumX);
     accumX -= dxToCalc;
     accumY = 0;
 }
 
-void Rectangle::accumulateY(int &dyToCalc, int &dxToUse) {
+void DuctileRectangle::accumulateY(int &dyToCalc, int &dxToUse) {
     accumY += (float)dxToUse / ratio;
     dyToCalc = std::floor(accumY);
     accumY -= dyToCalc;
     accumX = 0;
 }
 
-void Rectangle::resizeUsing(ict::Zone zone){
+void DuctileRectangle::resizeUsing(ict::Zone zone){
     if(fix) fixHint = zone;
     wxPoint mousePosition(wxGetMousePosition());
     wxPoint positionOnScreen(GetScreenPosition());
@@ -337,7 +337,7 @@ void Rectangle::resizeUsing(ict::Zone zone){
     }
 }
 
-void Rectangle::changeCursor(ict::Zone type) {
+void DuctileRectangle::changeCursor(ict::Zone type) {
     if(type == ict::N || type == ict::S) 
         wxSetCursor(wxCursor(wxCURSOR_SIZENS));
     if(type == ict::E || type == ict::W) 
@@ -352,14 +352,14 @@ void Rectangle::changeCursor(ict::Zone type) {
         wxSetCursor(wxNullCursor);
 }
 
-void Rectangle::mousePress(wxMouseEvent &event) {
+void DuctileRectangle::mousePress(wxMouseEvent &event) {
     if(!HasCapture()) CaptureMouse();
     clientPressPoint = event.GetPosition();
     zonePressed = getLocation(event.GetPosition());
     rectInPress = GetRect();
 }
 
-void Rectangle::mouseRelease(wxMouseEvent &event) {
+void DuctileRectangle::mouseRelease(wxMouseEvent &event) {
     if(HasCapture()) ReleaseMouse();
     if(rectInPress != GetRect()) sendChangeEvent();
     zonePressed = ict::NONE;
@@ -367,7 +367,7 @@ void Rectangle::mouseRelease(wxMouseEvent &event) {
     else changeCursor(getLocation(event.GetPosition()));
 }
 
-ict::Zone Rectangle::getLocation(const wxPoint p) {
+ict::Zone DuctileRectangle::getLocation(const wxPoint p) {
     if(nez.Contains(p)) return ict::NE;
     if(nwz.Contains(p)) return ict::NW;
     if(sez.Contains(p)) return ict::SE;
@@ -380,7 +380,7 @@ ict::Zone Rectangle::getLocation(const wxPoint p) {
     return ict::NONE;
 }
 
-void Rectangle::paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill) {
+void DuctileRectangle::paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill) {
     wxPen wLine(wxColour(*wxWHITE), 1);
     wxPen bLine(wxColour(*wxBLACK), 1);
     gc->SetBrush(wxBrush(wxColour(0, 0, 0, 0)));
@@ -396,7 +396,7 @@ void Rectangle::paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, bo
     gc->DrawRectangle(paint.GetX() + 2, paint.GetY() + 2, paint.GetWidth() - 5, paint.GetHeight() - 5);
 }
 
-void Rectangle::onPaint(wxPaintEvent &) {
+void DuctileRectangle::onPaint(wxPaintEvent &) {
     wxPaintDC device(this);
     wxGraphicsContext *gcd = wxGraphicsContext::Create(device);
     if(gcd) {
@@ -409,6 +409,6 @@ void Rectangle::onPaint(wxPaintEvent &) {
     }
 }
 
-Rectangle::~Rectangle() {
+DuctileRectangle::~DuctileRectangle() {
 
 }
