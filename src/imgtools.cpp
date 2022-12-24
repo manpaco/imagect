@@ -1,6 +1,14 @@
 #include "imgtools.h"
 #include <cmath>
 #include <cstdlib>
+#include <Magick++.h>
+#include "optscontainer.h"
+
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
 
 using Magick::Quantum;
 
@@ -151,18 +159,18 @@ bool tryOpen(const wxString &imgFile, const wxString &msgTitle) {
     return true;
 }
 
-Magick::Image composeState(const Magick::Image &img, const State &s) {
-    int w = std::get<1>(s).cropSize.GetWidth();
-    int h = std::get<1>(s).cropSize.GetHeight();
-    int xo = std::get<0>(s).x;
-    int yo = std::get<0>(s).y;
+Magick::Image composeState(const Magick::Image &img, const OptionsContainer &s) {
+    int w = s.cropSize.GetWidth();
+    int h = s.cropSize.GetHeight();
+    int xo = s.cropOff.x;
+    int yo = s.cropOff.y;
     Magick::Geometry crop(w, h, xo, yo);
     Magick::Image comp(extractArea(crop, img));
-    if(std::get<1>(s).allowGrow) {
-        switch(std::get<1>(s).growChoice) {
+    if(s.allowGrow) {
+        switch(s.growChoice) {
             case ict::IMAGE: {
                 try {
-                    Magick::Image back(std::get<1>(s).backImage.ToStdString());
+                    Magick::Image back(s.backImage.ToStdString());
                     overlap(comp, back);
                     return back;
                 }
@@ -172,7 +180,7 @@ Magick::Image composeState(const Magick::Image &img, const State &s) {
                 break;
             }
             case ict::COLOR: {
-                wxColour c = std::get<1>(s).backColour;
+                wxColour c = s.backColour;
 #if MAGICKCORE_QUANTUM_DEPTH == 16
                 unsigned short r = toDepth16(c.Red());
                 unsigned short g = toDepth16(c.Green());
