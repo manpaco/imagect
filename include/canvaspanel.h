@@ -1,16 +1,14 @@
 #ifndef CANVASPANEL_H
 #define CANVASPANEL_H
 
+class DuctileRectangle;
+class ImageWindow;
+
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
 #endif
-
-#include "rectangle.h"
-#include "imagewindow.h"
-
-const int virtualOffset = 100;
 
 class CanvasPanel: public wxScrolledCanvas {
     public:
@@ -42,7 +40,7 @@ class CanvasPanel: public wxScrolledCanvas {
         void initParams();
         void tryToAttachImg();
 
-        Rectangle *cropArea = nullptr;
+        DuctileRectangle *cropArea = nullptr;
         ImageWindow *img = nullptr;
         wxGridSizer *sz = nullptr;
         wxWindow *shadow = nullptr;
@@ -51,6 +49,8 @@ class CanvasPanel: public wxScrolledCanvas {
         wxPoint cropOffset;
         int ppuX, ppuY;
         bool attachedImg = false;
+
+        const int virtualOffset = 100;
 };
 
 #endif // CANVASPANEL_H

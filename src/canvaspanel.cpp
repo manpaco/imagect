@@ -1,5 +1,6 @@
 #include "canvaspanel.h"
 #include "rectangle.h"
+#include "imagewindow.h"
 #include "cropevent.h"
 
 CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id) {
@@ -115,7 +116,7 @@ void CanvasPanel::updateElements(wxBitmap &bm) {
     initShadow();
     tryToAttachImg();
     if(!cropArea) {
-        cropArea = new Rectangle(this, ict::CROP_AREA);
+        cropArea = new DuctileRectangle(this, ict::CROP_AREA);
         bindCrop();
     }
     initCrop();
