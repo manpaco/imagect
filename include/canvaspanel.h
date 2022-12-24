@@ -15,7 +15,7 @@ class CanvasPanel: public wxScrolledCanvas {
         void updateCanvas(wxBitmap &);
         void cropSize(const wxSize &s);
         wxSize cropSize();
-        wxPoint getCropOffset() const;
+        wxPoint cropOffset() const;
         void cropGeometry(const wxRect &g);
         void fixCrop(bool);
         void allowGrow(bool);
@@ -44,7 +44,7 @@ class CanvasPanel: public wxScrolledCanvas {
         wxWindow *shadow = nullptr;
 
         wxPoint oldCropPosition;
-        wxPoint cropOffset;
+        wxPoint cropOff;
         int ppuX, ppuY;
         bool attachedImg = false;
 
