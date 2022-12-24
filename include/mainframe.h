@@ -5,23 +5,16 @@ class CanvasPanel;
 class ToolsPanel;
 class PreviewPanel;
 class CropEvent;
+class wxBoxSizer;
+class wxButton;
+class wxSplitterWindow;
+namespace Magick {
+    class Image;
+}
+struct OptionsContainer;
 
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
-
-#if wxUSE_STATLINE
-    #include <wx/statline.h>
-#endif
-
-#if wxUSE_SPLITTER
-    #include <wx/splitter.h>
-#endif
-
-#include "Magick++/Image.h"
-#include "statedef.h"
+#include "wx/frame.h"
+#include <list>
 
 class MainFrame: public wxFrame {
     
@@ -32,7 +25,6 @@ class MainFrame: public wxFrame {
 
     private:
         void initParams();
-        void updatePreview(wxBitmap &bm);
         void allocateMem();
         void bindMenuBar();
         void bindElements();
@@ -41,10 +33,10 @@ class MainFrame: public wxFrame {
         void saveState(wxCommandEvent &);
         void composePreview();
         void onCropChange(CropEvent &);
-        void updateHistory(State toSave);
+        void updateHistory(OptionsContainer toSave);
         void redo(wxCommandEvent &);
         void undo(wxCommandEvent &);
-        void updateCropGeometry(State &s);
+        void updateCropGeometry(wxPoint &o, wxSize &s);
         void onFixRatio(wxCommandEvent &);
         void onAllowGrow(wxCommandEvent &event);
         void createMenuBar();
@@ -77,8 +69,8 @@ class MainFrame: public wxFrame {
         wxMenuBar *topMenuBar;
         wxMenu *mFile, *mEdit, *mHelp;
 
-        std::list<State> history{};
-        std::list<State>::iterator currentState;
+        std::list<OptionsContainer> history;
+        std::list<OptionsContainer>::iterator currentState;
 
         bool openedImg, exportedImg;
 

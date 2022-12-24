@@ -3,11 +3,26 @@
 #include "cropevent.h"
 #include "defs.h"
 #include "previewpanel.h"
+#include "optscontainer.h"
 #include "toolspanel.h"
 #include "imgtools.h"
 #include "filext.h"
 #include "exportdlg.h"
-#include <iostream>
+#include <Magick++.h>
+
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
+
+#if wxUSE_STATLINE
+    #include <wx/statline.h>
+#endif
+
+#if wxUSE_SPLITTER
+    #include <wx/splitter.h>
+#endif
 
 using Magick::Quantum;
 
@@ -218,8 +233,7 @@ void MainFrame::openImage(const wxString &p) {
         canvas->updateCanvas(newBmp);
         tools->clear(true);
         tools->cropSize(canvas->cropSize());
-        OptionsContainer opts = tools->currentOpts();
-        State toSave = std::make_tuple(canvas->getCropOffset(), opts);
+        OptionsContainer toSave = tools->currentOpts();
         updateHistory(toSave);
         mEdit->Enable(wxID_APPLY, true);
         openedImg = true;
@@ -269,30 +283,30 @@ void MainFrame::onAllowGrow(wxCommandEvent &event) {
 
 void MainFrame::undo(wxCommandEvent &event) {
     currentState--;
-    tools->setOpts(std::get<1>(*currentState));
-    updateCropGeometry(*currentState);
+    tools->setOpts(*currentState);
+    updateCropGeometry(currentState->cropOff, currentState->cropSize);
     if(currentState == history.begin()) mEdit->Enable(wxID_UNDO, false);
     mEdit->Enable(wxID_REDO, true);
     composePreview();
     exportedImg = false;
 }
 
-void MainFrame::updateCropGeometry(State &s) {
-    wxRect g(std::get<0>(s), std::get<1>(s).cropSize);
+void MainFrame::updateCropGeometry(wxPoint &o, wxSize &s) {
+    wxRect g(o, s);
     canvas->cropGeometry(g);
 }
 
 void MainFrame::redo(wxCommandEvent &event) {
     if(currentState == history.begin()) mEdit->Enable(wxID_UNDO, true);
     currentState++;
-    tools->setOpts(std::get<1>(*currentState));
-    updateCropGeometry(*currentState);
+    tools->setOpts(*currentState);
+    updateCropGeometry(currentState->cropOff, currentState->cropSize);
     if(currentState == --history.end()) mEdit->Enable(wxID_REDO, false);
     composePreview();
     exportedImg = false;
 }
 
-void MainFrame::updateHistory(State toSave) {
+void MainFrame::updateHistory(OptionsContainer toSave) {
     if(currentState != history.end()) history.erase(++currentState, history.end());
     history.push_back(toSave);
     currentState = --history.end();
@@ -303,24 +317,21 @@ void MainFrame::updateHistory(State toSave) {
 }
 
 void MainFrame::onCropChange(CropEvent &event) {
-    tools->cropSize(event.getSize());
+    wxRect newGeometry(event.getOffset(), event.getSize());
+    tools->cropGeometry(newGeometry);
 }
 
 void MainFrame::composePreview() {
     Magick::Image newImg = composeState(*scaledImg, *currentState);
     wxBitmap newPreview(createImage(newImg));
-    updatePreview(newPreview);
+    preview->updatePreview(newPreview);
 }
 
 void MainFrame::saveState(wxCommandEvent &event) {
-    // update preview and/or update crop rectangle
     if(!tools->checkValues()) return;
     canvas->cropSize(tools->optsCropSize());
-    State toSave = std::make_tuple(canvas->getCropOffset(), tools->currentOpts());
+    OptionsContainer toSave = tools->currentOpts();
     if(toSave == *currentState) return;
     updateHistory(toSave);
 }
 
-void MainFrame::updatePreview(wxBitmap &bm) {
-    preview->updatePreview(bm);
-}
