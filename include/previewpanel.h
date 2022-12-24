@@ -1,6 +1,8 @@
 #ifndef PREVIEWPANEL_H
 #define PREVIEWPANEL_H
 
+class ImageWindow;
+
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP
@@ -10,8 +12,6 @@
 #if wxUSE_STATLINE
     #include <wx/statline.h>
 #endif
-
-#include "imagewindow.h"
 
 class PreviewPanel: public wxPanel {
 

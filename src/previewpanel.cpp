@@ -1,5 +1,5 @@
 #include "previewpanel.h"
-#include "imgtools.h"
+#include "imagewindow.h"
 
 extern const int bestSpace;
 
