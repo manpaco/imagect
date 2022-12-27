@@ -360,7 +360,7 @@ void ToolsPanel::growChoiceState(bool state, int choice) {
 void ToolsPanel::initGrowChoices() {
     growChoices[ict::COLOR] = wxString("Color");
     growChoices[ict::IMAGE] = wxString("Image");
-    growChoices[ict::VOID] = wxString("Void");
+    growChoices[ict::VOID_G] = wxString("Void");
 }
 
 void ToolsPanel::initShapeChoices() {
