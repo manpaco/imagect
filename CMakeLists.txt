@@ -29,7 +29,7 @@ find_program(MAGICK_CONFIG "Magick++-config")
 execute_process(COMMAND "${MAGICK_CONFIG}" "--cxxflags" OUTPUT_VARIABLE MAGICK_CXX_FLAGS)
 string(STRIP "${MAGICK_CXX_FLAGS}" MAGICK_CXX_FLAGS)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MAGICK_CXX_FLAGS}")
-find_package(ImageMagick COMPONENTS Magick++)
+find_package(ImageMagick REQUIRED COMPONENTS Magick++ MagickWand MagickCore)
 target_include_directories(imgcrop PRIVATE ${ImageMagick_INCLUDE_DIRS})
 target_link_libraries(imgcrop ${ImageMagick_LIBRARIES})
 
