@@ -1,11 +1,16 @@
 #include "imgcropapp.h"
 #include "wx/string.h"
 #include "mainframe.h"
+#include <Magick++.h>
 
 wxIMPLEMENT_APP(ImgCropApp);
 
 bool ImgCropApp::OnInit() {
     if(!wxApp::OnInit()) return false;
+
+#ifdef __WXMSW__
+    Magick::InitializeMagick(wxGetCwd().char_str());
+#endif // __WXMSW__
 
     MainFrame *imgCropFrame;
 
