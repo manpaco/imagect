@@ -17,10 +17,6 @@
     #include <wx/filepicker.h>
 #endif
 
-#if wxUSE_COLLPANE
-    #include <wx/collpane.h>
-#endif
-
 #if wxUSE_STATLINE
     #include <wx/statline.h>
 #endif

@@ -3,8 +3,6 @@
 
 class wxColourPickerEvent;
 class wxFileDirPickerEvent;
-class wxCollapsiblePaneEvent;
-class wxCollapsiblePane;
 class wxChoice;
 class wxTextCtrl;
 class wxSlider;
@@ -14,6 +12,10 @@ class wxStaticText;
 
 #include "wx/scrolwin.h"
 #include "wx/checkbox.h"
+
+#if wxUSE_COLLPANE
+    #include <wx/collpane.h>
+#endif
 
 #include "optscontainer.h"
 #include "defs.h"
