@@ -400,7 +400,7 @@ void DuctileRectangle::paintSpecialFrame(const wxRect &paint, wxGraphicsContext 
     gc->DrawRectangle(paint.GetX() + 2, paint.GetY() + 2, paint.GetWidth() - 5, paint.GetHeight() - 5);
 }
 
-void DuctileRectangle::onPaint(wxPaintEvent &) {
+void DuctileRectangle::onPaint(wxPaintEvent &event) {
     wxPaintDC device(this);
     wxGraphicsContext *gcd = wxGraphicsContext::Create(device);
     if(gcd) {
@@ -411,6 +411,7 @@ void DuctileRectangle::onPaint(wxPaintEvent &) {
         paintSpecialFrame(swz, gcd, true);
         delete gcd;
     }
+    event.Skip();
 }
 
 DuctileRectangle::~DuctileRectangle() {
