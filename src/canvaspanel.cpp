@@ -127,7 +127,7 @@ void CanvasPanel::updateElements(wxBitmap &bm) {
     }
     initCrop();
     Layout();
-    Refresh();
+    cropArea->Refresh();
 }
 
 void CanvasPanel::tryToAttachImg() {
