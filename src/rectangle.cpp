@@ -60,10 +60,12 @@ void DuctileRectangle::setRatio(float r) {
 void DuctileRectangle::leaveWinHandler(wxMouseEvent &event) {
     if(!zonePressed) changeCursor(ict::NONE);
     mouseLeftWin = true;
+    event.Skip();
 }
 
 void DuctileRectangle::enterWinHandler(wxMouseEvent &event) {
     mouseLeftWin = false;
+    event.Skip();
 }
 
 void DuctileRectangle::mouseMotion(wxMouseEvent &event) {
@@ -361,6 +363,7 @@ void DuctileRectangle::mousePress(wxMouseEvent &event) {
     clientPressPoint = event.GetPosition();
     zonePressed = getLocation(event.GetPosition());
     rectInPress = GetRect();
+    event.Skip();
 }
 
 void DuctileRectangle::mouseRelease(wxMouseEvent &event) {
@@ -369,6 +372,7 @@ void DuctileRectangle::mouseRelease(wxMouseEvent &event) {
     zonePressed = ict::NONE;
     if(mouseLeftWin) changeCursor(ict::NONE);
     else changeCursor(getLocation(event.GetPosition()));
+    event.Skip();
 }
 
 ict::Zone DuctileRectangle::getLocation(const wxPoint p) {
