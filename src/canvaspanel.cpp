@@ -122,7 +122,7 @@ void CanvasPanel::updateElements(wxBitmap &bm) {
     initShadow();
     tryToAttachImg();
     if(!cropArea) {
-        cropArea = new DuctileRectangle(img, ict::CROP_AREA);
+        cropArea = new DuctileRectangle(this, ict::CROP_AREA);
         bindCrop();
     }
     initCrop();
