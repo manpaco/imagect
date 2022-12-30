@@ -43,6 +43,7 @@ void ImageWindow::onPaint(wxPaintEvent &event) {
         wxPaintDC dev(this);
         dev.DrawBitmap(*img, 0, 0);
     }
+    event.Skip();
 }
 
 ImageWindow::~ImageWindow() {
