@@ -11,10 +11,10 @@ class wxSplitterWindow;
 namespace Magick {
     class Image;
 }
-struct OptionsContainer;
 
 #include "wx/frame.h"
-#include <list>
+#include "optscontainer.h"
+#include <stack>
 
 class MainFrame: public wxFrame {
     
@@ -69,8 +69,9 @@ class MainFrame: public wxFrame {
         wxMenuBar *topMenuBar;
         wxMenu *mFile, *mEdit, *mHelp;
 
-        std::list<OptionsContainer> history;
-        std::list<OptionsContainer>::iterator currentState;
+        std::stack<OptionsContainer> undoStack;
+        OptionsContainer currentState;
+        std::stack<OptionsContainer> redoStack;
 
         bool openedImg, exportedImg;
 

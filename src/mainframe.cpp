@@ -2,8 +2,8 @@
 #include "canvaspanel.h"
 #include "cropevent.h"
 #include "defs.h"
-#include "previewpanel.h"
 #include "optscontainer.h"
+#include "previewpanel.h"
 #include "toolspanel.h"
 #include "imgtools.h"
 #include "filext.h"
@@ -212,7 +212,7 @@ int MainFrame::showProceedMessage() {
 void MainFrame::exportImage(const wxString &p) {
     if(!openedImg) return;
     try {
-        Magick::Image out(composeState(*sourceImg, *currentState));
+        Magick::Image out(composeState(*sourceImg, currentState));
         out.write(p.ToStdString());
         exportedImg = true;
     }
@@ -233,8 +233,7 @@ void MainFrame::openImage(const wxString &p) {
         canvas->updateCanvas(newBmp);
         tools->clear(true);
         tools->cropSize(canvas->cropSize());
-        OptionsContainer toSave = tools->currentOpts();
-        updateHistory(toSave);
+        currentState = tools->currentOpts();
         mEdit->Enable(wxID_APPLY, true);
         openedImg = true;
     }
@@ -245,7 +244,7 @@ void MainFrame::openImage(const wxString &p) {
 }
 
 void MainFrame::initParams() {
-    currentState = history.begin();
+    currentState = OptionsContainer();
     openedImg = false;
     exportedImg = false;
     mEdit->Enable(wxID_APPLY, false);
@@ -263,7 +262,8 @@ void MainFrame::clear() {
         delete scaledImg;
         scaledImg = nullptr;
     }
-    history.clear();
+    undoStack = std::stack<OptionsContainer>();
+    redoStack = std::stack<OptionsContainer>();
     initParams();
     tools->Enable(false);
     tools->collapseBlocks();
@@ -282,11 +282,13 @@ void MainFrame::onAllowGrow(wxCommandEvent &event) {
 }
 
 void MainFrame::undo(wxCommandEvent &event) {
-    currentState--;
-    tools->setOpts(*currentState);
-    updateCropGeometry(currentState->cropOff, currentState->cropSize);
-    if(currentState == history.begin()) mEdit->Enable(wxID_UNDO, false);
-    mEdit->Enable(wxID_REDO, true);
+    if(redoStack.empty()) mEdit->Enable(wxID_REDO, true);
+    redoStack.push(currentState);
+    currentState = undoStack.top();
+    undoStack.pop();
+    if(undoStack.empty()) mEdit->Enable(wxID_UNDO, false);
+    tools->setOpts(currentState);
+    updateCropGeometry(currentState.cropOff, currentState.cropSize);
     composePreview();
     exportedImg = false;
 }
@@ -297,21 +299,23 @@ void MainFrame::updateCropGeometry(wxPoint &o, wxSize &s) {
 }
 
 void MainFrame::redo(wxCommandEvent &event) {
-    if(currentState == history.begin()) mEdit->Enable(wxID_UNDO, true);
-    currentState++;
-    tools->setOpts(*currentState);
-    updateCropGeometry(currentState->cropOff, currentState->cropSize);
-    if(currentState == --history.end()) mEdit->Enable(wxID_REDO, false);
+    if(undoStack.empty()) mEdit->Enable(wxID_UNDO, true);
+    undoStack.push(currentState);
+    currentState = redoStack.top();
+    redoStack.pop();
+    if(redoStack.empty()) mEdit->Enable(wxID_REDO, false);
+    tools->setOpts(currentState);
+    updateCropGeometry(currentState.cropOff, currentState.cropSize);
     composePreview();
     exportedImg = false;
 }
 
 void MainFrame::updateHistory(OptionsContainer toSave) {
-    if(currentState != history.end()) history.erase(++currentState, history.end());
-    history.push_back(toSave);
-    currentState = --history.end();
+    if(undoStack.empty()) mEdit->Enable(wxID_UNDO, true);
     mEdit->Enable(wxID_REDO, false);
-    if(currentState == ++history.begin()) mEdit->Enable(wxID_UNDO, true);
+    redoStack = std::stack<OptionsContainer>();
+    undoStack.push(currentState);
+    currentState = toSave;
     composePreview();
     exportedImg = false;
 }
@@ -322,7 +326,7 @@ void MainFrame::onCropChange(CropEvent &event) {
 }
 
 void MainFrame::composePreview() {
-    Magick::Image newImg = composeState(*scaledImg, *currentState);
+    Magick::Image newImg = composeState(*scaledImg, currentState);
     wxBitmap newPreview(createImage(newImg));
     preview->updatePreview(newPreview);
 }
@@ -331,7 +335,7 @@ void MainFrame::saveState(wxCommandEvent &event) {
     if(!tools->checkValues()) return;
     canvas->cropSize(tools->cropSize());
     OptionsContainer toSave = tools->currentOpts();
-    if(toSave == *currentState) return;
+    if(toSave == currentState) return;
     updateHistory(toSave);
 }
 
