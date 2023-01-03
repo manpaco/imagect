@@ -231,7 +231,7 @@ void MainFrame::openImage(const wxString &p) {
         bindElements();
         preview->updatePreview(newBmp);
         canvas->updateCanvas(newBmp);
-        tools->clear(true);
+        tools->Enable(true);
         tools->cropSize(canvas->cropSize());
         currentState = tools->currentOpts();
         mEdit->Enable(wxID_APPLY, true);
@@ -265,8 +265,7 @@ void MainFrame::clear() {
     undoStack = std::stack<OptionsContainer>();
     redoStack = std::stack<OptionsContainer>();
     initParams();
-    tools->Enable(false);
-    tools->collapseBlocks();
+    tools->clear(false);
     canvas->clear();
     preview->clear();
 }
