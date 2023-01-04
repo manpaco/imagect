@@ -8,6 +8,7 @@ class CropEvent;
 class wxBoxSizer;
 class wxButton;
 class wxSplitterWindow;
+class ScrolledView;
 namespace Magick {
     class Image;
 }
@@ -55,13 +56,13 @@ class MainFrame: public wxFrame {
         void resetCrop(wxCommandEvent &event);
 
         CanvasPanel *canvas = nullptr;
+        ScrolledView *sView = nullptr;
         ToolsPanel *tools = nullptr;
         wxSplitterWindow *mainSplitter = nullptr;
         wxSplitterWindow *sideSplitter = nullptr;
         PreviewPanel *preview = nullptr;
         wxBoxSizer *mainSizer = nullptr;
         Magick::Image *sourceImg = nullptr;
-        Magick::Image *scaledImg = nullptr;
 
         wxButton *apply;
         wxButton *reset;

@@ -9,6 +9,7 @@
 #include "filext.h"
 #include "exportdlg.h"
 #include <Magick++.h>
+#include "scrolview.h"
 
 #include <wx/wxprec.h>
 
@@ -48,7 +49,6 @@ MainFrame::MainFrame(const wxString &initImg): MainFrame() {
 
 MainFrame::~MainFrame() {
     if(sourceImg) delete(sourceImg);
-    if(scaledImg) delete(scaledImg);
 }
 
 void MainFrame::initDimensions() {
@@ -62,7 +62,7 @@ void MainFrame::initDimensions() {
 void MainFrame::allocateMem() {
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
-    canvas = new CanvasPanel(mainSplitter, ict::CANVAS);
+    sView = new ScrolledView(mainSplitter, ict::SCVIEW);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxVERTICAL);
@@ -100,7 +100,7 @@ void MainFrame::createMenuBar() {
 
 void MainFrame::overlayPanels() {
     sideSplitter->SplitHorizontally(preview, tools);
-    mainSplitter->SplitVertically(sideSplitter, canvas);
+    mainSplitter->SplitVertically(sideSplitter, sView);
     wxBoxSizer *buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
     buttonsSizer->AddSpacer(bestSpace);
     buttonsSizer->Add(apply);
@@ -146,7 +146,8 @@ void MainFrame::unbindElements() {
 }
 
 void MainFrame::resetCrop(wxCommandEvent &event) {
-    canvas->cropGeometry(wxRect(wxPoint(0, 0), wxSize(-1, -1)));
+    wxRect rst(wxPoint(0, 0), wxSize(-1, -1));
+    canvas->cropGeometry(&rst);
 }
 
 void MainFrame::onAbout(wxCommandEvent &event) {
@@ -225,13 +226,13 @@ void MainFrame::openImage(const wxString &p) {
     if(openedImg) clear();
     try {
         sourceImg = new Magick::Image(p.ToStdString());
-        scaledImg = new Magick::Image(*sourceImg);
-        scaledImg->zoom(Magick::Geometry(scaledImg->columns() * 0.3, scaledImg->rows() * 0.3));
-        wxBitmap newBmp(createImage(*scaledImg));
+        wxBitmap newBmp(createImage(*sourceImg));
+        canvas = new CanvasPanel(sView, ict::CANVAS, newBmp);
         bindElements();
         preview->updatePreview(newBmp);
-        canvas->updateCanvas(newBmp);
-        tools->Enable(true);
+        sView->handle(canvas);
+        sView->SetVirtualSize(minMainSplitterSize, minMainSplitterSize);
+        tools->clear(true);
         tools->cropSize(canvas->cropSize());
         currentState = tools->currentOpts();
         mEdit->Enable(wxID_APPLY, true);
@@ -258,15 +259,12 @@ void MainFrame::clear() {
         delete sourceImg;
         sourceImg = nullptr;
     }
-    if(scaledImg) {
-        delete scaledImg;
-        scaledImg = nullptr;
-    }
     undoStack = std::stack<OptionsContainer>();
     redoStack = std::stack<OptionsContainer>();
     initParams();
-    tools->clear(false);
-    canvas->clear();
+    tools->Enable(false);
+    tools->collapseBlocks();
+    sView->clear();
     preview->clear();
 }
 
@@ -294,7 +292,7 @@ void MainFrame::undo(wxCommandEvent &event) {
 
 void MainFrame::updateCropGeometry(wxPoint &o, wxSize &s) {
     wxRect g(o, s);
-    canvas->cropGeometry(g);
+    canvas->cropGeometry(&g);
 }
 
 void MainFrame::redo(wxCommandEvent &event) {
@@ -325,14 +323,15 @@ void MainFrame::onCropChange(CropEvent &event) {
 }
 
 void MainFrame::composePreview() {
-    Magick::Image newImg = composeState(*scaledImg, currentState);
+    Magick::Image newImg = composeState(*sourceImg, currentState);
     wxBitmap newPreview(createImage(newImg));
     preview->updatePreview(newPreview);
 }
 
 void MainFrame::saveState(wxCommandEvent &event) {
-    if(!tools->checkValues()) return;
-    canvas->cropSize(tools->cropSize());
+    if(!tools->valid()) return;
+    wxSize ts(tools->cropSize()); 
+    if(canvas->cropSize(&ts)) tools->cropSize(ts);
     OptionsContainer toSave = tools->currentOpts();
     if(toSave == currentState) return;
     updateHistory(toSave);
