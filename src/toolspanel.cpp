@@ -21,8 +21,6 @@
     #include <wx/statline.h>
 #endif
 
-#include "wx/valnum.h"
-
 extern const int bestSpace;
 
 ToolsPanel::ToolsPanel(wxWindow *parent, wxWindowID id) {
@@ -117,13 +115,13 @@ void ToolsPanel::cropSize(const wxSize &s) {
     heightCrop(s.GetHeight());
 }
 
-bool ToolsPanel::checkValues() {
+bool ToolsPanel::valid() {
     std::string checking = widthCtrl->GetValue().ToStdString();
-    if(checking.empty()) widthCrop(1);
+    if(checking.empty()) widthCrop(ict::MIN_CROP);
     checking = heightCtrl->GetValue().ToStdString();
-    if(checking.empty()) heightCrop(1);
+    if(checking.empty()) heightCrop(ict::MIN_CROP);
     checking = strokeWidthCtrl->GetValue().ToStdString();
-    if(checking.empty()) strokeWidth(0);
+    if(checking.empty()) strokeWidth(ict::MIN_STROKE);
     if(opts.growChoice == ict::IMAGE) {
         return tryOpen(opts.backImage, "Background image");
     }
@@ -201,13 +199,13 @@ void ToolsPanel::createAspectBlock() {
             wxCP_NO_TLW_RESIZE);
     wxWindow *winAspect = aspectBlock->GetPane();
 
-    wxIntegerValidator<unsigned int> validator;
-    validator.SetMin(1);
+    wVal.SetMin(ict::MIN_CROP);
+    hVal.SetMin(ict::MIN_CROP);
 
     widthCtrl = new wxTextCtrl(winAspect, ict::WIDTH_TC, wxEmptyString, 
-            wxDefaultPosition, wxDefaultSize, 0, validator);
+            wxDefaultPosition, wxDefaultSize, 0, wVal);
     heightCtrl = new wxTextCtrl(winAspect, ict::HEIGHT_TC, wxEmptyString, 
-            wxDefaultPosition, wxDefaultSize, 0, validator);
+            wxDefaultPosition, wxDefaultSize, 0, hVal);
     fixRatio = new UnfocusedCheckBox(winAspect, ict::FIX_RATIO_CB, "Fix ratio");
 
     wxBoxSizer *widthSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -304,13 +302,13 @@ void ToolsPanel::createShapeBlock() {
             wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
     wxWindow *winShape = shapeBlock->GetPane();
     initShapeChoices();
+    swVal.SetMin(ict::MIN_STROKE);
     shapeSelector = new wxChoice(winShape, ict::SHAPE_CH, wxDefaultPosition, 
             wxDefaultSize, 
             wxArrayString(ict::SHAPE_CHOICE_SIZE, shapeChoices));
     shapeSelector->SetSelection(0);
     strokeWidthCtrl = new wxTextCtrl(winShape, ict::STROKE_WIDTH_TC, wxEmptyString, 
-            wxDefaultPosition, wxDefaultSize, 0,
-            wxIntegerValidator<unsigned int>());
+            wxDefaultPosition, wxDefaultSize, 0, swVal);
     strokeColorPicker = new wxColourPickerCtrl(winShape, ict::PICK_STROKE_COLOUR_BT, 
             *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL);
     

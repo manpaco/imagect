@@ -12,6 +12,7 @@ class wxStaticText;
 
 #include "wx/scrolwin.h"
 #include "wx/checkbox.h"
+#include "wx/valnum.h"
 
 #if wxUSE_COLLPANE
     #include <wx/collpane.h>
@@ -30,7 +31,7 @@ class ToolsPanel: public wxScrolledCanvas {
         void cropSize(const wxSize &s);
         void cropGeometry(const wxRect &r);
         wxSize cropSize() const;
-        bool checkValues();
+        bool valid();
         void strokeWidth(unsigned int sw);
         OptionsContainer currentOpts() const;
         void setOpts(const OptionsContainer &oc);
@@ -96,6 +97,9 @@ class ToolsPanel: public wxScrolledCanvas {
         wxString shapeChoices[ict::SHAPE_CHOICE_SIZE];
 
         OptionsContainer opts;
+        wxIntegerValidator<unsigned int> wVal;
+        wxIntegerValidator<unsigned int> hVal;
+        wxIntegerValidator<unsigned int> swVal;
 
 };
 

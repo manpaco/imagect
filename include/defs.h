@@ -5,6 +5,12 @@
 
 namespace ict {
 
+const int IMG_MULTIPLIER = 3;
+const int SHADOW_OFFSET = 2;
+const int CORNER = 10;
+const unsigned int MIN_CROP = 1;
+const unsigned int MIN_STROKE = 0;
+
 enum ControlID {
     WIDTH_TC = wxID_HIGHEST + 1,
     HEIGHT_TC,
@@ -30,6 +36,7 @@ enum ControlID {
 
 enum PanelID {
     CANVAS = wxID_HIGHEST + 100,
+    SCVIEW,
     TOOLS,
     PREVIEW
 };
