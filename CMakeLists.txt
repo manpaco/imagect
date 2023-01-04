@@ -16,6 +16,8 @@ list(APPEND SRC_FILES
     "imagewindow.cpp"
     "filext.cpp"
     "exportdlg.cpp"
+    "controller.cpp"
+    "scrolview.cpp"
 )
 list(TRANSFORM SRC_FILES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 add_executable(imgcrop ${SRC_FILES})
