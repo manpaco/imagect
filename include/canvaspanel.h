@@ -1,54 +1,60 @@
 #ifndef CANVASPANEL_H
 #define CANVASPANEL_H
 
-class DuctileRectangle;
-class ImageWindow;
-class wxGridSizer;
 class wxGraphicsContext;
 
-#include "wx/scrolwin.h"
+#include "wx/panel.h"
+#include "controller.h"
+#include "defs.h"
 
-class CanvasPanel: public wxScrolledCanvas {
+class CanvasPanel: public wxPanel {
     public:
         CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &);
         CanvasPanel(wxWindow *parent, wxWindowID id);
-        void updateCanvas(wxBitmap &);
-        void cropSize(const wxSize &s);
-        wxSize cropSize();
+        bool cropSize(wxSize *s);
+        bool cropGeometry(wxRect *g);
+        wxSize cropSize() const;
         wxPoint cropOffset() const;
-        void cropGeometry(const wxRect &g);
         void fixCrop(bool);
         void allowGrow(bool);
-        void clear();
+        void setScaleFactor(float sf);
         ~CanvasPanel();
 
     private:
-        void updateElements(wxBitmap &bm);
-        void initElements();
-        void updateCropPosition(wxSizeEvent &event);
-        void reportChange(wxCommandEvent &);
+        void onPaint(wxPaintEvent &event);
         void sendCropEvent();
-        void paintShadow(const wxRect &, wxGraphicsContext *);
-        void bindCrop(); 
-        void unbindCrop();
-        void saveCropPosition(wxScrollWinEvent &event);
-        void createSizer();
-        void initShadow();
-        void initCrop();
-        void initParams();
-        void tryToAttachImg();
+        int translateIn(int v) const;
+        int translateOut(int v) const;
+        void changeCursor(ict::Zone type);
+        void updatePaintBuffer(bool force = false);
+        wxRect translateRectIn(const wxRect &r) const;
+        wxRect translateRectOut(const wxRect &r) const;
+        wxPoint translatePointIn(const wxPoint &p) const;
+        wxPoint translatePointOut(const wxPoint &p) const;
+        wxSize translateSizeIn(const wxSize &s) const;
+        wxSize translateSizeOut(const wxSize &s) const;
+        wxBitmap createCropBitmap();
+        void paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill);
+        void initBuffers();
+        void initCanvas(wxBitmap &);
+        void initSizes();
+        void refreshCanvas();
+        wxRect shadowRect();
+        void mouseMotion(wxMouseEvent &event);
+        void mousePress(wxMouseEvent &event);
+        void mouseRelease(wxMouseEvent &event);
+        wxPoint relativeToImage(const wxPoint &ap, bool scaled = false) const;
+        wxPoint absoluteCoords(const wxPoint &rp, bool scaled = false) const;
 
-        DuctileRectangle *cropArea = nullptr;
-        ImageWindow *img = nullptr;
-        wxGridSizer *sz = nullptr;
-        wxWindow *shadow = nullptr;
+        CropController controller;
+        wxBitmap *baseBuffer = nullptr;
+        wxBitmap *paintBuffer = nullptr;
+        wxBitmap *img = nullptr;
+        wxRect srcImgRect;
+        float scaleFactor = 1.0;
 
-        wxPoint oldCropPosition;
-        wxPoint cropOff;
-        int ppuX, ppuY;
-        bool attachedImg = false;
-
-        const int virtualOffset = 100;
+        wxPoint lastPoint;
+        wxRect prevCrop;
 };
 
 #endif // CANVASPANEL_H
