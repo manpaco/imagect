@@ -26,18 +26,16 @@ class CanvasPanel: public wxPanel {
         int translateIn(int v) const;
         int translateOut(int v) const;
         void changeCursor(ict::Zone type);
-        void updatePaintBuffer(bool force = false);
         wxRect translateRectIn(const wxRect &r) const;
         wxRect translateRectOut(const wxRect &r) const;
         wxPoint translatePointIn(const wxPoint &p) const;
         wxPoint translatePointOut(const wxPoint &p) const;
         wxSize translateSizeIn(const wxSize &s) const;
         wxSize translateSizeOut(const wxSize &s) const;
-        wxBitmap createCropBitmap();
-        void paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill);
-        void initBuffers();
+        void paintFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill);
+        void initBuffer(wxBitmap &);
         void initCanvas(wxBitmap &);
-        void initSizes();
+        void updateSizes();
         void refreshCanvas();
         wxRect shadowRect();
         void mouseMotion(wxMouseEvent &event);
@@ -47,10 +45,9 @@ class CanvasPanel: public wxPanel {
         wxPoint absoluteCoords(const wxPoint &rp, bool scaled = false) const;
 
         CropController controller;
-        wxBitmap *baseBuffer = nullptr;
-        wxBitmap *paintBuffer = nullptr;
-        wxBitmap *img = nullptr;
-        wxRect srcImgRect;
+        wxBitmap *buffer = nullptr;
+        wxRect imgRect;
+        wxSize bufferSize;
         float scaleFactor = 1.0;
 
         wxPoint lastPoint;

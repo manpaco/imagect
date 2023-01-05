@@ -54,34 +54,39 @@ void CanvasPanel::sendCropEvent() {
     CropEvent toSend(EVT_CROP_CHANGE, GetId(), cs, co);
     toSend.SetEventObject(this);
     ProcessWindowEvent(toSend);
-    updatePaintBuffer();
+    RefreshRect(translateRectIn(prevCrop));
     prevCrop = controller.cropRect();
 }
 
 void CanvasPanel::onPaint(wxPaintEvent &event) {
     wxPaintDC painter(this);
-    wxRegionIterator it(GetUpdateRegion());
+    wxRegion damaged(GetUpdateRegion());
+    wxRegionIterator it(damaged);
     while(it) {
         wxRect upd(it.GetX(), it.GetY(), it.GetW(), it.GetH());
-        painter.DrawBitmap(paintBuffer->GetSubBitmap(upd), upd.GetPosition());
+        wxBitmap patch(buffer->GetSubBitmap(translateRectOut(upd)));
+        patch.SetWidth(upd.GetWidth());
+        patch.SetHeight(upd.GetHeight());
+        painter.DrawBitmap(patch, upd.GetPosition());
         it++;
     }
+    //if(!damaged.Intersect(translateRectIn(prevCrop))) {
+    //    event.Skip();
+    //    return;
+    //}
+    wxGraphicsContext *gcd = wxGraphicsContext::Create(painter);
+    if(gcd) {
+        paintFrame(translateRectIn(controller.cropRect()), gcd, false);
+        paintFrame(translateRectIn(controller.rectZone(ict::NW)), gcd, true);
+        paintFrame(translateRectIn(controller.rectZone(ict::NE)), gcd, true);
+        paintFrame(translateRectIn(controller.rectZone(ict::SE)), gcd, true);
+        paintFrame(translateRectIn(controller.rectZone(ict::SW)), gcd, true);
+        delete gcd;
+    }
+    event.Skip();
 }
 
-void CanvasPanel::updatePaintBuffer(bool force) {
-    if(prevCrop == controller.cropRect() && !force) return;
-    wxMemoryDC painter(*paintBuffer);
-    wxRect tpc(translateRectIn(prevCrop));
-    if(prevCrop != controller.cropRect()) painter.DrawBitmap(baseBuffer->GetSubBitmap(tpc), tpc.GetPosition());
-    wxRect tcr(translateRectIn(controller.cropRect()));
-    painter.DrawBitmap(createCropBitmap(), tcr.GetPosition());
-    wxRect damaged(tpc);
-    if(force) damaged = wxRect(0, 0, paintBuffer->GetWidth(), paintBuffer->GetHeight());
-    else damaged.Union(tcr);
-    RefreshRect(damaged);
-}
-
-void CanvasPanel::paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill) {
+void CanvasPanel::paintFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill) {
     wxPen wLine(wxColour(*wxWHITE), 1);
     wxPen bLine(wxColour(*wxBLACK), 1);
     gc->SetBrush(wxBrush(wxColour(0, 0, 0, 0)));
@@ -95,22 +100,6 @@ void CanvasPanel::paintSpecialFrame(const wxRect &paint, wxGraphicsContext *gc, 
         gc->SetPen(wxPen(wxColour(*wxWHITE)));
     }
     gc->DrawRectangle(paint.GetX() + 2, paint.GetY() + 2, paint.GetWidth() - 5, paint.GetHeight() - 5);
-}
-
-wxBitmap CanvasPanel::createCropBitmap() {
-    wxRect tcr(translateRectIn(controller.cropRect()));
-    wxBitmap cb(baseBuffer->GetSubBitmap(tcr));
-    wxMemoryDC memCb(cb);
-    wxGraphicsContext *gcd = wxGraphicsContext::Create(memCb);
-    if(gcd) {
-        paintSpecialFrame(wxRect(0, 0, tcr.GetWidth(), tcr.GetHeight()), gcd, false);
-        paintSpecialFrame(translateRectIn(controller.relativeToCrop(ict::NW)), gcd, true);
-        paintSpecialFrame(translateRectIn(controller.relativeToCrop(ict::NE)), gcd, true);
-        paintSpecialFrame(translateRectIn(controller.relativeToCrop(ict::SE)), gcd, true);
-        paintSpecialFrame(translateRectIn(controller.relativeToCrop(ict::SW)), gcd, true);
-        delete gcd;
-    }
-    return cb;
 }
 
 void CanvasPanel::changeCursor(ict::Zone type) {
@@ -131,8 +120,8 @@ void CanvasPanel::changeCursor(ict::Zone type) {
 bool CanvasPanel::cropGeometry(wxRect *g) {
     wxPoint newPos(absoluteCoords(g->GetPosition()));
     wxSize newSz(g->GetSize());
-    if(g->GetSize().x < 0) newSz.SetWidth(srcImgRect.GetWidth());
-    if(g->GetSize().y < 0) newSz.SetHeight(srcImgRect.GetHeight());
+    if(g->GetSize().x < 0) newSz.SetWidth(imgRect.GetWidth());
+    if(g->GetSize().y < 0) newSz.SetHeight(imgRect.GetHeight());
     wxRect newG(newPos, newSz);
     if(controller.cropRect(newG)) sendCropEvent();
     newG = controller.cropRect();
@@ -145,15 +134,15 @@ bool CanvasPanel::cropGeometry(wxRect *g) {
 
 wxPoint CanvasPanel::relativeToImage(const wxPoint &ap, bool scaled) const {
     wxPoint rel;
-    if(scaled) rel = wxPoint(ap - translatePointIn(srcImgRect.GetPosition()));
-    else rel = wxPoint(ap - srcImgRect.GetPosition());
+    if(scaled) rel = wxPoint(ap - translatePointIn(imgRect.GetPosition()));
+    else rel = wxPoint(ap - imgRect.GetPosition());
     return rel;
 }
 
 wxPoint CanvasPanel::absoluteCoords(const wxPoint &rp, bool scaled) const {
     wxPoint abs;
-    if(scaled) abs = wxPoint(rp + translatePointIn(srcImgRect.GetPosition()));
-    else abs = wxPoint(rp + srcImgRect.GetPosition());
+    if(scaled) abs = wxPoint(rp + translatePointIn(imgRect.GetPosition()));
+    else abs = wxPoint(rp + imgRect.GetPosition());
     return abs;
 }
 
@@ -217,8 +206,8 @@ wxSize CanvasPanel::translateSizeOut(const wxSize &s) const {
 }
 
 void CanvasPanel::refreshCanvas() {
-    initSizes();
-    initBuffers();
+    updateSizes();
+    Refresh();
 }
 
 void CanvasPanel::setScaleFactor(float sf) {
@@ -229,47 +218,43 @@ void CanvasPanel::setScaleFactor(float sf) {
 
 void CanvasPanel::initCanvas(wxBitmap &bm) {
     if(!bm.IsOk()) return;
-    img = new wxBitmap(bm);
-    srcImgRect = wxRect(bm.GetWidth(), bm.GetHeight(), bm.GetWidth(), bm.GetHeight());
-    controller = CropController(srcImgRect);
-    prevCrop = srcImgRect;
+    imgRect = wxRect(bm.GetWidth(), bm.GetHeight(), bm.GetWidth(), bm.GetHeight());
+    controller = CropController(imgRect);
+    prevCrop = imgRect;
+    initBuffer(bm);
+    bufferSize = buffer->GetSize();
     refreshCanvas();
 }
 
-void CanvasPanel::initSizes() {
-    wxSize newSize(srcImgRect.GetSize() * ict::IMG_MULTIPLIER);
+void CanvasPanel::updateSizes() {
+    wxSize newSize(imgRect.GetSize() * ict::IMG_MULTIPLIER);
     SetMinSize(translateSizeIn(newSize));
     SetSize(GetMinSize());
-    img->SetWidth(translateIn(srcImgRect.GetWidth()));
-    img->SetHeight(translateIn(srcImgRect.GetHeight()));
+    buffer->SetWidth(translateIn(bufferSize.GetWidth()));
+    buffer->SetHeight(translateIn(bufferSize.GetHeight()));
 }
 
 wxRect CanvasPanel::shadowRect() {
     wxPoint posOff(ict::SHADOW_OFFSET, ict::SHADOW_OFFSET);
-    wxPoint shPos(translatePointIn(srcImgRect.GetPosition()) - posOff);
+    wxPoint shPos(imgRect.GetPosition() - posOff);
     wxSize szOff(ict::SHADOW_OFFSET * 2, ict::SHADOW_OFFSET * 2);
-    wxSize shSz(translateSizeIn(srcImgRect.GetSize()) + szOff);
+    wxSize shSz(imgRect.GetSize() + szOff);
     return wxRect(shPos, shSz);
 }
 
-void CanvasPanel::initBuffers() {
-    if(paintBuffer) delete paintBuffer;
-    if(baseBuffer) delete baseBuffer;
-    baseBuffer = new wxBitmap(GetSize());
-    wxMemoryDC memBb(*baseBuffer);
+void CanvasPanel::initBuffer(wxBitmap &bm) {
+    if(buffer) delete buffer;
+    buffer = new wxBitmap(imgRect.GetSize() * ict::IMG_MULTIPLIER);
+    wxMemoryDC memBb(*buffer);
     wxBrush backBrush(wxColour(188, 188, 188));
     memBb.SetBrush(backBrush);
-    memBb.DrawRectangle(0, 0, baseBuffer->GetWidth(), baseBuffer->GetHeight());
+    memBb.DrawRectangle(0, 0, buffer->GetWidth(), buffer->GetHeight());
     wxBrush shadowBrush(wxColour(91, 91, 91));
     memBb.SetBrush(shadowBrush);
     memBb.DrawRectangle(shadowRect());
-    memBb.DrawBitmap(*img, translatePointIn(srcImgRect.GetPosition()));
-    paintBuffer = new wxBitmap(*baseBuffer);
-    updatePaintBuffer(true);
+    memBb.DrawBitmap(bm, imgRect.GetPosition());
 }
 
 CanvasPanel::~CanvasPanel() {
-    if(paintBuffer) delete paintBuffer;
-    if(baseBuffer) delete baseBuffer;
-    if(img) delete img;
+    if(buffer) delete buffer;
 }
