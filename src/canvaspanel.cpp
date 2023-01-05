@@ -55,13 +55,12 @@ void CanvasPanel::sendCropEvent() {
     CropEvent toSend(EVT_CROP_CHANGE, GetId(), cs, co);
     toSend.SetEventObject(this);
     ProcessWindowEvent(toSend);
-    //RefreshRect(translateRectIn(prevCrop).Inflate(4, 4));
-    RefreshRect(translateRectIn(prevCrop));
+    RefreshRect(translateRectIn(prevCrop).Union(translateRectIn(controller.cropRect())).Inflate(1, 1));
     prevCrop = controller.cropRect();
 }
 
 void CanvasPanel::onPaint(wxPaintEvent &event) {
-    wxBufferedPaintDC painter(this);
+    wxPaintDC painter(this);
     wxRegion damaged(GetUpdateRegion());
     wxRegionIterator it(damaged);
     while(it) {
