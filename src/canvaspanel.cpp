@@ -19,6 +19,7 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm): CanvasP
     Bind(wxEVT_LEFT_DOWN, &CanvasPanel::mousePress, this);
     Bind(wxEVT_LEFT_UP, &CanvasPanel::mouseRelease, this);
     Bind(wxEVT_PAINT, &CanvasPanel::onPaint, this);
+    Bind(wxEVT_ERASE_BACKGROUND, [](wxEraseEvent &){});
 }
 
 void CanvasPanel::mouseMotion(wxMouseEvent &event) {
