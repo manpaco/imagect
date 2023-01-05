@@ -2,6 +2,7 @@
 #include "cropevent.h"
 #include "defs.h"
 #include <wx/graphics.h>
+#include "wx/dcbuffer.h"
 
 #include <wx/wxprec.h>
 
@@ -54,12 +55,13 @@ void CanvasPanel::sendCropEvent() {
     CropEvent toSend(EVT_CROP_CHANGE, GetId(), cs, co);
     toSend.SetEventObject(this);
     ProcessWindowEvent(toSend);
+    //RefreshRect(translateRectIn(prevCrop).Inflate(4, 4));
     RefreshRect(translateRectIn(prevCrop));
     prevCrop = controller.cropRect();
 }
 
 void CanvasPanel::onPaint(wxPaintEvent &event) {
-    wxPaintDC painter(this);
+    wxBufferedPaintDC painter(this);
     wxRegion damaged(GetUpdateRegion());
     wxRegionIterator it(damaged);
     while(it) {
@@ -218,17 +220,15 @@ void CanvasPanel::setScaleFactor(float sf) {
 
 void CanvasPanel::initCanvas(wxBitmap &bm) {
     if(!bm.IsOk()) return;
-    imgRect = wxRect(bm.GetWidth(), bm.GetHeight(), bm.GetWidth(), bm.GetHeight());
+    initBuffer(bm);
     controller = CropController(imgRect);
     prevCrop = imgRect;
-    initBuffer(bm);
-    bufferSize = buffer->GetSize();
     refreshCanvas();
 }
 
 void CanvasPanel::updateSizes() {
-    wxSize newSize(imgRect.GetSize() * ict::IMG_MULTIPLIER);
-    SetMinSize(translateSizeIn(newSize));
+    wxSize newSize(translateSizeIn(bufferSize));
+    SetMinSize(newSize);
     SetSize(GetMinSize());
     buffer->SetWidth(translateIn(bufferSize.GetWidth()));
     buffer->SetHeight(translateIn(bufferSize.GetHeight()));
@@ -244,7 +244,11 @@ wxRect CanvasPanel::shadowRect() {
 
 void CanvasPanel::initBuffer(wxBitmap &bm) {
     if(buffer) delete buffer;
-    buffer = new wxBitmap(imgRect.GetSize() * ict::IMG_MULTIPLIER);
+    buffer = new wxBitmap(bm.GetSize() * ict::IMG_MULTIPLIER);
+    bufferSize = buffer->GetSize();
+    wxSize aux((bufferSize - bm.GetSize()) / 2);
+    wxPoint imgPos(aux.GetWidth(), aux.GetHeight());
+    imgRect = wxRect(imgPos, bm.GetSize());
     wxMemoryDC memBb(*buffer);
     wxBrush backBrush(wxColour(188, 188, 188));
     memBb.SetBrush(backBrush);
