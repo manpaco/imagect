@@ -32,7 +32,7 @@ class CanvasPanel: public wxPanel {
         wxPoint translatePointOut(const wxPoint &p) const;
         wxSize translateSizeIn(const wxSize &s) const;
         wxSize translateSizeOut(const wxSize &s) const;
-        void paintFrame(const wxRect &paint, wxGraphicsContext *gc, bool fill);
+        void paintCropRect(const wxRect &paint, wxGraphicsContext *gc);
         void initBuffer(wxBitmap &);
         void initCanvas(wxBitmap &);
         void updateSizes();
