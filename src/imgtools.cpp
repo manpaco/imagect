@@ -17,16 +17,9 @@ void overlap(const Magick::Image &overlay, Magick::Image &background, bool fit,
     Magick::Geometry geoBack(background.columns(), background.rows());
     Magick::Geometry geoOver(overlay.columns(), overlay.rows());
     if(fit && (geoOver != geoBack)) {
-        float backRatio = (float)background.columns() / (float)background.rows();
-        float overRatio = (float)overlay.columns() / (float)overlay.rows();
-        if(backRatio > overRatio) {
-            geoBack.height(overlay.rows());
-            geoBack.width((float)overlay.rows() * backRatio);
-        } else {
-            geoBack.width(overlay.columns());
-            geoBack.height((float)overlay.columns() / backRatio);
-        }
-        background.resize(geoBack);
+        float fitFactor = factorToGrowFit(geoOver, geoBack);
+        Magick::Geometry newGeo(background.columns() * fitFactor, background.rows() * fitFactor);
+        background.zoom(newGeo);
         if(crop) {
             int xco = (background.columns() - overlay.columns()) / 2;
             int yco = (background.rows() - overlay.rows()) / 2;
@@ -35,6 +28,20 @@ void overlap(const Magick::Image &overlay, Magick::Image &background, bool fit,
     }
     background.composite(overlay, Magick::CenterGravity, 
             Magick::OverCompositeOp);
+}
+
+float factorToFit(Magick::Geometry &area, Magick::Geometry &toFit) {
+    float areaRatio = (float)area.width() / (float)area.height();
+    float toFitRatio = (float)toFit.width() / (float)toFit.height();
+    if(areaRatio > toFitRatio) return (float)area.height() / (float)toFit.height();
+    else return (float)area.width() / (float)toFit.width();
+}
+
+float factorToGrowFit(Magick::Geometry &area, Magick::Geometry &toFit) {
+    float areaRatio = (float)area.width() / (float)area.height();
+    float toFitRatio = (float)toFit.width() / (float)toFit.height();
+    if(areaRatio > toFitRatio) return (float)area.width() / (float)toFit.width();
+    else return (float)area.height() / (float)toFit.height();
 }
 
 Magick::Image extractArea(const Magick::Geometry &area, const Magick::Image &target) {

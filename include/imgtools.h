@@ -25,5 +25,7 @@ unsigned short toDepth16(const unsigned char);
 Magick::Image composeState(const Magick::Image &img, const OptionsContainer &s);
 wxImage createImage(const Magick::Image &img);
 bool tryOpen(const wxString &imgFile, const wxString &msgTitle);
+float factorToFit(Magick::Geometry &g, Magick::Geometry &toFit);
+float factorToGrowFit(Magick::Geometry &area, Magick::Geometry &toFit);
 
 #endif // IMGTOOLS_H
