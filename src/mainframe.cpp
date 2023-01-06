@@ -247,9 +247,8 @@ void MainFrame::openImage(const wxString &p) {
         bindElements();
         preview->updatePreview(newBmp);
         sView->handle(canvas);
-        sView->SetVirtualSize(minMainSplitterSize, minMainSplitterSize);
         tools->clear(true);
-        tools->cropSize(translateSizeIn(canvas->cropSize()));
+        tools->cropSize(wxSize(sourceImg->columns(), sourceImg->rows()));
         currentState = tools->currentOpts();
         mEdit->Enable(wxID_APPLY, true);
         openedImg = true;
@@ -363,17 +362,20 @@ void MainFrame::onCropChange(CropEvent &event) {
 }
 
 void MainFrame::composePreview() {
-    Magick::Image newImg = composeState(*scaledImg, currentState);
+    OptionsContainer aux(currentState);
+    aux.cropSize = translateSizeOut(aux.cropSize);
+    aux.cropOff = translatePointOut(aux.cropOff);
+    Magick::Image newImg = composeState(*scaledImg, aux);
     wxBitmap newPreview(createImage(newImg));
     preview->updatePreview(newPreview);
 }
 
 void MainFrame::saveState(wxCommandEvent &event) {
     if(!tools->valid()) return;
-    wxSize ts(translateSizeOut(tools->cropSize())); 
-    if(canvas->cropSize(&ts)) tools->cropSize(translateSizeIn(ts));
     OptionsContainer toSave = tools->currentOpts();
     if(toSave == currentState) return;
+    wxSize ts(translateSizeOut(tools->cropSize())); 
+    if(canvas->cropSize(&ts)) tools->cropSize(translateSizeIn(ts));
     updateHistory(toSave);
 }
 

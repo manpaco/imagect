@@ -87,7 +87,7 @@ class MainFrame: public wxFrame {
         int minMainSplitterSize, minSideSplitterSize;
         const int mainSplitterFactor = 4;
         const int sideSplitterFactor = 3;
-        float compressFactor;
+        float compressFactor = 1.0;
 
 };
 
