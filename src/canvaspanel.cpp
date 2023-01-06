@@ -55,33 +55,32 @@ void CanvasPanel::sendCropEvent() {
     CropEvent toSend(EVT_CROP_CHANGE, GetId(), cs, co);
     toSend.SetEventObject(this);
     ProcessWindowEvent(toSend);
-    RefreshRect(translateRectIn(prevCrop).Union(translateRectIn(controller.cropRect())).Inflate(1, 1));
+    wxRect damaged(translateRectIn(prevCrop).Union(translateRectIn(controller.cropRect())));
+    damaged.Inflate(ict::CORNER, ict::CORNER);
+    RefreshRect(damaged);
     prevCrop = controller.cropRect();
 }
 
 void CanvasPanel::onPaint(wxPaintEvent &event) {
-    wxPaintDC painter(this);
-    wxRegion damaged(GetUpdateRegion());
-    wxRegionIterator it(damaged);
-    while(it) {
-        wxRect upd(it.GetX(), it.GetY(), it.GetW(), it.GetH());
-        wxBitmap patch(buffer->GetSubBitmap(translateRectOut(upd)));
-        patch.SetWidth(upd.GetWidth());
-        patch.SetHeight(upd.GetHeight());
-        painter.DrawBitmap(patch, upd.GetPosition());
-        it++;
+    wxRect damaged(GetUpdateRegion().GetBox());
+    wxWindow *myParent(GetParent());
+    if(myParent) {
+        wxRect viewRect(myParent->GetScreenRect());
+        viewRect.SetPosition(ScreenToClient(viewRect.GetPosition()));
+        damaged.Intersect(viewRect);
     }
-    //if(!damaged.Intersect(translateRectIn(prevCrop))) {
-    //    event.Skip();
-    //    return;
-    //}
-    wxGraphicsContext *gcd = wxGraphicsContext::Create(painter);
+    damaged = translateRectOut(damaged);
+    wxBufferedPaintDC canvasPainter(this);
+    canvasPainter.SetUserScale(scaleFactor, scaleFactor);
+    canvasPainter.DrawBitmap(buffer->GetSubBitmap(damaged), damaged.GetPosition());
+    canvasPainter.SetUserScale(1, 1);
+    wxGraphicsContext *gcd = wxGraphicsContext::Create(canvasPainter);
     if(gcd) {
         paintFrame(translateRectIn(controller.cropRect()), gcd, false);
-        paintFrame(translateRectIn(controller.rectZone(ict::NW)), gcd, true);
-        paintFrame(translateRectIn(controller.rectZone(ict::NE)), gcd, true);
-        paintFrame(translateRectIn(controller.rectZone(ict::SE)), gcd, true);
-        paintFrame(translateRectIn(controller.rectZone(ict::SW)), gcd, true);
+        //paintFrame(translateRectIn(controller.rectZone(ict::NW)), gcd, true);
+        //paintFrame(translateRectIn(controller.rectZone(ict::NE)), gcd, true);
+        //paintFrame(translateRectIn(controller.rectZone(ict::SE)), gcd, true);
+        //paintFrame(translateRectIn(controller.rectZone(ict::SW)), gcd, true);
         delete gcd;
     }
     event.Skip();
@@ -92,15 +91,13 @@ void CanvasPanel::paintFrame(const wxRect &paint, wxGraphicsContext *gc, bool fi
     wxPen bLine(wxColour(*wxBLACK), 1);
     gc->SetBrush(wxBrush(wxColour(0, 0, 0, 0)));
     gc->SetPen(bLine);
-    gc->DrawRectangle(paint.GetX(), paint.GetY(), paint.GetWidth() - 1, paint.GetHeight() - 1);
+    gc->DrawRectangle(paint.GetX(), paint.GetY(), paint.GetWidth(), paint.GetHeight());
     gc->SetPen(wLine);
-    gc->DrawRectangle(paint.GetX() + 1, paint.GetY() + 1, paint.GetWidth() - 3, paint.GetHeight() - 3);
+    if(fill) gc->SetBrush(wxBrush(wxColour(*wxWHITE)));
+    gc->DrawRectangle(paint.GetX() + 1, paint.GetY() + 1, paint.GetWidth() - 2, paint.GetHeight() - 2);
+    if(fill) return;
     gc->SetPen(bLine);
-    if(fill) { 
-        gc->SetBrush(wxBrush(wxColour(*wxWHITE)));
-        gc->SetPen(wxPen(wxColour(*wxWHITE)));
-    }
-    gc->DrawRectangle(paint.GetX() + 2, paint.GetY() + 2, paint.GetWidth() - 5, paint.GetHeight() - 5);
+    gc->DrawRectangle(paint.GetX() + 2, paint.GetY() + 2, paint.GetWidth() - 4, paint.GetHeight() - 4);
 }
 
 void CanvasPanel::changeCursor(ict::Zone type) {
@@ -229,8 +226,6 @@ void CanvasPanel::updateSizes() {
     wxSize newSize(translateSizeIn(bufferSize));
     SetMinSize(newSize);
     SetSize(GetMinSize());
-    buffer->SetWidth(translateIn(bufferSize.GetWidth()));
-    buffer->SetHeight(translateIn(bufferSize.GetHeight()));
 }
 
 wxRect CanvasPanel::shadowRect() {
