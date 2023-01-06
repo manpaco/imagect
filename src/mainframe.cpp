@@ -1,4 +1,5 @@
 #include "mainframe.h"
+#include "Magick++/Geometry.h"
 #include "canvaspanel.h"
 #include "cropevent.h"
 #include "defs.h"
@@ -49,6 +50,7 @@ MainFrame::MainFrame(const wxString &initImg): MainFrame() {
 
 MainFrame::~MainFrame() {
     if(sourceImg) delete(sourceImg);
+    if(scaledImg) delete scaledImg;
 }
 
 void MainFrame::initDimensions() {
@@ -56,7 +58,8 @@ void MainFrame::initDimensions() {
     minSideSplitterSize = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) / sideSplitterFactor;
     mainSplitter->SetMinimumPaneSize(minMainSplitterSize);
     sideSplitter->SetMinimumPaneSize(minSideSplitterSize);
-    SetMinClientSize(wxSize(minMainSplitterSize * 3.0, minSideSplitterSize * 2.5));
+    SetMinClientSize(wxSize(minMainSplitterSize * (mainSplitterFactor - 1), 
+                minSideSplitterSize * (sideSplitterFactor - 1)));
 }
 
 void MainFrame::allocateMem() {
@@ -222,18 +225,31 @@ void MainFrame::exportImage(const wxString &p) {
     }
 }
 
+void MainFrame::fitImgToView(Magick::Image *img) {
+    Magick::Geometry geoImg(img->columns(), img->rows());
+    Magick::Geometry geoMax(sView->GetSize().GetWidth() / ict::IMG_MULTIPLIER, 
+            sView->GetSize().GetHeight() / ict::IMG_MULTIPLIER);
+    if(geoImg.width() <= geoMax.width() && geoImg.height() <= geoMax.height()) return;
+    compressFactor = factorToFit(geoMax, geoImg);
+    geoImg.width(geoImg.width() * compressFactor);
+    geoImg.height(geoImg.height() * compressFactor);
+    img->zoom(geoImg);
+}
+
 void MainFrame::openImage(const wxString &p) {
     if(openedImg) clear();
     try {
         sourceImg = new Magick::Image(p.ToStdString());
-        wxBitmap newBmp(createImage(*sourceImg));
+        scaledImg = new Magick::Image(*sourceImg);
+        fitImgToView(scaledImg);
+        wxBitmap newBmp(createImage(*scaledImg));
         canvas = new CanvasPanel(sView, ict::CANVAS, newBmp);
         bindElements();
         preview->updatePreview(newBmp);
         sView->handle(canvas);
         sView->SetVirtualSize(minMainSplitterSize, minMainSplitterSize);
         tools->clear(true);
-        tools->cropSize(canvas->cropSize());
+        tools->cropSize(translateSizeIn(canvas->cropSize()));
         currentState = tools->currentOpts();
         mEdit->Enable(wxID_APPLY, true);
         openedImg = true;
@@ -268,6 +284,30 @@ void MainFrame::clear() {
     preview->clear();
 }
 
+int MainFrame::translateOut(int v) {
+    return v * compressFactor;
+}
+
+int MainFrame::translateIn(int v) {
+    return v / compressFactor;
+}
+
+wxSize MainFrame::translateSizeOut(const wxSize &s) {
+    return wxSize(translateOut(s.GetWidth()), translateOut(s.GetHeight()));
+}
+
+wxSize MainFrame::translateSizeIn(const wxSize &s) {
+    return wxSize(translateIn(s.GetWidth()), translateIn(s.GetHeight()));
+}
+
+wxPoint MainFrame::translatePointOut(const wxPoint &p) {
+    return wxPoint(translateOut(p.x), translateOut(p.y));
+}
+
+wxPoint MainFrame::translatePointIn(const wxPoint &p) {
+    return wxPoint(translateIn(p.x), translateIn(p.y));
+}
+
 void MainFrame::onFixRatio(wxCommandEvent &event) {
     canvas->fixCrop(event.IsChecked());
     event.Skip();
@@ -291,7 +331,7 @@ void MainFrame::undo(wxCommandEvent &event) {
 }
 
 void MainFrame::updateCropGeometry(wxPoint &o, wxSize &s) {
-    wxRect g(o, s);
+    wxRect g(translatePointOut(o), translateSizeOut(s));
     canvas->cropGeometry(&g);
 }
 
@@ -318,20 +358,20 @@ void MainFrame::updateHistory(OptionsContainer toSave) {
 }
 
 void MainFrame::onCropChange(CropEvent &event) {
-    wxRect newGeometry(event.getOffset(), event.getSize());
+    wxRect newGeometry(translatePointIn(event.getOffset()), translateSizeIn(event.getSize()));
     tools->cropGeometry(newGeometry);
 }
 
 void MainFrame::composePreview() {
-    Magick::Image newImg = composeState(*sourceImg, currentState);
+    Magick::Image newImg = composeState(*scaledImg, currentState);
     wxBitmap newPreview(createImage(newImg));
     preview->updatePreview(newPreview);
 }
 
 void MainFrame::saveState(wxCommandEvent &event) {
     if(!tools->valid()) return;
-    wxSize ts(tools->cropSize()); 
-    if(canvas->cropSize(&ts)) tools->cropSize(ts);
+    wxSize ts(translateSizeOut(tools->cropSize())); 
+    if(canvas->cropSize(&ts)) tools->cropSize(translateSizeIn(ts));
     OptionsContainer toSave = tools->currentOpts();
     if(toSave == currentState) return;
     updateHistory(toSave);
