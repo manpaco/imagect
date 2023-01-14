@@ -30,6 +30,9 @@ enum ControlID {
     RESET_CROP_BT,
     EXPORT_MI,
 
+    ZIN_BT,
+    ZOUT_BT,
+
     CROP_AREA
 
 };
