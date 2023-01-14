@@ -104,11 +104,11 @@ void CanvasPanel::paintCropRect(const wxRect &paint, wxGraphicsContext *gc) {
     wxPen bLine(wxColour(*wxBLACK), 1);
     gc->SetBrush(wxBrush(wxColour(0, 0, 0, 0)));
     gc->SetPen(bLine);
-    gc->DrawRectangle(paint.GetX(), paint.GetY(), paint.GetWidth(), paint.GetHeight());
+    gc->DrawRectangle(paint.GetX(), paint.GetY(), paint.GetWidth() - 1, paint.GetHeight() - 1);
     gc->SetPen(wLine);
-    gc->DrawRectangle(paint.GetX() + 1, paint.GetY() + 1, paint.GetWidth() - 2, paint.GetHeight() - 2);
+    gc->DrawRectangle(paint.GetX() + 1, paint.GetY() + 1, paint.GetWidth() - 3, paint.GetHeight() - 3);
     gc->SetPen(bLine);
-    gc->DrawRectangle(paint.GetX() + 2, paint.GetY() + 2, paint.GetWidth() - 4, paint.GetHeight() - 4);
+    gc->DrawRectangle(paint.GetX() + 2, paint.GetY() + 2, paint.GetWidth() - 5, paint.GetHeight() - 5);
 }
 
 void CanvasPanel::changeCursor(ict::Zone type) {

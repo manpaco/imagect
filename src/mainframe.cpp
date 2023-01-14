@@ -231,6 +231,7 @@ void MainFrame::openImage(const wxString &p) {
         sourceImg = new Magick::Image(p.ToStdString());
         compImg = new Magick::Image(*sourceImg);
         canvas = new CanvasPanel(sView, ict::CANVAS, compImg);
+        canvas->setScaleFactor(3);
         wxBitmap newBmp(createImage(*compImg));
         bindElements();
         preview->updatePreview(newBmp);
