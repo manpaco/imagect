@@ -373,9 +373,14 @@ void MainFrame::composePreview() {
 void MainFrame::saveState(wxCommandEvent &event) {
     if(!tools->valid()) return;
     OptionsContainer toSave = tools->currentOpts();
+    if(toSave.cropSize != currentState.cropSize) {
+        wxSize ts(translateSizeOut(toSave.cropSize)); 
+        if(!canvas->cropSize(&ts)) {
+            tools->cropSize(translateSizeIn(ts));
+            toSave.cropSize = tools->cropSize();
+        }
+    }
     if(toSave == currentState) return;
-    wxSize ts(translateSizeOut(tools->cropSize())); 
-    if(canvas->cropSize(&ts)) tools->cropSize(translateSizeIn(ts));
     updateHistory(toSave);
 }
 

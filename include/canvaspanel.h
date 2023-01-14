@@ -37,6 +37,7 @@ class CanvasPanel: public wxPanel {
         void initCanvas(wxBitmap &);
         void updateSizes();
         void refreshCanvas();
+        void refreshDamaged();
         wxRect shadowRect();
         void mouseMotion(wxMouseEvent &event);
         void mousePress(wxMouseEvent &event);

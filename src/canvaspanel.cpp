@@ -30,7 +30,10 @@ void CanvasPanel::mouseMotion(wxMouseEvent &event) {
     if(!controller.zonePressed()) {
         if(lastZone != currentZone) changeCursor(currentZone);
     } else {
-        if(controller.modify(translatePointOut(currentPoint))) sendCropEvent();
+        if(controller.modify(translatePointOut(currentPoint))) {
+            refreshDamaged();
+            sendCropEvent();
+        }
     }
     lastPoint = currentPoint;
     event.Skip();
@@ -55,6 +58,9 @@ void CanvasPanel::sendCropEvent() {
     CropEvent toSend(EVT_CROP_CHANGE, GetId(), cs, co);
     toSend.SetEventObject(this);
     ProcessWindowEvent(toSend);
+}
+
+void CanvasPanel::refreshDamaged() {
     wxRect damaged(translateRectIn(prevCrop).Union(translateRectIn(controller.cropRect())));
     wxWindow *myParent(GetParent());
     if(myParent) {
@@ -114,14 +120,13 @@ bool CanvasPanel::cropGeometry(wxRect *g) {
     wxSize newSz(g->GetSize());
     if(g->GetSize().x < 0) newSz.SetWidth(imgRect.GetWidth());
     if(g->GetSize().y < 0) newSz.SetHeight(imgRect.GetHeight());
-    wxRect newG(newPos, newSz);
-    if(controller.cropRect(newG)) sendCropEvent();
-    newG = controller.cropRect();
-    newG.SetPosition(relativeToImage(newG.GetPosition()));
-    if(newG != *g) {
-        *g = newG;
-        return true;
-    } else return false;
+    wxRect newR(newPos, newSz);
+    if(controller.cropRect(newR)) refreshDamaged();
+    if(newR != controller.cropRect()) {
+        *g = controller.cropRect();
+        g->SetPosition(relativeToImage(g->GetPosition()));
+        return false;
+    } else return true;
 }
 
 wxPoint CanvasPanel::relativeToImage(const wxPoint &ap, bool scaled) const {
@@ -151,12 +156,11 @@ wxPoint CanvasPanel::cropOffset() const {
 }
 
 bool CanvasPanel::cropSize(wxSize *s) {
-    if(controller.cropSize(*s)) sendCropEvent();
+    if(controller.cropSize(*s)) refreshDamaged();
     if(controller.cropSize() != *s) {
         *s = controller.cropSize();
-        return true;
-    }
-    return false;
+        return false;
+    } else return true;
 }
 
 wxSize CanvasPanel::cropSize() const {
