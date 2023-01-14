@@ -12,6 +12,7 @@ class ScrolledView;
 namespace Magick {
     class Image;
 }
+class ZoomCtrl;
 
 #include "wx/frame.h"
 #include "optscontainer.h"
@@ -67,6 +68,7 @@ class MainFrame: public wxFrame {
 
         wxButton *apply;
         wxButton *reset;
+        ZoomCtrl *zoom;
 
         wxMenuBar *topMenuBar;
         wxMenu *mFile, *mEdit, *mHelp;

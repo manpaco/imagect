@@ -11,6 +11,7 @@
 #include "exportdlg.h"
 #include <Magick++.h>
 #include "scrolview.h"
+#include "zoomctrl.h"
 
 #include <wx/wxprec.h>
 
@@ -71,6 +72,7 @@ void MainFrame::allocateMem() {
     mainSizer = new wxBoxSizer(wxVERTICAL);
     apply = new wxButton(this, ict::APPLY_BT, "Apply");
     reset = new wxButton(this, ict::RESET_CROP_BT, "Reset crop area");
+    zoom = new ZoomCtrl(this, wxID_ANY);
 }
 
 void MainFrame::createMenuBar() {
@@ -110,7 +112,7 @@ void MainFrame::overlayPanels() {
     buttonsSizer->AddSpacer(bestSpace);
     buttonsSizer->Add(reset);
     buttonsSizer->AddStretchSpacer();
-    buttonsSizer->Add(new wxButton(this, wxID_ANY, "Zoom"));
+    buttonsSizer->Add(zoom);
     buttonsSizer->AddSpacer(bestSpace);
     mainSizer->AddSpacer(bestSpace);
     mainSizer->Add(buttonsSizer, 0, wxEXPAND);
