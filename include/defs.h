@@ -106,6 +106,17 @@ enum Extension {
     JPEG_EXT
 };
 
+enum Tot {
+    SCALE_T = 0,
+    COMPRESS_T,
+    SNC_T
 };
+
+enum Dot {
+    IN_D = 0,
+    OUT_D
+};
+
+}
 
 #endif // DEFS_H
