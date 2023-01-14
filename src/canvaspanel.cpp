@@ -3,6 +3,8 @@
 #include "defs.h"
 #include <wx/graphics.h>
 #include "wx/dcbuffer.h"
+#include <Magick++.h>
+#include "imgtools.h"
 
 #include <wx/wxprec.h>
 
@@ -14,8 +16,17 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
 }
 
-CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm): CanvasPanel(parent, id) {
-    initCanvas(bm);
+CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, Magick::Image *img): CanvasPanel(parent, id) {
+    if(!GetParent()) return;
+    wxSize imgSz(img->columns(), img->rows());
+    wxSize aux(((imgSz * ict::IMG_MULTIPLIER) - imgSz) / 2);
+    wxPoint imgPos(aux.GetWidth(), aux.GetHeight());
+    imgRect = wxRect(imgPos, imgSz);
+    controller = CropController(imgRect);
+    prevCrop = imgRect;
+    compressImage(img);
+    wxBitmap initBm(createImage(*img));
+    initCanvas(initBm);
     Bind(wxEVT_MOTION, &CanvasPanel::mouseMotion, this);
     Bind(wxEVT_LEFT_DOWN, &CanvasPanel::mousePress, this);
     Bind(wxEVT_LEFT_UP, &CanvasPanel::mouseRelease, this);
@@ -24,13 +35,13 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm): CanvasP
 }
 
 void CanvasPanel::mouseMotion(wxMouseEvent &event) {
-    ict::Zone lastZone(controller.getLocation(translatePointOut(lastPoint)));
+    ict::Zone lastZone(controller.getLocation(translatePoint(lastPoint, ict::SNC_T, ict::OUT_D)));
     wxPoint currentPoint(event.GetPosition());
-    ict::Zone currentZone(controller.getLocation(translatePointOut(currentPoint)));
+    ict::Zone currentZone(controller.getLocation(translatePoint(currentPoint, ict::SNC_T, ict::OUT_D)));
     if(!controller.zonePressed()) {
         if(lastZone != currentZone) changeCursor(currentZone);
     } else {
-        if(controller.modify(translatePointOut(currentPoint))) {
+        if(controller.modify(translatePoint(currentPoint, ict::SNC_T, ict::OUT_D))) {
             refreshDamaged();
             sendCropEvent();
         }
@@ -41,14 +52,14 @@ void CanvasPanel::mouseMotion(wxMouseEvent &event) {
 
 void CanvasPanel::mousePress(wxMouseEvent &event) {
     if(!HasCapture()) CaptureMouse();
-    controller.press(translatePointOut(event.GetPosition()));
+    controller.press(translatePoint(event.GetPosition(), ict::SNC_T, ict::OUT_D));
     event.Skip();
 }
 
 void CanvasPanel::mouseRelease(wxMouseEvent &event) {
     if(HasCapture()) ReleaseMouse();
     controller.release();
-    changeCursor(controller.getLocation(translatePointOut(lastPoint)));
+    changeCursor(controller.getLocation(translatePoint(lastPoint, ict::SNC_T, ict::OUT_D)));
     event.Skip();
 }
 
@@ -61,7 +72,7 @@ void CanvasPanel::sendCropEvent() {
 }
 
 void CanvasPanel::refreshDamaged() {
-    wxRect damaged(translateRectIn(prevCrop).Union(translateRectIn(controller.cropRect())));
+    wxRect damaged(translateRect(prevCrop, ict::SNC_T, ict::IN_D).Union(translateRect(controller.cropRect(), ict::SNC_T, ict::IN_D)));
     wxWindow *myParent(GetParent());
     if(myParent) {
         wxRect viewRect(myParent->GetScreenRect());
@@ -75,14 +86,14 @@ void CanvasPanel::refreshDamaged() {
 
 void CanvasPanel::onPaint(wxPaintEvent &event) {
     wxRect damaged(GetUpdateRegion().GetBox());
-    damaged = translateRectOut(damaged);
+    damaged = translateRect(damaged, ict::SCALE_T, ict::OUT_D);
     wxBufferedPaintDC canvasPainter(this);
     canvasPainter.SetUserScale(scaleFactor, scaleFactor);
     canvasPainter.DrawBitmap(buffer->GetSubBitmap(damaged), damaged.GetPosition());
     canvasPainter.SetUserScale(1, 1);
     wxGraphicsContext *gcd = wxGraphicsContext::Create(canvasPainter);
     if(gcd) {
-        paintCropRect(translateRectIn(controller.cropRect()), gcd);
+        paintCropRect(translateRect(controller.cropRect(), ict::SNC_T, ict::IN_D), gcd);
         delete gcd;
     }
     event.Skip();
@@ -129,18 +140,12 @@ bool CanvasPanel::cropGeometry(wxRect *g) {
     } else return true;
 }
 
-wxPoint CanvasPanel::relativeToImage(const wxPoint &ap, bool scaled) const {
-    wxPoint rel;
-    if(scaled) rel = wxPoint(ap - translatePointIn(imgRect.GetPosition()));
-    else rel = wxPoint(ap - imgRect.GetPosition());
-    return rel;
+wxPoint CanvasPanel::relativeToImage(const wxPoint &ap) const {
+    return wxPoint(ap - imgRect.GetPosition());
 }
 
-wxPoint CanvasPanel::absoluteCoords(const wxPoint &rp, bool scaled) const {
-    wxPoint abs;
-    if(scaled) abs = wxPoint(rp + translatePointIn(imgRect.GetPosition()));
-    else abs = wxPoint(rp + imgRect.GetPosition());
-    return abs;
+wxPoint CanvasPanel::absoluteCoords(const wxPoint &rp) const {
+    return wxPoint(rp + imgRect.GetPosition());
 }
 
 void CanvasPanel::fixCrop(bool op) {
@@ -167,38 +172,32 @@ wxSize CanvasPanel::cropSize() const {
     return controller.cropSize();
 }
 
-int CanvasPanel::translateIn(int v) const {
-    return v * scaleFactor;
+int CanvasPanel::translate(int v, ict::Tot t, ict::Dot d) const {
+    if(t == ict::SCALE_T) {
+        if(d == ict::IN_D) return v * scaleFactor;
+        if(d == ict::OUT_D) return v / scaleFactor;
+    } else if(t == ict::COMPRESS_T) {
+        if(d == ict::IN_D) return v * compressFactor;
+        if(d == ict::OUT_D) return v / compressFactor;
+    } else if(t == ict::SNC_T) {
+        if(d == ict::IN_D) return v * scaleFactor * compressFactor;
+        if(d == ict::OUT_D) return v / scaleFactor / compressFactor;
+    }
+    return 0;
 }
 
-int CanvasPanel::translateOut(int v) const {
-    return v / scaleFactor;
+wxRect CanvasPanel::translateRect(const wxRect &r, ict::Tot t, ict::Dot d) const {
+    return wxRect(translatePoint(r.GetPosition(), t, d), translateSize(r.GetSize(), t, d));
 }
 
-wxRect CanvasPanel::translateRectIn(const wxRect &r) const {
-    return wxRect(translateIn(r.GetX()), translateIn(r.GetY()), 
-            translateIn(r.GetWidth()), translateIn(r.GetHeight()));
+wxPoint CanvasPanel::translatePoint(const wxPoint &p, ict::Tot t, ict::Dot d) const {
+    return wxPoint(translate(p.x, t, d), translate(p.y, t, d));
 }
 
-wxRect CanvasPanel::translateRectOut(const wxRect &r) const {
-    return wxRect(translateOut(r.GetX()), translateOut(r.GetY()), 
-            translateOut(r.GetWidth()), translateOut(r.GetHeight()));
-}
-
-wxPoint CanvasPanel::translatePointIn(const wxPoint &p) const {
-    return wxPoint(translateIn(p.x), translateIn(p.y));
-}
-
-wxPoint CanvasPanel::translatePointOut(const wxPoint &p) const {
-    return wxPoint(translateOut(p.x), translateOut(p.y));
-}
-
-wxSize CanvasPanel::translateSizeIn(const wxSize &s) const {
-    return wxSize(translateIn(s.GetWidth()), translateIn(s.GetHeight()));
-}
-
-wxSize CanvasPanel::translateSizeOut(const wxSize &s) const {
-    return wxSize(translateOut(s.GetWidth()), translateOut(s.GetHeight()));
+wxSize CanvasPanel::translateSize(const wxSize &s, ict::Tot t, ict::Dot d) const {
+    wxPoint aux(s.GetWidth(), s.GetHeight());
+    aux = translatePoint(aux, t, d);
+    return wxSize(aux.x, aux.y);
 }
 
 void CanvasPanel::refreshCanvas() {
@@ -215,22 +214,20 @@ void CanvasPanel::setScaleFactor(float sf) {
 void CanvasPanel::initCanvas(wxBitmap &bm) {
     if(!bm.IsOk()) return;
     initBuffer(bm);
-    controller = CropController(imgRect);
-    prevCrop = imgRect;
     refreshCanvas();
 }
 
 void CanvasPanel::updateSizes() {
-    wxSize newSize(translateSizeIn(bufferSize));
+    wxSize newSize(translateSize(bufferSize, ict::SCALE_T, ict::IN_D));
     SetMinSize(newSize);
-    SetSize(GetMinSize());
+    SetSize(newSize);
 }
 
 wxRect CanvasPanel::shadowRect() {
     wxPoint posOff(ict::SHADOW_OFFSET, ict::SHADOW_OFFSET);
-    wxPoint shPos(imgRect.GetPosition() - posOff);
+    wxPoint shPos(translatePoint(imgRect.GetPosition(), ict::COMPRESS_T, ict::IN_D) - posOff);
     wxSize szOff(ict::SHADOW_OFFSET * 2, ict::SHADOW_OFFSET * 2);
-    wxSize shSz(imgRect.GetSize() + szOff);
+    wxSize shSz(translateSize(imgRect.GetSize(), ict::COMPRESS_T, ict::IN_D) + szOff);
     return wxRect(shPos, shSz);
 }
 
@@ -238,9 +235,6 @@ void CanvasPanel::initBuffer(wxBitmap &bm) {
     if(buffer) delete buffer;
     buffer = new wxBitmap(bm.GetSize() * ict::IMG_MULTIPLIER);
     bufferSize = buffer->GetSize();
-    wxSize aux((bufferSize - bm.GetSize()) / 2);
-    wxPoint imgPos(aux.GetWidth(), aux.GetHeight());
-    imgRect = wxRect(imgPos, bm.GetSize());
     wxMemoryDC memBb(*buffer);
     wxBrush backBrush(wxColour(188, 188, 188));
     memBb.SetBrush(backBrush);
@@ -248,7 +242,19 @@ void CanvasPanel::initBuffer(wxBitmap &bm) {
     wxBrush shadowBrush(wxColour(91, 91, 91));
     memBb.SetBrush(shadowBrush);
     memBb.DrawRectangle(shadowRect());
-    memBb.DrawBitmap(bm, imgRect.GetPosition());
+    memBb.DrawBitmap(bm, translatePoint(imgRect.GetPosition(), ict::COMPRESS_T, ict::IN_D));
+}
+
+void CanvasPanel::compressImage(Magick::Image *img) {
+    wxWindow *myParent = GetParent();
+    Magick::Geometry geoImg(img->columns(), img->rows());
+    Magick::Geometry geoMax(myParent->GetSize().GetWidth() / ict::IMG_MULTIPLIER, 
+            myParent->GetSize().GetHeight() / ict::IMG_MULTIPLIER);
+    if(geoImg.width() <= geoMax.width() && geoImg.height() <= geoMax.height()) return;
+    compressFactor = factorToFit(geoMax, geoImg);
+    geoImg.width(geoImg.width() * compressFactor);
+    geoImg.height(geoImg.height() * compressFactor);
+    img->zoom(geoImg);
 }
 
 CanvasPanel::~CanvasPanel() {

@@ -54,13 +54,6 @@ class MainFrame: public wxFrame {
         void onAbout(wxCommandEvent &event);
         void initDimensions();
         void resetCrop(wxCommandEvent &event);
-        void fitImgToView(Magick::Image *img);
-        int translateOut(int v);
-        int translateIn(int v);
-        wxSize translateSizeOut(const wxSize &s);
-        wxSize translateSizeIn(const wxSize &s);
-        wxPoint translatePointOut(const wxPoint &p);
-        wxPoint translatePointIn(const wxPoint &p);
 
         CanvasPanel *canvas = nullptr;
         ScrolledView *sView = nullptr;
@@ -70,7 +63,7 @@ class MainFrame: public wxFrame {
         PreviewPanel *preview = nullptr;
         wxBoxSizer *mainSizer = nullptr;
         Magick::Image *sourceImg = nullptr;
-        Magick::Image *scaledImg = nullptr;
+        Magick::Image *compImg = nullptr;
 
         wxButton *apply;
         wxButton *reset;
@@ -87,7 +80,6 @@ class MainFrame: public wxFrame {
         int minMainSplitterSize, minSideSplitterSize;
         const int mainSplitterFactor = 4;
         const int sideSplitterFactor = 3;
-        float compressFactor = 1.0;
 
 };
 
