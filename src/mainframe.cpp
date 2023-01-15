@@ -150,11 +150,6 @@ void MainFrame::unbindElements() {
     tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
 }
 
-void MainFrame::resetCrop(wxCommandEvent &event) {
-    wxRect rst(wxPoint(0, 0), wxSize(-1, -1));
-    canvas->cropGeometry(&rst);
-}
-
 void MainFrame::onAbout(wxCommandEvent &event) {
     wxMessageBox(_("Image Cropping Tool\rby manpaco"), _("About"), wxOK | wxICON_INFORMATION);
 }
@@ -284,8 +279,15 @@ void MainFrame::onFixRatio(wxCommandEvent &event) {
 }
 
 void MainFrame::onAllowGrow(wxCommandEvent &event) {
-    canvas->allowGrow(event.IsChecked());
+    if(canvas->allowGrow(event.IsChecked())) 
+        tools->cropGeometry(canvas->cropGeometry());
     event.Skip();
+}
+
+void MainFrame::resetCrop(wxCommandEvent &event) {
+    wxRect rst(wxPoint(0, 0), wxSize(-1, -1));
+    canvas->cropGeometry(&rst);
+    tools->cropGeometry(rst);
 }
 
 void MainFrame::undo(wxCommandEvent &event) {
@@ -295,14 +297,10 @@ void MainFrame::undo(wxCommandEvent &event) {
     undoStack.pop();
     if(undoStack.empty()) mEdit->Enable(wxID_UNDO, false);
     tools->setOpts(currentState);
-    updateCropGeometry(currentState.cropOff, currentState.cropSize);
+    wxRect upd(currentState.cropOff, currentState.cropSize);
+    canvas->cropGeometry(&upd);
     composePreview();
     exportedImg = false;
-}
-
-void MainFrame::updateCropGeometry(wxPoint &o, wxSize &s) {
-    wxRect g(o, s);
-    canvas->cropGeometry(&g);
 }
 
 void MainFrame::redo(wxCommandEvent &event) {
@@ -312,7 +310,8 @@ void MainFrame::redo(wxCommandEvent &event) {
     redoStack.pop();
     if(redoStack.empty()) mEdit->Enable(wxID_REDO, false);
     tools->setOpts(currentState);
-    updateCropGeometry(currentState.cropOff, currentState.cropSize);
+    wxRect upd(currentState.cropOff, currentState.cropSize);
+    canvas->cropGeometry(&upd);
     composePreview();
     exportedImg = false;
 }

@@ -38,7 +38,6 @@ class MainFrame: public wxFrame {
         void updateHistory(OptionsContainer toSave);
         void redo(wxCommandEvent &);
         void undo(wxCommandEvent &);
-        void updateCropGeometry(wxPoint &o, wxSize &s);
         void onFixRatio(wxCommandEvent &);
         void onAllowGrow(wxCommandEvent &event);
         void createMenuBar();
