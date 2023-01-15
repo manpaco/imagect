@@ -275,7 +275,8 @@ void CropController::constraint(wxRect &cons) {
 
 bool CropController::constraint(bool op) {
     activeCons = op;
-    return cropRect(crop, true, accumX, accumY);
+    if(op) return cropRect(crop, true, accumX, accumY);
+    else return false;
 }
 
 void CropController::accumulateX(int &dxToCalc, int &dyToUse) {
