@@ -16,10 +16,11 @@ class CanvasPanel: public wxPanel {
         CanvasPanel(wxWindow *parent, wxWindowID id);
         bool cropSize(wxSize *s);
         bool cropGeometry(wxRect *g);
+        wxRect cropGeometry() const;
         wxSize cropSize() const;
         wxPoint cropOffset() const;
         void fixCrop(bool);
-        void allowGrow(bool);
+        bool allowGrow(bool);
         void setScaleFactor(float sf);
         wxRect translateRect(const wxRect &r, ict::Tot, ict::Dot) const;
         wxPoint translatePoint(const wxPoint &p, ict::Tot, ict::Dot) const;

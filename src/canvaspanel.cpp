@@ -64,8 +64,8 @@ void CanvasPanel::mouseRelease(wxMouseEvent &event) {
 }
 
 void CanvasPanel::sendCropEvent() {   
-    wxSize cs(controller.cropSize());
-    wxPoint co(relativeToImage(controller.cropPosition()));
+    wxSize cs(cropSize());
+    wxPoint co(cropOffset());
     CropEvent toSend(EVT_CROP_CHANGE, GetId(), cs, co);
     toSend.SetEventObject(this);
     ProcessWindowEvent(toSend);
@@ -127,10 +127,10 @@ void CanvasPanel::changeCursor(ict::Zone type) {
 }
 
 bool CanvasPanel::cropGeometry(wxRect *g) {
+    if(g->GetSize().x < 0) g->SetWidth(imgRect.GetWidth());
+    if(g->GetSize().y < 0) g->SetHeight(imgRect.GetHeight());
     wxPoint newPos(absoluteCoords(g->GetPosition()));
     wxSize newSz(g->GetSize());
-    if(g->GetSize().x < 0) newSz.SetWidth(imgRect.GetWidth());
-    if(g->GetSize().y < 0) newSz.SetHeight(imgRect.GetHeight());
     wxRect newR(newPos, newSz);
     if(controller.cropRect(newR)) refreshDamaged();
     if(newR != controller.cropRect()) {
@@ -152,8 +152,11 @@ void CanvasPanel::fixCrop(bool op) {
     controller.fixRatio(op);
 }
 
-void CanvasPanel::allowGrow(bool op) {
-    if(controller.constraint(!op)) sendCropEvent();
+bool CanvasPanel::allowGrow(bool op) {
+    if(controller.constraint(!op)) {
+        refreshDamaged();
+        return true;
+    } else return false;
 }
 
 wxPoint CanvasPanel::cropOffset() const {
@@ -170,6 +173,10 @@ bool CanvasPanel::cropSize(wxSize *s) {
 
 wxSize CanvasPanel::cropSize() const {
     return controller.cropSize();
+}
+
+wxRect CanvasPanel::cropGeometry() const {
+    return wxRect(cropOffset(), cropSize());
 }
 
 int CanvasPanel::translate(int v, ict::Tot t, ict::Dot d) const {
