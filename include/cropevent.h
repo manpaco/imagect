@@ -8,9 +8,7 @@ class CropEvent : public wxEvent {
         CropEvent(wxEventType, int, const wxSize &, wxPoint &o);
         wxSize getSize() const;
         wxPoint getOffset() const;
-
         virtual wxEvent * Clone() const;
-        wxDECLARE_DYNAMIC_CLASS(CropEvent);
 
     private:
         wxSize size;
