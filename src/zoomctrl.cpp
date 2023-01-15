@@ -15,3 +15,7 @@ ZoomCtrl::ZoomCtrl(wxWindow *parent, wxWindowID id) : wxControl(parent, id) {
     zSizer->Add(zIn);
     SetSizerAndFit(zSizer);
 }
+
+ZoomCtrl::~ZoomCtrl() {
+
+}
