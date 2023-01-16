@@ -10,6 +10,7 @@ const int SHADOW_OFFSET = 2;
 const int CORNER = 10;
 const unsigned int MIN_CROP = 1;
 const unsigned int MIN_STROKE = 0;
+const int BEST_SPACE = 5;
 
 enum ControlID {
     WIDTH_TC = wxID_HIGHEST + 1,
