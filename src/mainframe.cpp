@@ -44,7 +44,6 @@ MainFrame::MainFrame():
     initParams();
     initDimensions();
     Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onQuitFrame, this);
-    zoom->Bind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
 MainFrame::MainFrame(const wxString &initImg): MainFrame() {
@@ -142,6 +141,7 @@ void MainFrame::bindElements() {
     Bind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
     tools->Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
+    zoom->Bind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
 void MainFrame::unbindElements() {
@@ -150,6 +150,7 @@ void MainFrame::unbindElements() {
     Unbind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
     tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
+    zoom->Unbind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
 void MainFrame::onAbout(wxCommandEvent &event) {
@@ -230,7 +231,6 @@ void MainFrame::openImage(const wxString &p) {
         sourceImg = new Magick::Image(p.ToStdString());
         compImg = new Magick::Image(*sourceImg);
         canvas = new CanvasPanel(sView, ict::CANVAS, compImg);
-        canvas->setScaleFactor(3);
         wxBitmap newBmp(createImage(*compImg));
         bindElements();
         preview->updatePreview(newBmp);
@@ -248,7 +248,7 @@ void MainFrame::openImage(const wxString &p) {
 }
 
 void MainFrame::onZoomChange(ZoomEvent &event) {
-    std::cout << event.getScaleFactor() << std::endl;
+    sView->scaleFactor(event.getScaleFactor());
 }
 
 void MainFrame::initParams() {
