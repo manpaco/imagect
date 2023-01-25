@@ -13,6 +13,7 @@ namespace Magick {
     class Image;
 }
 class ZoomCtrl;
+class ZoomEvent;
 
 #include "wx/frame.h"
 #include "optscontainer.h"
@@ -54,6 +55,7 @@ class MainFrame: public wxFrame {
         void onAbout(wxCommandEvent &event);
         void initDimensions();
         void resetCrop(wxCommandEvent &event);
+        void onZoomChange(ZoomEvent &event);
 
         CanvasPanel *canvas = nullptr;
         ScrolledView *sView = nullptr;

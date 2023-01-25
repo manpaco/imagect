@@ -12,6 +12,7 @@
 #include <Magick++.h>
 #include "scrolview.h"
 #include "zoomctrl.h"
+#include "zoomevent.h"
 
 #include <wx/wxprec.h>
 
@@ -43,6 +44,7 @@ MainFrame::MainFrame():
     initParams();
     initDimensions();
     Bind(wxEVT_CLOSE_WINDOW, &MainFrame::onQuitFrame, this);
+    zoom->Bind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
 MainFrame::MainFrame(const wxString &initImg): MainFrame() {
@@ -72,7 +74,7 @@ void MainFrame::allocateMem() {
     mainSizer = new wxBoxSizer(wxVERTICAL);
     apply = new wxButton(this, ict::APPLY_BT, "Apply");
     reset = new wxButton(this, ict::RESET_CROP_BT, "Reset crop area");
-    zoom = new ZoomCtrl(this, wxID_ANY);
+    zoom = new ZoomCtrl(this, ict::ZOOM_CT);
 }
 
 void MainFrame::createMenuBar() {
@@ -243,6 +245,10 @@ void MainFrame::openImage(const wxString &p) {
         std::cerr << e.what() << std::endl;
         wxMessageBox(e.what(), "Error opening image");
     }
+}
+
+void MainFrame::onZoomChange(ZoomEvent &event) {
+    std::cout << event.getScaleFactor() << std::endl;
 }
 
 void MainFrame::initParams() {
