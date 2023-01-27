@@ -2,7 +2,9 @@
 
 wxDEFINE_EVENT(EVT_CROP_CHANGE, CropEvent);
 
-CropEvent::CropEvent(wxEventType eventType, int winId, const wxSize &s, wxPoint &o) : wxEvent(winId, eventType), size(s), offset(o) {
+CropEvent::
+CropEvent(wxEventType eventType, int winId, const wxSize &s, wxPoint &o) :
+    wxEvent(winId, eventType), size(s), offset(o) {
 
 }
 
