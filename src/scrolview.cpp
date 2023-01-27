@@ -25,11 +25,15 @@ void ScrolledView::clear() {
     }
 }
 
-void ScrolledView::handle(CanvasPanel *cp) {
+void ScrolledView::handle(Magick::Image *img) {
     if(canvas) clear();
-    canvas = cp;
+    canvas = new CanvasPanel(this, ict::CANVAS, img);
     centerSizer->Add(canvas, 0, wxALIGN_CENTER | wxALL);
     Layout();
+}
+
+CanvasPanel * ScrolledView::getCanvas() const {
+    return canvas;
 }
 
 void ScrolledView::initParams() {

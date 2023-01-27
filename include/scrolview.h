@@ -3,6 +3,9 @@
 
 class CanvasPanel;
 class wxGridSizer;
+namespace Magick {
+    class Image;
+}
 
 #include "wx/scrolwin.h"
 
@@ -13,7 +16,8 @@ class ScrolledView : public wxScrolledCanvas {
 
         void scaleFactor(float sf);
         void clear();
-        void handle(CanvasPanel *cp);
+        void handle(Magick::Image *img);
+        CanvasPanel * getCanvas() const;
 
     private:
         void initParams();
