@@ -45,6 +45,8 @@ class CanvasPanel: public wxPanel {
         wxPoint relativeToImage(const wxPoint &ap) const;
         wxPoint absoluteCoords(const wxPoint &rp) const;
         void compressImage(Magick::Image *);
+        void updateZones();
+        ict::Zone getLocation(const wxPoint &p) const;
 
         CropController controller;
         wxBitmap *buffer = nullptr;
@@ -52,6 +54,7 @@ class CanvasPanel: public wxPanel {
         wxSize bufferSize;
         float scaleFactor = 1.0, compressFactor = 1.0;
 
+        wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
         wxPoint lastPoint;
         wxRect prevCrop;
 };

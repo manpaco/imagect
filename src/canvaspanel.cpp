@@ -29,12 +29,37 @@ CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id, Magick::Image *img):
     Bind(wxEVT_ERASE_BACKGROUND, [](wxEraseEvent &){});
 }
 
+void CanvasPanel::updateZones() {
+    iz = translateRect(controller.cropRect(), ict::SNC_T, ict::IN_D);
+    int x1 = iz.GetX(), x2 = iz.GetX() + iz.GetWidth();
+    int y1 = iz.GetY(), y2 = iz.GetY() + iz.GetHeight();
+    nz = wxRect(x1, y1, iz.GetWidth(), ict::CORNER);
+    sz = wxRect(x1, y2 - ict::CORNER, iz.GetWidth(), ict::CORNER);
+    ez = wxRect(x2 - ict::CORNER, y1, ict::CORNER, iz.GetHeight());
+    wz = wxRect(x1, y1, ict::CORNER, iz.GetHeight());
+    nez = wxRect(x2 - ict::CORNER, y1, ict::CORNER, ict::CORNER);
+    nwz = wxRect(x1, y1, ict::CORNER, ict::CORNER);
+    sez = wxRect(x2 - ict::CORNER, y2 - ict::CORNER, ict::CORNER, ict::CORNER);
+    swz = wxRect(x1, y2 - ict::CORNER, ict::CORNER, ict::CORNER);
+}
+
+ict::Zone CanvasPanel::getLocation(const wxPoint &p) const {
+    if(nez.Contains(p)) return ict::NE;
+    if(nwz.Contains(p)) return ict::NW;
+    if(sez.Contains(p)) return ict::SE;
+    if(swz.Contains(p)) return ict::SW;
+    if(nz.Contains(p)) return ict::N;
+    if(sz.Contains(p)) return ict::S;
+    if(ez.Contains(p)) return ict::E;
+    if(wz.Contains(p)) return ict::W;
+    if(iz.Contains(p)) return ict::INNER;
+    return ict::NONE;
+}
+
 void CanvasPanel::mouseMotion(wxMouseEvent &event) {
-    ict::Zone lastZone(controller.
-            getLocation(translatePoint(lastPoint, ict::SNC_T, ict::OUT_D)));
+    ict::Zone lastZone(getLocation(lastPoint));
     wxPoint currentPoint(event.GetPosition());
-    ict::Zone currentZone(controller.
-            getLocation(translatePoint(currentPoint, ict::SNC_T, ict::OUT_D)));
+    ict::Zone currentZone(getLocation(currentPoint));
     if(!controller.zonePressed()) {
         if(lastZone != currentZone) changeCursor(currentZone);
     } else {
@@ -50,16 +75,16 @@ void CanvasPanel::mouseMotion(wxMouseEvent &event) {
 
 void CanvasPanel::mousePress(wxMouseEvent &event) {
     if(!HasCapture()) CaptureMouse();
-    controller.
-        press(translatePoint(event.GetPosition(), ict::SNC_T, ict::OUT_D));
+    ict::Zone pz(getLocation(event.GetPosition()));
+    wxPoint tp(translatePoint(event.GetPosition(), ict::SNC_T, ict::OUT_D));
+    controller.press(pz, tp);
     event.Skip();
 }
 
 void CanvasPanel::mouseRelease(wxMouseEvent &event) {
     if(HasCapture()) ReleaseMouse();
     controller.release();
-    changeCursor(controller.
-        getLocation(translatePoint(lastPoint, ict::SNC_T, ict::OUT_D)));
+    changeCursor(getLocation(event.GetPosition()));
     event.Skip();
 }
 
@@ -83,6 +108,7 @@ void CanvasPanel::refreshDamaged() {
     damaged.Inflate(ict::CORNER, ict::CORNER);
     RefreshRect(damaged);
     prevCrop = controller.cropRect();
+    updateZones();
 }
 
 void CanvasPanel::onPaint(wxPaintEvent &event) {
@@ -226,6 +252,7 @@ translateSize(const wxSize &s, ict::Tot t, ict::Dot d) const {
 
 void CanvasPanel::refreshCanvas() {
     updateSizes();
+    updateZones();
     Refresh();
 }
 
