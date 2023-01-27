@@ -3,8 +3,8 @@
 #include "filext.h"
 
 ExportDialog::ExportDialog(wxWindow *parent): 
-    wxFileDialog(parent, _("Export image"),wxEmptyString, wxEmptyString, wxEmptyString, 
-        wxFD_SAVE | wxFD_OVERWRITE_PROMPT) {
+    wxFileDialog(parent, _("Export image"), wxEmptyString, wxEmptyString,
+                 wxEmptyString, wxFD_SAVE | wxFD_OVERWRITE_PROMPT) {
     initWildcards();
     SetWildcard(exportWc);
 }
