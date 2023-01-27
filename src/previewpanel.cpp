@@ -9,7 +9,9 @@ PreviewPanel::PreviewPanel(wxWindow *parent, wxWindowID id) {
     initParams();
 }
 
-PreviewPanel::PreviewPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm): PreviewPanel(parent, id) {
+PreviewPanel::
+PreviewPanel(wxWindow *parent, wxWindowID id, wxBitmap &bm):
+    PreviewPanel(parent, id) {
     updateElements(bm);
 }
 
