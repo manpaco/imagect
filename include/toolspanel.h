@@ -66,14 +66,16 @@ class ToolsPanel: public wxScrolledCanvas {
         
         class UnfocusedCheckBox : public wxCheckBox {
             public:
-                UnfocusedCheckBox(wxWindow *parent, wxWindowID id, const wxString &label) {
+                UnfocusedCheckBox(wxWindow *parent,
+                                  wxWindowID id,
+                                  const wxString &label) {
                     Create(parent, id, label);
                 }
                 bool AcceptsFocus() const {
                     return false;
                 }
         };
-        
+
         wxCollapsiblePane *aspectBlock;
         wxTextCtrl *widthCtrl;
         wxTextCtrl *heightCtrl;

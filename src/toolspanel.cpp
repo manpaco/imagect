@@ -1,5 +1,6 @@
 #include "toolspanel.h"
 #include <string>
+#include "defs.h"
 #include "filext.h"
 #include "imgtools.h"
 
@@ -20,8 +21,6 @@
 #if wxUSE_STATLINE
     #include <wx/statline.h>
 #endif
-
-extern const int bestSpace;
 
 ToolsPanel::ToolsPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
@@ -57,11 +56,16 @@ void ToolsPanel::setBindings() {
     Bind(wxEVT_TEXT, &ToolsPanel::heightChange, this, ict::HEIGHT_TC);
     Bind(wxEVT_CHECKBOX, &ToolsPanel::fixRatioChange, this, ict::FIX_RATIO_CB);
     Bind(wxEVT_CHOICE, &ToolsPanel::shapeChange, this, ict::SHAPE_CH);
-    Bind(wxEVT_COLOURPICKER_CHANGED, &ToolsPanel::colourChange, this, ict::PICK_COLOUR_BT);
-    Bind(wxEVT_FILEPICKER_CHANGED, &ToolsPanel::imageChange, this, ict::PICK_IMG_FP);
-    Bind(wxEVT_SCROLL_THUMBRELEASE, &ToolsPanel::blurChange, this, ict::BACK_BLUR_SL);
-    Bind(wxEVT_COLOURPICKER_CHANGED, &ToolsPanel::strokeColorChange, this, ict::PICK_STROKE_COLOUR_BT);
-    Bind(wxEVT_TEXT, &ToolsPanel::strokeWidthChange, this, ict::STROKE_WIDTH_TC);
+    Bind(wxEVT_COLOURPICKER_CHANGED, &ToolsPanel::colourChange, this,
+         ict::PICK_COLOUR_BT);
+    Bind(wxEVT_FILEPICKER_CHANGED, &ToolsPanel::imageChange, this,
+         ict::PICK_IMG_FP);
+    Bind(wxEVT_SCROLL_THUMBRELEASE, &ToolsPanel::blurChange, this,
+         ict::BACK_BLUR_SL);
+    Bind(wxEVT_COLOURPICKER_CHANGED, &ToolsPanel::strokeColorChange, this,
+         ict::PICK_STROKE_COLOUR_BT);
+    Bind(wxEVT_TEXT, &ToolsPanel::strokeWidthChange, this,
+         ict::STROKE_WIDTH_TC);
 }
 
 void ToolsPanel::setOpts(const OptionsContainer &oc) {
@@ -148,7 +152,8 @@ void ToolsPanel::heightChange(wxCommandEvent &event) {
 
 void ToolsPanel::fixRatioChange(wxCommandEvent &event) {
     opts.fixRatio = event.IsChecked();
-    opts.ratio = (float)opts.cropSize.GetWidth() / (float)opts.cropSize.GetHeight();
+    opts.ratio =
+        (float)opts.cropSize.GetWidth() / (float)opts.cropSize.GetHeight();
 }
 
 void ToolsPanel::shapeChange(wxCommandEvent &event) {
@@ -194,47 +199,49 @@ void ToolsPanel::createTools() {
 }
 
 void ToolsPanel::createAspectBlock() {
-    aspectBlock = new wxCollapsiblePane(this, ict::ASPECT_RATIO, 
-            "Aspect", wxDefaultPosition, wxDefaultSize, 
-            wxCP_NO_TLW_RESIZE);
+    aspectBlock = new wxCollapsiblePane(this, ict::ASPECT_RATIO,
+                                        "Aspect", wxDefaultPosition,
+                                        wxDefaultSize, wxCP_NO_TLW_RESIZE);
     wxWindow *winAspect = aspectBlock->GetPane();
 
     wVal.SetMin(ict::MIN_CROP);
     hVal.SetMin(ict::MIN_CROP);
 
-    widthCtrl = new wxTextCtrl(winAspect, ict::WIDTH_TC, wxEmptyString, 
-            wxDefaultPosition, wxDefaultSize, 0, wVal);
-    heightCtrl = new wxTextCtrl(winAspect, ict::HEIGHT_TC, wxEmptyString, 
-            wxDefaultPosition, wxDefaultSize, 0, hVal);
-    fixRatio = new UnfocusedCheckBox(winAspect, ict::FIX_RATIO_CB, "Fix ratio");
+    widthCtrl = new wxTextCtrl(winAspect, ict::WIDTH_TC, wxEmptyString,
+                               wxDefaultPosition, wxDefaultSize, 0, wVal);
+    heightCtrl = new wxTextCtrl(winAspect, ict::HEIGHT_TC, wxEmptyString,
+                                wxDefaultPosition, wxDefaultSize, 0, hVal);
+    fixRatio =
+        new UnfocusedCheckBox(winAspect, ict::FIX_RATIO_CB, "Fix ratio");
 
     wxBoxSizer *widthSizer = new wxBoxSizer(wxHORIZONTAL);
-    widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Width:"), 0, 
-            wxALIGN_CENTER_VERTICAL);
-    widthSizer->AddSpacer(bestSpace);
-    widthSizer->Add(widthCtrl);
-    widthSizer->AddSpacer(bestSpace);
-    widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "px"), 0, wxALIGN_CENTER);
+    widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Width:"), 0,
+                                     wxALIGN_CENTER_VERTICAL);
+    widthSizer->AddSpacer(ict::BEST_SPACE);
+    widthSizer->Add(widthCtrl); widthSizer->AddSpacer(ict::BEST_SPACE);
+    widthSizer->
+        Add(new wxStaticText(winAspect, wxID_ANY, "px"), 0, wxALIGN_CENTER);
 
     wxBoxSizer *heightSizer = new wxBoxSizer(wxHORIZONTAL);
-    heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Height:"), 0, 
-            wxALIGN_CENTER_VERTICAL);
-    heightSizer->AddSpacer(bestSpace);
+    heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Height:"), 0,
+                                      wxALIGN_CENTER_VERTICAL);
+    heightSizer->AddSpacer(ict::BEST_SPACE);
     heightSizer->Add(heightCtrl);
-    heightSizer->AddSpacer(bestSpace);
-    heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "px"), 0, wxALIGN_CENTER);
+    heightSizer->AddSpacer(ict::BEST_SPACE);
+    heightSizer->
+        Add(new wxStaticText(winAspect, wxID_ANY, "px"), 0, wxALIGN_CENTER);
 
     wxBoxSizer *aspectSizer = new wxBoxSizer(wxVERTICAL);
-    aspectSizer->AddSpacer(bestSpace);
+    aspectSizer->AddSpacer(ict::BEST_SPACE);
     aspectSizer->Add(fixRatio);
     wxStaticLine *fl = new wxStaticLine(winAspect);
-    aspectSizer->AddSpacer(bestSpace);
+    aspectSizer->AddSpacer(ict::BEST_SPACE);
     aspectSizer->Add(fl, 0, wxEXPAND);
-    aspectSizer->AddSpacer(bestSpace);
+    aspectSizer->AddSpacer(ict::BEST_SPACE);
     aspectSizer->Add(widthSizer, 0, wxALIGN_CENTER);
-    aspectSizer->AddSpacer(bestSpace);
+    aspectSizer->AddSpacer(ict::BEST_SPACE);
     aspectSizer->Add(heightSizer, 0, wxALIGN_CENTER);
-    aspectSizer->AddSpacer(bestSpace);
+    aspectSizer->AddSpacer(ict::BEST_SPACE);
     winAspect->SetSizerAndFit(aspectSizer);
 }
 
@@ -244,95 +251,112 @@ void ToolsPanel::createGrowBlock() {
     wxWindow *winGrow = growBlock->GetPane();
 
     initGrowChoices();
-    growCheck = new UnfocusedCheckBox(winGrow, ict::GROW_CHECK_CB, "Allow growing with:");
-    growSelector = new wxChoice(winGrow, ict::GROW_SELECTOR_CH, 
-            wxDefaultPosition, wxDefaultSize, 
-            wxArrayString(ict::GROW_CHOICE_SIZE, growChoices));
+    growCheck = new UnfocusedCheckBox(winGrow, ict::GROW_CHECK_CB,
+                                      "Allow growing with:");
+    growSelector = new wxChoice(winGrow, ict::GROW_SELECTOR_CH,
+                                wxDefaultPosition, wxDefaultSize,
+                                wxArrayString(ict::GROW_CHOICE_SIZE,
+                                growChoices));
     growSelector->Enable(false);
     colorPicker = new wxColourPickerCtrl(winGrow, ict::PICK_COLOUR_BT, 
-            *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL);
+                                         *wxBLACK, wxDefaultPosition,
+                                         wxDefaultSize, wxCLRP_SHOW_LABEL);
     colorPicker->Enable(false);
-    imagePicker = new wxFilePickerCtrl(winGrow, ict::PICK_IMG_FP, 
-            wxEmptyString, "Background image", importWc);
+    imagePicker = new wxFilePickerCtrl(winGrow, ict::PICK_IMG_FP,
+                                       wxEmptyString, "Background image",
+                                       importWc);
     imagePicker->Enable(false);
     backBlur = new wxSlider(winGrow, ict::BACK_BLUR_SL, 0, 0, 100);
     backBlur->Enable(false);
 
     wxBoxSizer *growSizer = new wxBoxSizer(wxVERTICAL);
-    growSizer->AddSpacer(bestSpace);
+    growSizer->AddSpacer(ict::BEST_SPACE);
     wxBoxSizer *hGrowSelecSizer = new wxBoxSizer(wxHORIZONTAL);
     hGrowSelecSizer->Add(growCheck, 0, wxALIGN_CENTER);
-    hGrowSelecSizer->AddSpacer(bestSpace);
+    hGrowSelecSizer->AddSpacer(ict::BEST_SPACE);
     hGrowSelecSizer->Add(growSelector, 0, wxALIGN_CENTER);
     growSizer->Add(hGrowSelecSizer);
     wxStaticLine *fl = new wxStaticLine(winGrow);
-    growSizer->AddSpacer(bestSpace);
+    growSizer->AddSpacer(ict::BEST_SPACE);
     growSizer->Add(fl, 0, wxEXPAND);
-    growSizer->AddSpacer(bestSpace);
+    growSizer->AddSpacer(ict::BEST_SPACE);
     colorText = new wxStaticText(winGrow, wxID_ANY, "Color:");
     colorText->Enable(false);
     wxBoxSizer *hColorSizer = new wxBoxSizer(wxHORIZONTAL);
     hColorSizer->Add(colorText, 0, wxALIGN_CENTER);
-    hColorSizer->AddSpacer(bestSpace);
+    hColorSizer->AddSpacer(ict::BEST_SPACE);
     hColorSizer->Add(colorPicker, 0, wxALIGN_CENTER);
     growSizer->Add(hColorSizer, 0, wxALIGN_CENTER);
-    growSizer->AddSpacer(bestSpace);
+    growSizer->AddSpacer(ict::BEST_SPACE);
     wxStaticLine *sl = new wxStaticLine(winGrow);
     growSizer->Add(sl, 0, wxEXPAND);
-    growSizer->AddSpacer(bestSpace);
+    growSizer->AddSpacer(ict::BEST_SPACE);
     imageText = new wxStaticText(winGrow, wxID_ANY, "Image:");
     imageText->Enable(false);
     wxBoxSizer *hImageSizer = new wxBoxSizer(wxHORIZONTAL);
     hImageSizer->Add(imageText, 0, wxALIGN_CENTER);
-    hImageSizer->AddSpacer(bestSpace);
+    hImageSizer->AddSpacer(ict::BEST_SPACE);
     hImageSizer->Add(imagePicker);
     growSizer->Add(hImageSizer, 0, wxALIGN_CENTER);
     blurText = new wxStaticText(winGrow, wxID_ANY, "Blur");
     blurText->Enable(false);
-    growSizer->AddSpacer(bestSpace);
+    growSizer->AddSpacer(ict::BEST_SPACE);
     growSizer->Add(blurText, 0, wxALIGN_CENTER);
     growSizer->Add(backBlur, 0, wxEXPAND);
-    growSizer->AddSpacer(bestSpace);
+    growSizer->AddSpacer(ict::BEST_SPACE);
 
     winGrow->SetSizerAndFit(growSizer);
 }
 
 void ToolsPanel::createShapeBlock() {
     shapeBlock = new wxCollapsiblePane(this, ict::SHAPE, "Shape",
-            wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
+                                       wxDefaultPosition, wxDefaultSize,
+                                       wxCP_NO_TLW_RESIZE);
     wxWindow *winShape = shapeBlock->GetPane();
     initShapeChoices();
     swVal.SetMin(ict::MIN_STROKE);
     shapeSelector = new wxChoice(winShape, ict::SHAPE_CH, wxDefaultPosition, 
-            wxDefaultSize, 
-            wxArrayString(ict::SHAPE_CHOICE_SIZE, shapeChoices));
+                                 wxDefaultSize, 
+                                 wxArrayString(ict::SHAPE_CHOICE_SIZE,
+                                               shapeChoices));
     shapeSelector->SetSelection(0);
-    strokeWidthCtrl = new wxTextCtrl(winShape, ict::STROKE_WIDTH_TC, wxEmptyString, 
-            wxDefaultPosition, wxDefaultSize, 0, swVal);
-    strokeColorPicker = new wxColourPickerCtrl(winShape, ict::PICK_STROKE_COLOUR_BT, 
-            *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL);
+    strokeWidthCtrl = new wxTextCtrl(winShape, ict::STROKE_WIDTH_TC,
+                                     wxEmptyString, wxDefaultPosition,
+                                     wxDefaultSize, 0, swVal);
+    strokeColorPicker = new wxColourPickerCtrl(winShape,
+                                               ict::PICK_STROKE_COLOUR_BT,
+                                               *wxBLACK, wxDefaultPosition,
+                                               wxDefaultSize,
+                                               wxCLRP_SHOW_LABEL);
     
     wxBoxSizer *shapeSizer = new wxBoxSizer(wxVERTICAL);
-    shapeSizer->AddSpacer(bestSpace);
+    shapeSizer->AddSpacer(ict::BEST_SPACE);
     shapeSizer->Add(shapeSelector, 0, wxALIGN_CENTER);
     wxStaticLine *fl = new wxStaticLine(winShape);
-    shapeSizer->AddSpacer(bestSpace);
+    shapeSizer->AddSpacer(ict::BEST_SPACE);
     shapeSizer->Add(fl, 0, wxEXPAND);
     wxBoxSizer *hStrokeWidthSizer = new wxBoxSizer(wxHORIZONTAL);
-    hStrokeWidthSizer->Add(new wxStaticText(winShape, wxID_ANY, "Stroke width:"), 0, wxALIGN_CENTER);
-    hStrokeWidthSizer->AddSpacer(bestSpace);
+    hStrokeWidthSizer->Add(new wxStaticText(winShape, wxID_ANY,
+                                            "Stroke width:"),
+                           0,
+                           wxALIGN_CENTER);
+    hStrokeWidthSizer->AddSpacer(ict::BEST_SPACE);
     hStrokeWidthSizer->Add(strokeWidthCtrl);
-    hStrokeWidthSizer->AddSpacer(bestSpace);
-    hStrokeWidthSizer->Add(new wxStaticText(winShape, wxID_ANY, "px"), 0, wxALIGN_CENTER);
-    shapeSizer->AddSpacer(bestSpace);
+    hStrokeWidthSizer->AddSpacer(ict::BEST_SPACE);
+    hStrokeWidthSizer->
+        Add(new wxStaticText(winShape, wxID_ANY, "px"), 0, wxALIGN_CENTER);
+    shapeSizer->AddSpacer(ict::BEST_SPACE);
     shapeSizer->Add(hStrokeWidthSizer, 0, wxALIGN_CENTER);
     wxBoxSizer *hStrokeColorSizer = new wxBoxSizer(wxHORIZONTAL);
-    hStrokeColorSizer->Add(new wxStaticText(winShape, wxID_ANY, "Stroke color:"), 0, wxALIGN_CENTER);
-    hStrokeColorSizer->AddSpacer(bestSpace);
+    hStrokeColorSizer->Add(new wxStaticText(winShape, wxID_ANY,
+                                            "Stroke color:"),
+                           0,
+                           wxALIGN_CENTER);
+    hStrokeColorSizer->AddSpacer(ict::BEST_SPACE);
     hStrokeColorSizer->Add(strokeColorPicker);
-    shapeSizer->AddSpacer(bestSpace);
+    shapeSizer->AddSpacer(ict::BEST_SPACE);
     shapeSizer->Add(hStrokeColorSizer, 0, wxALIGN_CENTER);
-    shapeSizer->AddSpacer(bestSpace);
+    shapeSizer->AddSpacer(ict::BEST_SPACE);
     winShape->SetSizerAndFit(shapeSizer);
 }
 
@@ -365,9 +389,9 @@ void ToolsPanel::initShapeChoices() {
 
 void ToolsPanel::overlayTools() {
     wxBoxSizer *toolsSizer = new wxBoxSizer(wxVERTICAL);
-    toolsSizer->Add(aspectBlock, 0, wxGROW | wxALL, bestSpace);
-    toolsSizer->Add(shapeBlock, 0, wxGROW | wxALL, bestSpace);
-    toolsSizer->Add(growBlock, 0, wxGROW | wxALL, bestSpace);
+    toolsSizer->Add(aspectBlock, 0, wxGROW | wxALL, ict::BEST_SPACE);
+    toolsSizer->Add(shapeBlock, 0, wxGROW | wxALL, ict::BEST_SPACE);
+    toolsSizer->Add(growBlock, 0, wxGROW | wxALL, ict::BEST_SPACE);
     SetSizerAndFit(toolsSizer);
     SetScrollRate(5, 5);
 }
