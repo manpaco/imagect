@@ -21,7 +21,12 @@ class ImgCropApp: public wxApp {
 };
 
 static const wxCmdLineEntryDesc cliDesc[] = {
-    { wxCMD_LINE_PARAM,  nullptr, nullptr, "input image", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+    { wxCMD_LINE_PARAM,  
+        nullptr, 
+        nullptr, 
+        "input image", 
+        wxCMD_LINE_VAL_STRING, 
+        wxCMD_LINE_PARAM_OPTIONAL },
     { wxCMD_LINE_NONE }
 };
 
