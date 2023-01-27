@@ -10,47 +10,68 @@ CropController::CropController(const wxRect &r) {
     crop = r;
     cons = r;
     pressZone = ict::NONE;
-    updateSizes();
+    updateZones();
 }
 
 CropController::~CropController() {
 
 }
 
-void CropController::updateSizes() {
-    int x1 = crop.GetX(), x2 = crop.GetX() + crop.GetWidth();
-    int y1 = crop.GetY(), y2 = crop.GetY() + crop.GetHeight();
-    iz = crop;
-    nz = wxRect(x1, y1, crop.GetWidth(), ict::CORNER);
-    sz = wxRect(x1, y2 - ict::CORNER, crop.GetWidth(), ict::CORNER);
-    ez = wxRect(x2 - ict::CORNER, y1, ict::CORNER, crop.GetHeight());
-    wz = wxRect(x1, y1, ict::CORNER, crop.GetHeight());
-    nez = wxRect(x2 - ict::CORNER, y1, ict::CORNER, ict::CORNER);
-    nwz = wxRect(x1, y1, ict::CORNER, ict::CORNER);
-    sez = wxRect(x2 - ict::CORNER, y2 - ict::CORNER, ict::CORNER, ict::CORNER);
-    swz = wxRect(x1, y2 - ict::CORNER, ict::CORNER, ict::CORNER);
+void CropController::updateZones() {
+    viz = crop;
+    int x1 = viz.GetX(), x2 = viz.GetX() + viz.GetWidth();
+    int y1 = viz.GetY(), y2 = viz.GetY() + viz.GetHeight();
+    vnz = wxRect(x1, y1, viz.GetWidth(), ict::CORNER);
+    vsz = wxRect(x1, y2 - ict::CORNER, viz.GetWidth(), ict::CORNER);
+    vez = wxRect(x2 - ict::CORNER, y1, ict::CORNER, viz.GetHeight());
+    vwz = wxRect(x1, y1, ict::CORNER, viz.GetHeight());
+    vnez = wxRect(x2 - ict::CORNER, y1, ict::CORNER, ict::CORNER);
+    vnwz = wxRect(x1, y1, ict::CORNER, ict::CORNER);
+    vsez = wxRect(x2 - ict::CORNER, y2 - ict::CORNER, ict::CORNER, ict::CORNER);
+    vswz = wxRect(x1, y2 - ict::CORNER, ict::CORNER, ict::CORNER);
 }
 
-ict::Zone CropController::getLocation(const wxPoint p) const {
-    if(nez.Contains(p)) return ict::NE;
-    if(nwz.Contains(p)) return ict::NW;
-    if(sez.Contains(p)) return ict::SE;
-    if(swz.Contains(p)) return ict::SW;
-    if(nz.Contains(p)) return ict::N;
-    if(sz.Contains(p)) return ict::S;
-    if(ez.Contains(p)) return ict::E;
-    if(wz.Contains(p)) return ict::W;
-    if(iz.Contains(p)) return ict::INNER;
-    return ict::NONE;
+wxPoint CropController::relativeToZone(const wxPoint &p, ict::Zone z) {
+    if(z == ict::NE) {
+        int t = vnez.GetY();
+        int r = vnez.GetX() + vnez.GetWidth();
+        return wxPoint(p.x - r, p.y - t);
+    } else if(z == ict::NW) {
+        int t = vnwz.GetY();
+        int l = vnwz.GetX();
+        return wxPoint(p.x - l, p.y - t);
+    } else if(z == ict::SE) {
+        int d = vsez.GetY() + vsez.GetHeight();
+        int r = vsez.GetX() + vsez.GetWidth();
+        return wxPoint(p.x - r, p.y - d);
+    } else if(z == ict::SW) {
+        int d = vswz.GetY() + vswz.GetHeight();
+        int l = vswz.GetX();
+        return wxPoint(p.x - l, p.y - d);
+    } else if(z == ict::N) {
+        int t = vnz.GetY();
+        return wxPoint(0, p.y - t);
+    } else if(z == ict::S) {
+        int d = vsz.GetY() + vsz.GetHeight();
+        return wxPoint(0, p.y - d);
+    } else if(z == ict::E) {
+        int r = vez.GetX() + vez.GetWidth();
+        return wxPoint(p.x - r, 0);
+    } else if(z == ict::W) {
+        int l = vwz.GetX();
+        return wxPoint(p.x - l, 0);
+    } else if(z == ict::INNER)
+        return wxPoint(p - viz.GetPosition());
+    return wxPoint(0, 0);
 }
 
 ict::Zone CropController::zonePressed() const {
     return pressZone;
 }
 
-void CropController::press(const wxPoint &p) {
-    pressZone = getLocation(p);
-    relativePress = relativeToZone(p, pressZone);
+void CropController::press(const ict::Zone z, const wxPoint &p) {
+    pressZone = z;
+    relativePress = relativeToZone(p, z);
 }
 
 void CropController::release() {
@@ -82,7 +103,7 @@ bool CropController::modify(const wxPoint &target) {
         resize(target);
     }
     if(prevCrop != crop) {
-        updateSizes();
+        updateZones();
         return true;
     } else return false;
 }
@@ -98,8 +119,8 @@ void CropController::resize(const wxPoint &target) {
     if(fix) fixHint = zonePressed();
     int deltaX = 0, deltaY = 0;
     if(zonePressed() == ict::SE) {
-        deltaX += ict::CORNER - relativePress.x;
-        deltaY += ict::CORNER - relativePress.y;
+        deltaX += - relativePress.x;
+        deltaY += - relativePress.y;
         deltaX += target.x - (crop.x + crop.GetWidth());
         deltaY += target.y - (crop.y + crop.GetHeight());
         if(fix) accumulateX(deltaX, deltaY);
@@ -115,7 +136,7 @@ void CropController::resize(const wxPoint &target) {
                 crop.GetWidth() - deltaX, 
                 crop.GetHeight() - deltaY);
     } else if(zonePressed() == ict::NE) {
-        deltaX += ict::CORNER - relativePress.x;
+        deltaX += - relativePress.x;
         deltaY += - relativePress.y;
         deltaX += target.x - (crop.x + crop.GetWidth());
         deltaY += target.y - crop.y;
@@ -125,7 +146,7 @@ void CropController::resize(const wxPoint &target) {
                 crop.GetHeight() - deltaY);
     } else if(zonePressed() == ict::SW) {
         deltaX += - relativePress.x;
-        deltaY += ict::CORNER - relativePress.y;
+        deltaY += - relativePress.y;
         deltaX += target.x - crop.x;
         deltaY += target.y - (crop.y + crop.GetHeight());
         if(fix) { accumulateX(deltaX, deltaY); deltaX = -deltaX; }
@@ -140,7 +161,7 @@ void CropController::resize(const wxPoint &target) {
                 crop.GetWidth() - deltaX, 
                 crop.GetHeight() - deltaY);
     } else if(zonePressed() == ict::S) {
-        deltaY += ict::CORNER - relativePress.y;
+        deltaY += - relativePress.y;
         deltaY += target.y - (crop.y + crop.GetHeight());
         if(fix) accumulateX(deltaX, deltaY);
         crop = wxRect(crop.x, crop.y, 
@@ -154,7 +175,7 @@ void CropController::resize(const wxPoint &target) {
                 crop.GetWidth() - deltaX, 
                 crop.GetHeight() + deltaY);
     } else if(zonePressed() == ict::E) {
-        deltaX += ict::CORNER - relativePress.x;
+        deltaX += - relativePress.x;
         deltaX += target.x - (crop.x + crop.GetWidth());
         if(fix) { accumulateY(deltaY, deltaX); deltaY = -deltaY; }
         crop = wxRect(crop.x, crop.y + deltaY, 
@@ -162,31 +183,6 @@ void CropController::resize(const wxPoint &target) {
                 crop.GetHeight() - deltaY);
     }
     fitInConstraint();
-}
-
-wxRect CropController::rectZone(ict::Zone z) const {
-    if(z == ict::NE) return nez;
-    if(z == ict::NW) return nwz;
-    if(z == ict::SE) return sez;
-    if(z == ict::SW) return swz;
-    if(z == ict::N) return nz;
-    if(z == ict::S) return sz;
-    if(z == ict::E) return ez;
-    if(z == ict::W) return wz;
-    if(z == ict::INNER) return iz;;
-    return wxRect();
-}
-
-wxPoint CropController::relativeToZone(const wxPoint &p, ict::Zone z) {
-    if(!z) return p;
-    wxRect rz(rectZone(z));
-    return wxPoint(p - rz.GetPosition());
-}
-
-wxRect CropController::relativeToCrop(ict::Zone z) const {
-    wxRect rel(rectZone(z));
-    rel.SetPosition(rel.GetPosition() - crop.GetPosition());
-    return rel;
 }
 
 void CropController::pushToConstraint() {
@@ -336,7 +332,7 @@ cropRect(const wxRect &r, bool holdRatio, float initAx, float initAy) {
     crop = next;
     fitInConstraint();
     if(prevRect != crop) {
-        updateSizes();
+        updateZones();
         return true;
     } else return false;
 }

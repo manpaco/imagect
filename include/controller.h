@@ -85,9 +85,9 @@ class CropController {
          *
          * @params
          *  z Zone to press.
-         *  po Pressure offset; relative to z.
+         *  p Pressure point, used to calculate offset in pressure.
          */
-        void press(const wxPoint &p);
+        void press(const ict::Zone z, const wxPoint &p);
 
         /**
          * Release the simulated pressure.
@@ -98,10 +98,6 @@ class CropController {
          * Enable or disable the fix aspect ratio.
          */
         void fixRatio(bool op);
-
-        wxRect rectZone(ict::Zone) const;
-        wxRect relativeToCrop(ict::Zone) const;
-        ict::Zone getLocation(const wxPoint p) const;
 
         /**
          * Get the crop size in virtual canvas.
@@ -129,8 +125,6 @@ class CropController {
         bool constraint() const;
 
     private:
-        void updateSizes();
-
         /**
          * Move the crop rectangle such that it fits in the constraint.
          */
@@ -180,10 +174,17 @@ class CropController {
          */
         void setRatio(float r);
 
+        /**
+         * Update zones based in crop rectangle.
+         */
+        void updateZones();
+
+        /**
+         * Get offset from p to respective zone.
+         */
         wxPoint relativeToZone(const wxPoint &p, ict::Zone z);
 
         wxRect crop;
-        wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
         float ratio;
         bool fix = false;
         float accumX = 0.0, accumY = 0.0;
@@ -192,6 +193,7 @@ class CropController {
         ict::Zone fixHint, pressZone;
 
         wxPoint relativePress;
+        wxRect viz, vnz, vsz, vez, vwz, vnez, vnwz, vsez, vswz;
 
 };
 
