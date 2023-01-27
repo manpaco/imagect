@@ -141,7 +141,8 @@ void MainFrame::bindMenuBar() {
 }
 
 void MainFrame::bindElements() {
-    canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
+    sView->
+        getCanvas()->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
     Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Bind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->
@@ -153,7 +154,8 @@ void MainFrame::bindElements() {
 }
 
 void MainFrame::unbindElements() {
-    canvas->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
+    sView->
+        getCanvas()->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
     Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Unbind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->
@@ -244,13 +246,12 @@ void MainFrame::openImage(const wxString &p) {
     try {
         sourceImg = new Magick::Image(p.ToStdString());
         compImg = new Magick::Image(*sourceImg);
-        canvas = new CanvasPanel(sView, ict::CANVAS, compImg);
+        sView->handle(compImg);
         wxBitmap newBmp(createImage(*compImg));
-        bindElements();
         preview->updatePreview(newBmp);
-        sView->handle(canvas);
+        bindElements();
         tools->clear(true);
-        tools->cropSize(canvas->cropSize());
+        tools->cropSize(sView->getCanvas()->cropSize());
         currentState = tools->currentOpts();
         mEdit->Enable(wxID_APPLY, true);
         openedImg = true;
@@ -294,19 +295,19 @@ void MainFrame::clear() {
 }
 
 void MainFrame::onFixRatio(wxCommandEvent &event) {
-    canvas->fixCrop(event.IsChecked());
+    sView->getCanvas()->fixCrop(event.IsChecked());
     event.Skip();
 }
 
 void MainFrame::onAllowGrow(wxCommandEvent &event) {
-    if(canvas->allowGrow(event.IsChecked())) 
-        tools->cropGeometry(canvas->cropGeometry());
+    if(sView->getCanvas()->allowGrow(event.IsChecked())) 
+        tools->cropGeometry(sView->getCanvas()->cropGeometry());
     event.Skip();
 }
 
 void MainFrame::resetCrop(wxCommandEvent &event) {
     wxRect rst(wxPoint(0, 0), wxSize(-1, -1));
-    canvas->cropGeometry(&rst);
+    sView->getCanvas()->cropGeometry(&rst);
     tools->cropGeometry(rst);
 }
 
@@ -318,7 +319,7 @@ void MainFrame::undo(wxCommandEvent &event) {
     if(undoStack.empty()) mEdit->Enable(wxID_UNDO, false);
     tools->setOpts(currentState);
     wxRect upd(currentState.cropOff, currentState.cropSize);
-    canvas->cropGeometry(&upd);
+    sView->getCanvas()->cropGeometry(&upd);
     composePreview();
     exportedImg = false;
 }
@@ -331,7 +332,7 @@ void MainFrame::redo(wxCommandEvent &event) {
     if(redoStack.empty()) mEdit->Enable(wxID_REDO, false);
     tools->setOpts(currentState);
     wxRect upd(currentState.cropOff, currentState.cropSize);
-    canvas->cropGeometry(&upd);
+    sView->getCanvas()->cropGeometry(&upd);
     composePreview();
     exportedImg = false;
 }
@@ -354,9 +355,11 @@ void MainFrame::onCropChange(CropEvent &event) {
 void MainFrame::composePreview() {
     OptionsContainer aux(currentState);
     aux.cropSize =
-        canvas->translateSize(aux.cropSize, ict::COMPRESS_T, ict::IN_D);
+        sView->getCanvas()->
+            translateSize(aux.cropSize, ict::COMPRESS_T, ict::IN_D);
     aux.cropOff =
-        canvas->translatePoint(aux.cropOff, ict::COMPRESS_T, ict::IN_D);
+        sView->getCanvas()->
+            translatePoint(aux.cropOff, ict::COMPRESS_T, ict::IN_D);
     Magick::Image newImg = composeState(*compImg, aux);
     wxBitmap newPreview(createImage(newImg));
     preview->updatePreview(newPreview);
@@ -367,7 +370,7 @@ void MainFrame::saveState(wxCommandEvent &event) {
     OptionsContainer toSave = tools->currentOpts();
     if(toSave.cropSize != currentState.cropSize) {
         wxSize ts(toSave.cropSize); 
-        if(!canvas->cropSize(&ts)) {
+        if(!sView->getCanvas()->cropSize(&ts)) {
             tools->cropSize(ts);
             toSave.cropSize = ts;
         }

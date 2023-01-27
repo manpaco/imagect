@@ -1,7 +1,6 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
-class CanvasPanel;
 class ToolsPanel;
 class PreviewPanel;
 class CropEvent;
@@ -57,7 +56,6 @@ class MainFrame: public wxFrame {
         void resetCrop(wxCommandEvent &event);
         void onZoomChange(ZoomEvent &event);
 
-        CanvasPanel *canvas = nullptr;
         ScrolledView *sView = nullptr;
         ToolsPanel *tools = nullptr;
         wxSplitterWindow *mainSplitter = nullptr;
