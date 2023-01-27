@@ -215,16 +215,18 @@ void ToolsPanel::createAspectBlock() {
         new UnfocusedCheckBox(winAspect, ict::FIX_RATIO_CB, "Fix ratio");
 
     wxBoxSizer *widthSizer = new wxBoxSizer(wxHORIZONTAL);
-    widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Width:"), 0,
-                                     wxALIGN_CENTER_VERTICAL);
+    widthSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Width:"),
+                    0,
+                    wxALIGN_CENTER_VERTICAL);
     widthSizer->AddSpacer(ict::BEST_SPACE);
     widthSizer->Add(widthCtrl); widthSizer->AddSpacer(ict::BEST_SPACE);
     widthSizer->
         Add(new wxStaticText(winAspect, wxID_ANY, "px"), 0, wxALIGN_CENTER);
 
     wxBoxSizer *heightSizer = new wxBoxSizer(wxHORIZONTAL);
-    heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Height:"), 0,
-                                      wxALIGN_CENTER_VERTICAL);
+    heightSizer->Add(new wxStaticText(winAspect, wxID_ANY, "Height:"),
+                     0,
+                     wxALIGN_CENTER_VERTICAL);
     heightSizer->AddSpacer(ict::BEST_SPACE);
     heightSizer->Add(heightCtrl);
     heightSizer->AddSpacer(ict::BEST_SPACE);
