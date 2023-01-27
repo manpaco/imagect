@@ -27,7 +27,8 @@ void CropController::updateZones() {
     vwz = wxRect(x1, y1, ict::CORNER, viz.GetHeight());
     vnez = wxRect(x2 - ict::CORNER, y1, ict::CORNER, ict::CORNER);
     vnwz = wxRect(x1, y1, ict::CORNER, ict::CORNER);
-    vsez = wxRect(x2 - ict::CORNER, y2 - ict::CORNER, ict::CORNER, ict::CORNER);
+    vsez = wxRect(x2 - ict::CORNER, y2 - ict::CORNER, ict::CORNER,
+                  ict::CORNER);
     vswz = wxRect(x1, y2 - ict::CORNER, ict::CORNER, ict::CORNER);
 }
 
