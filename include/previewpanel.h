@@ -28,14 +28,12 @@ class PreviewPanel: public wxPanel {
         void setBindings();
         void initParams();
         void updateElements(wxBitmap &bm);
-        void tryToAttachImg();
 
         wxBoxSizer *sz = nullptr;
         wxGridSizer *imgSz = nullptr;
         ImageWindow *preview = nullptr;
         wxStaticText *title = nullptr;
 
-        bool attachedImg = false;
 };
 
 #endif // PREVIEWPANEL_H

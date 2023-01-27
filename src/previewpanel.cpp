@@ -28,7 +28,6 @@ void PreviewPanel::createSizer() {
 void PreviewPanel::clear() {
     if(preview) {
         imgSz->Detach(preview);
-        attachedImg = false;
         preview->Destroy();
         preview = nullptr;
     }
@@ -42,15 +41,9 @@ void PreviewPanel::updateElements(wxBitmap &bm) {
     if(!bm.IsOk()) return;
     if(!preview) {
         preview = new ImageWindow(this, wxID_ANY, bm);
+        imgSz->Add(preview, 0, wxALIGN_CENTER);
     } else preview->updateImage(bm);
-    tryToAttachImg();
     Layout();
-}
-
-void PreviewPanel::tryToAttachImg() {
-    if(attachedImg) return;
-    imgSz->Add(preview, 0, wxALIGN_CENTER);
-    attachedImg = true;
 }
 
 void PreviewPanel::updatePreview(wxBitmap &bm) {
