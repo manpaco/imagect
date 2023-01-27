@@ -194,11 +194,13 @@ void CropController::pushToConstraint() {
     int cx1 = cons.GetX(), cx2 = cons.GetX() + cons.GetWidth();
     int nx1 = crop.GetX(), nx2 = crop.GetX() + crop.GetWidth();
     if(nx1 < cx1) crop.SetPosition(wxPoint(cx1, crop.GetY()));
-    if(nx2 > cx2) crop.SetPosition(wxPoint(cx2 - crop.GetWidth(), crop.GetY()));
+    if(nx2 > cx2)
+        crop.SetPosition(wxPoint(cx2 - crop.GetWidth(), crop.GetY()));
     int cy1 = cons.GetY(), cy2 = cons.GetY() + cons.GetHeight();
     int ny1 = crop.GetY(), ny2 = crop.GetY() + crop.GetHeight();
     if(ny1 < cy1) crop.SetPosition(wxPoint(crop.GetX(), cy1));
-    if(ny2 > cy2) crop.SetPosition(wxPoint(crop.GetX(), cy2 - crop.GetHeight()));
+    if(ny2 > cy2)
+        crop.SetPosition(wxPoint(crop.GetX(), cy2 - crop.GetHeight()));
 }
 
 void CropController::fitInConstraint() {
@@ -208,9 +210,11 @@ void CropController::fitInConstraint() {
         return;
     }
     bool exceedsTopY = crop.GetY() < cons.GetY();
-    bool exceedsBottomY = (crop.GetY() + crop.GetHeight()) > (cons.GetY() + cons.GetHeight());
+    bool exceedsBottomY =
+        (crop.GetY() + crop.GetHeight()) > (cons.GetY() + cons.GetHeight());
     bool exceedsLeftX = crop.GetX() < cons.GetX();
-    bool exceedsRightX = (crop.GetX() + crop.GetWidth()) > (cons.GetX() + cons.GetWidth());
+    bool exceedsRightX =
+        (crop.GetX() + crop.GetWidth()) > (cons.GetX() + cons.GetWidth());
     wxRect aux(crop);
     aux.Intersect(cons);
     int newWidth, newHeight;
@@ -219,7 +223,9 @@ void CropController::fitInConstraint() {
             newWidth = aux.GetWidth();
             accumulateY(newHeight, newWidth);
             crop.SetSize(wxSize(newWidth, newHeight));
-            exceedsBottomY = (crop.GetY() + crop.GetHeight()) > (cons.GetY() + cons.GetHeight());
+            exceedsBottomY =
+                (crop.GetY() + crop.GetHeight()) >
+                (cons.GetY() + cons.GetHeight());
         }
         if(exceedsBottomY) {
             newHeight = aux.GetHeight();
@@ -232,12 +238,15 @@ void CropController::fitInConstraint() {
             accumulateY(newHeight, newWidth);
             crop.SetSize(wxSize(newWidth, newHeight));
             crop.SetPosition(wxPoint(cons.GetX(), crop.GetY()));
-            exceedsBottomY = (crop.GetY() + crop.GetHeight()) > (cons.GetY() + cons.GetHeight());
+            exceedsBottomY =
+                (crop.GetY() + crop.GetHeight()) >
+                (cons.GetY() + cons.GetHeight());
         }
         if(exceedsBottomY) {
             newHeight = aux.GetHeight();
             accumulateX(newWidth, newHeight);
-            wxPoint newPos(crop.GetX() + crop.GetWidth() - newWidth, crop.GetY());
+            wxPoint newPos(crop.GetX() + crop.GetWidth() - newWidth,
+                           crop.GetY());
             crop.SetSize(wxSize(newWidth, newHeight));
             crop.SetPosition(newPos);
         }
@@ -245,7 +254,8 @@ void CropController::fitInConstraint() {
         if(exceedsRightX) {
             newWidth = aux.GetWidth();
             accumulateY(newHeight, newWidth);
-            wxPoint newPos(crop.GetX(), crop.GetY() + crop.GetHeight() - newHeight);
+            wxPoint newPos(crop.GetX(),
+                           crop.GetY() + crop.GetHeight() - newHeight);
             crop.SetSize(wxSize(newWidth, newHeight));
             crop.SetPosition(newPos);
             exceedsTopY = crop.GetY() < cons.GetY();
@@ -260,7 +270,8 @@ void CropController::fitInConstraint() {
         if(exceedsLeftX) {
             newWidth = aux.GetWidth();
             accumulateY(newHeight, newWidth);
-            wxPoint newPos(cons.GetX(), crop.GetY() + crop.GetHeight() - newHeight);
+            wxPoint newPos(cons.GetX(),
+                           crop.GetY() + crop.GetHeight() - newHeight);
             crop.SetSize(wxSize(newWidth, newHeight));
             crop.SetPosition(newPos);
             exceedsTopY = crop.GetY() < cons.GetY();
@@ -268,7 +279,8 @@ void CropController::fitInConstraint() {
         if(exceedsTopY) {
             newHeight = aux.GetHeight();
             accumulateX(newWidth, newHeight);
-            wxPoint newPos(crop.GetX() + crop.GetWidth() - newWidth, cons.GetY());
+            wxPoint newPos(crop.GetX() + crop.GetWidth() - newWidth,
+                           cons.GetY());
             crop.SetSize(wxSize(newWidth, newHeight));
             crop.SetPosition(newPos);
         }
@@ -311,7 +323,8 @@ bool CropController::cropSize(const wxSize &s) {
     return cropRect(wxRect(crop.GetPosition(),s));
 }
 
-bool CropController::cropRect(const wxRect &r, bool holdRatio, float initAx, float initAy) {
+bool CropController::
+cropRect(const wxRect &r, bool holdRatio, float initAx, float initAy) {
     wxRect next(r);
     wxRect prevRect = crop;
     fixHint = ict::SE;

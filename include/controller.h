@@ -41,7 +41,10 @@ class CropController {
         void move(const wxPoint &t);
         void resize(const wxPoint &t);
         wxPoint relativeToZone(const wxPoint &p, ict::Zone z);
-        bool cropRect(const wxRect &r, bool holdRatio, float initAx, float initAy);
+        bool cropRect(const wxRect &r,
+                      bool holdRatio,
+                      float initAx,
+                      float initAy);
 
         wxRect crop;
         wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
