@@ -33,10 +33,13 @@ using Magick::Quantum;
 extern const int bestSpace = 5;
 
 MainFrame::MainFrame(): 
-    wxFrame(NULL, wxID_ANY, "Image Cropping Tool", wxDefaultPosition, 
-            wxDefaultSize, wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | 
-            wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN | 
-            wxMAXIMIZE) {
+    wxFrame(NULL,
+            wxID_ANY,
+            "Image Cropping Tool",
+            wxDefaultPosition,
+            wxDefaultSize,
+            wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxSYSTEM_MENU |
+            wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN | wxMAXIMIZE) {
     createMenuBar();
     bindMenuBar();
     allocateMem();
@@ -56,12 +59,14 @@ MainFrame::~MainFrame() {
 }
 
 void MainFrame::initDimensions() {
-    minMainSplitterSize = wxSystemSettings::GetMetric(wxSYS_SCREEN_X) / mainSplitterFactor;
-    minSideSplitterSize = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) / sideSplitterFactor;
+    minMainSplitterSize =
+        wxSystemSettings::GetMetric(wxSYS_SCREEN_X) / mainSplitterFactor;
+    minSideSplitterSize =
+        wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) / sideSplitterFactor;
     mainSplitter->SetMinimumPaneSize(minMainSplitterSize);
     sideSplitter->SetMinimumPaneSize(minSideSplitterSize);
-    SetMinClientSize(wxSize(minMainSplitterSize * (mainSplitterFactor - 1), 
-                minSideSplitterSize * (sideSplitterFactor - 1)));
+    SetMinClientSize(wxSize(minMainSplitterSize * (mainSplitterFactor - 1),
+                            minSideSplitterSize * (sideSplitterFactor - 1)));
 }
 
 void MainFrame::allocateMem() {
@@ -139,8 +144,11 @@ void MainFrame::bindElements() {
     canvas->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
     Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Bind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
-    tools->Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
-    tools->Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
+    tools->
+        Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
+    tools->
+        Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this,
+             ict::GROW_CHECK_CB);
     zoom->Bind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
@@ -148,13 +156,19 @@ void MainFrame::unbindElements() {
     canvas->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
     Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Unbind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
-    tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
-    tools->Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this, ict::GROW_CHECK_CB);
-    zoom->Unbind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
+    tools->
+        Unbind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this,
+               ict::FIX_RATIO_CB);
+    tools->
+        Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this,
+               ict::GROW_CHECK_CB);
+    zoom->
+        Unbind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
 void MainFrame::onAbout(wxCommandEvent &event) {
-    wxMessageBox(_("Image Cropping Tool\rby manpaco"), _("About"), wxOK | wxICON_INFORMATION);
+    wxMessageBox(_("Image Cropping Tool\rby manpaco"), _("About"),
+                 wxOK | wxICON_INFORMATION);
 }
 
 void MainFrame::onClose(wxCommandEvent &event) {
@@ -204,13 +218,13 @@ void MainFrame::onQuitFrame(wxCloseEvent &event) {
 }
 
 int MainFrame::showCloseMessage() {
-    return wxMessageBox(_("There is an image in the workspace! Close anyway?"), 
-            _("Please confirm"), wxYES_NO, this);
+    return wxMessageBox(_("There is an image in the workspace! Close anyway?"),
+                        _("Please confirm"), wxYES_NO, this);
 }
 
 int MainFrame::showProceedMessage() {
-    return wxMessageBox(_("Current content has not been exported! Proceed?"), 
-            _("Please confirm"), wxICON_QUESTION | wxYES_NO, this);
+    return wxMessageBox(_("Current content has not been exported! Proceed?"),
+                        _("Please confirm"), wxICON_QUESTION | wxYES_NO, this);
 }
 
 void MainFrame::exportImage(const wxString &p) {
@@ -339,8 +353,10 @@ void MainFrame::onCropChange(CropEvent &event) {
 
 void MainFrame::composePreview() {
     OptionsContainer aux(currentState);
-    aux.cropSize = canvas->translateSize(aux.cropSize, ict::COMPRESS_T, ict::IN_D);
-    aux.cropOff = canvas->translatePoint(aux.cropOff, ict::COMPRESS_T, ict::IN_D);
+    aux.cropSize =
+        canvas->translateSize(aux.cropSize, ict::COMPRESS_T, ict::IN_D);
+    aux.cropOff =
+        canvas->translatePoint(aux.cropOff, ict::COMPRESS_T, ict::IN_D);
     Magick::Image newImg = composeState(*compImg, aux);
     wxBitmap newPreview(createImage(newImg));
     preview->updatePreview(newPreview);
