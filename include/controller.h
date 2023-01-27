@@ -7,44 +7,180 @@ class wxPoint;
 #include "wx/gdicmn.h"
 #include "defs.h"
 
+/**
+ * Implementation of a crop controller.
+ * 
+ * Manages the position and size of crop rectangle in a virtual space. This
+ * contains simulated and direct modification functions.
+ * Simulated: allows to simulate user inputs (press, release, move and resize).
+ * Direct: allows to modify directly the crop rectangle (change size and pos.). 
+ * Fix aspect ratio and constraint area are supported.
+ */
 class CropController {
     public:
+        /**
+         * Ctor.
+         */
         CropController();
+
+        /**
+         * Create a controller with initial crop rectangle. The constraint will
+         * be the same as the initial rectangle.
+         */
         CropController(const wxRect &c);
+
+        /**
+         * Dtor.
+         */
         ~CropController();
         
+        /**
+         * Change the crop size to given one. The constraint is used if its
+         * active.
+         *
+         * @return
+         *  true if crop size changes, else false.
+         */
         bool cropSize(const wxSize &s);
+
+        /**
+         * Change the crop rectangle to given one. The constraint is used if
+         * its active.
+         *
+         * @return
+         *  true if crop rectangle changes, else false.
+         */
         bool cropRect(const wxRect &r);
-        bool constraint(bool);
+
+        /**
+         * Enable or disable the constraint area.
+         *
+         * @return
+         *  true if crop rectangle changes after enable constraint, else false.
+         */
+        bool constraint(bool op);
+
+        /**
+         * Set the constraint. This is used to delimit the area where the crop
+         * rectangle can exist.
+         *
+         * @params
+         *  cons Delimited area.
+         */
         void constraint(wxRect &cons);
+
+        /**
+         * Modify the the crop rectangle. If inner zone is pressed the
+         * rectangle is moved. Otherwise, the rectangle is resized.
+         *
+         * @params
+         *  target Point used to move or resize.
+         * @return
+         *  true if crop rectangle changes, else false.
+         */
         bool modify(const wxPoint &target);
+
+        /**
+         * Simulate pressure at a given zone.
+         *
+         * @params
+         *  z Zone to press.
+         *  po Pressure offset; relative to z.
+         */
         void press(const wxPoint &p);
+
+        /**
+         * Release the simulated pressure.
+         */
         void release();
+
+        /**
+         * Enable or disable the fix aspect ratio.
+         */
         void fixRatio(bool op);
-        void setRatio(float r);
 
         wxRect rectZone(ict::Zone) const;
         wxRect relativeToCrop(ict::Zone) const;
-        wxSize cropSize() const;
-        wxPoint cropPosition() const;
-        wxRect cropRect() const;
         ict::Zone getLocation(const wxPoint p) const;
+
+        /**
+         * Get the crop size in virtual canvas.
+         */
+        wxSize cropSize() const;
+
+        /**
+         * Get the crop position in virtual canvas.
+         */
+        wxPoint cropPosition() const;
+
+        /**
+         * Get the crop rectangle in virtual canvas.
+         */
+        wxRect cropRect() const;
+
+        /**
+         * Get the zone pressed.
+         */
         ict::Zone zonePressed() const;
+
+        /**
+         * Ask if the constraint is active.
+         */
         bool constraint() const;
 
     private:
         void updateSizes();
+
+        /**
+         * Move the crop rectangle such that it fits in the constraint.
+         */
         void pushToConstraint();
+
+        /**
+         * Fit the crop rectangle in the constraint holding the position. That
+         * means the size is modified.
+         */
         void fitInConstraint();
+
+        /**
+         * Use delta in y axis to calculate delta in x axis. Here the ratio is
+         * considered
+         */
         void accumulateX(int &dxToCalc, int &dyToUse);
+
+        /**
+         * Use delta in x axis to calculate delta in y axis. Here the ratio is
+         * considered
+         */
         void accumulateY(int &dyToCalc, int &dxToUse);
+
+        /**
+         * Move to target point. Relative pressure is considered.
+         */
         void move(const wxPoint &t);
+
+        /**
+         * Resize to target point. Relative pressure and edge zones are
+         * considered.
+         */
         void resize(const wxPoint &t);
-        wxPoint relativeToZone(const wxPoint &p, ict::Zone z);
+
+        /**
+         * Internal function that allows to change the crop rectangle and hold
+         * the ratio. It also allows to set new accumulators.
+         */
         bool cropRect(const wxRect &r,
                       bool holdRatio,
                       float initAx,
                       float initAy);
+
+        /**
+         * Set the ratio used by the accumulators to calculate deltas. This
+         * does not modify the crop rectangle.
+         */
+        void setRatio(float r);
+
+        wxPoint relativeToZone(const wxPoint &p, ict::Zone z);
 
         wxRect crop;
         wxRect iz, nz, sz, ez, wz, nez, nwz, sez, swz;
