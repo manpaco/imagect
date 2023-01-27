@@ -7,7 +7,9 @@ class wxTextCtrl;
 #include "wx/control.h"
 #include "defs.h"
 
-static const ict::ZoomArray zValues = {0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0};
+static const ict::ZoomArray zValues = {
+    0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0
+};
 
 class ZoomCtrl : public wxControl {
     public:
