@@ -18,12 +18,16 @@ void overlap(const Magick::Image &overlay, Magick::Image &background, bool fit,
     Magick::Geometry geoOver(overlay.columns(), overlay.rows());
     if(fit && (geoOver != geoBack)) {
         float fitFactor = factorToGrowFit(geoOver, geoBack);
-        Magick::Geometry newGeo(background.columns() * fitFactor, background.rows() * fitFactor);
+        Magick::Geometry newGeo(background.columns() * fitFactor,
+                                background.rows() * fitFactor);
         background.zoom(newGeo);
         if(crop) {
             int xco = (background.columns() - overlay.columns()) / 2;
             int yco = (background.rows() - overlay.rows()) / 2;
-            background.crop(Magick::Geometry(overlay.columns(), overlay.rows(), xco, yco));
+            background.crop(Magick::Geometry(overlay.columns(),
+                                             overlay.rows(),
+                                             xco,
+                                             yco));
         }
     }
     background.composite(overlay, Magick::CenterGravity, 
@@ -33,18 +37,21 @@ void overlap(const Magick::Image &overlay, Magick::Image &background, bool fit,
 float factorToFit(Magick::Geometry &area, Magick::Geometry &toFit) {
     float areaRatio = (float)area.width() / (float)area.height();
     float toFitRatio = (float)toFit.width() / (float)toFit.height();
-    if(areaRatio > toFitRatio) return (float)area.height() / (float)toFit.height();
+    if(areaRatio > toFitRatio)
+        return (float)area.height() / (float)toFit.height();
     else return (float)area.width() / (float)toFit.width();
 }
 
 float factorToGrowFit(Magick::Geometry &area, Magick::Geometry &toFit) {
     float areaRatio = (float)area.width() / (float)area.height();
     float toFitRatio = (float)toFit.width() / (float)toFit.height();
-    if(areaRatio > toFitRatio) return (float)area.width() / (float)toFit.width();
+    if(areaRatio > toFitRatio)
+        return (float)area.width() / (float)toFit.width();
     else return (float)area.height() / (float)toFit.height();
 }
 
-Magick::Image extractArea(const Magick::Geometry &area, const Magick::Image &target) {
+Magick::Image
+extractArea(const Magick::Geometry &area, const Magick::Image &target) {
     Magick::Image extracted(area, Magick::Color(0, 0, 0, QuantumRange));
     Magick::Image tCopy(target);
     if(emptyIntersection(area, tCopy)) return extracted;
@@ -60,7 +67,8 @@ Magick::Image extractArea(const Magick::Geometry &area, const Magick::Image &tar
     return extracted;
 }
 
-bool emptyIntersection(const Magick::Geometry &area, const Magick::Image &image) {
+bool
+emptyIntersection(const Magick::Geometry &area, const Magick::Image &image) {
     bool mtX = false, mtY = false;
     mtX = area.xOff() >= image.columns();
     if(area.xOff() < 0) mtX = abs(area.xOff()) >= area.width();
@@ -80,7 +88,9 @@ bool contains(const Magick::Geometry &area, const Magick::Image &image) {
     return false;
 }
 
-unsigned char * extractDepth8Channel(const Magick::Image &img, ict::Channel ch, bool opaqueAtHigh) {
+unsigned char * extractDepth8Channel(const Magick::Image &img,
+                                     ict::Channel ch,
+                                     bool opaqueAtHigh) {
     Magick::Image iCopy(img);
     iCopy.modifyImage();
     Magick::Pixels cache(iCopy);
@@ -152,7 +162,9 @@ unsigned char toDepth8(const unsigned short value) {
 
 bool tryOpen(const wxString &imgFile, const wxString &msgTitle) {
     try {
-        if(imgFile.IsEmpty()) throw std::invalid_argument("No image selected! Please, select a valid one to continue...");
+        if(imgFile.IsEmpty()) 
+            throw std::invalid_argument
+            ("No image selected! Please, select a valid one to continue...");
         Magick::Image test(imgFile.ToStdString());
     }
     catch(Magick::Exception &e) {
@@ -166,7 +178,8 @@ bool tryOpen(const wxString &imgFile, const wxString &msgTitle) {
     return true;
 }
 
-Magick::Image composeState(const Magick::Image &img, const OptionsContainer &s) {
+Magick::Image
+composeState(const Magick::Image &img, const OptionsContainer &s) {
     int w = s.cropSize.GetWidth();
     int h = s.cropSize.GetHeight();
     int xo = s.cropOff.x;
@@ -198,7 +211,8 @@ Magick::Image composeState(const Magick::Image &img, const OptionsContainer &s) 
                 unsigned char b = c.Blue();
 #endif
                 Magick::Color bc(r, g, b);
-                Magick::Image back(Magick::Geometry(comp.columns(), comp.rows()), bc);
+                Magick::Image 
+                    back(Magick::Geometry(comp.columns(), comp.rows()), bc);
                 overlap(comp, back);
                 return back;
                 break;
@@ -209,7 +223,8 @@ Magick::Image composeState(const Magick::Image &img, const OptionsContainer &s) 
 }
 
 wxImage createImage(const Magick::Image &img) {
-    return wxImage(img.columns(), img.rows(), 
-            extractDepth8Channel(img, ict::RGB), extractDepth8Channel(img, ict::ALPHA));
+    return wxImage(img.columns(), img.rows(),
+                   extractDepth8Channel(img, ict::RGB),
+                   extractDepth8Channel(img, ict::ALPHA));
 }
 
