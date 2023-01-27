@@ -1,10 +1,6 @@
 #include "imagewindow.h"
-
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
+#include "wx/bitmap.h"
+#include "wx/dcclient.h"
 
 ImageWindow::ImageWindow(wxWindow *parent,
                          wxWindowID id,

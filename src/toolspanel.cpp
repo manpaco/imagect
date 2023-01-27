@@ -3,12 +3,10 @@
 #include "defs.h"
 #include "filext.h"
 #include "imgtools.h"
-
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
+#include "wx/textctrl.h"
+#include "wx/choice.h"
+#include "wx/slider.h"
+#include "wx/stattext.h"
 
 #if wxUSE_COLOURPICKERCTRL
     #include <wx/clrpicker.h>

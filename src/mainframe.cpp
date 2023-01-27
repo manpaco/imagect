@@ -9,16 +9,16 @@
 #include "imgtools.h"
 #include "filext.h"
 #include "exportdlg.h"
-#include <Magick++.h>
+#include <Magick++/Image.h>
 #include "scrolview.h"
 #include "zoomctrl.h"
 #include "zoomevent.h"
-
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
+#include "wx/settings.h"
+#include "wx/button.h"
+#include "wx/sizer.h"
+#include "wx/menu.h"
+#include "wx/msgdlg.h"
+#include <iostream>
 
 #if wxUSE_STATLINE
     #include <wx/statline.h>

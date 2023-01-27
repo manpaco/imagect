@@ -2,16 +2,11 @@
 #define PREVIEWPANEL_H
 
 class ImageWindow;
+class wxStaticText;
+class wxBoxSizer;
+class wxGridSizer;
 
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
-
-#if wxUSE_STATLINE
-    #include <wx/statline.h>
-#endif
+#include "wx/panel.h"
 
 class PreviewPanel: public wxPanel {
 

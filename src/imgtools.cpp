@@ -3,12 +3,9 @@
 #include <cstdlib>
 #include <Magick++.h>
 #include "optscontainer.h"
-
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
+#include "wx/image.h"
+#include <wx/msgdlg.h>
+#include <iostream>
 
 using Magick::Quantum;
 

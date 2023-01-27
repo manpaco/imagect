@@ -6,12 +6,6 @@
 #include <Magick++.h>
 #include "imgtools.h"
 
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
-
 CanvasPanel::CanvasPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
 }

@@ -1,12 +1,7 @@
 #ifndef EXPORTDLG_H
 #define EXPORTDLG_H
 
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
-
+#include "wx/filedlg.h"
 #include "defs.h"
 
 class ExportDialog: public wxFileDialog {

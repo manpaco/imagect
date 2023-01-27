@@ -1,6 +1,12 @@
 #include "previewpanel.h"
 #include "defs.h"
 #include "imagewindow.h"
+#include "wx/sizer.h"
+#include "wx/stattext.h"
+
+#if wxUSE_STATLINE
+    #include <wx/statline.h>
+#endif
 
 PreviewPanel::PreviewPanel(wxWindow *parent, wxWindowID id) {
     Create(parent, id);
