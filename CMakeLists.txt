@@ -11,7 +11,6 @@ list(APPEND SRC_FILES
     "toolspanel.cpp"
     "canvaspanel.cpp"
     "imgtools.cpp"
-    "rectangle.cpp"
     "cropevent.cpp"
     "imagewindow.cpp"
     "filext.cpp"
