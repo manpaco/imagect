@@ -30,8 +30,6 @@
 
 using Magick::Quantum;
 
-extern const int bestSpace = 5;
-
 MainFrame::MainFrame(): 
     wxFrame(NULL,
             wxID_ANY,
@@ -113,16 +111,16 @@ void MainFrame::overlayPanels() {
     sideSplitter->SplitHorizontally(preview, tools);
     mainSplitter->SplitVertically(sideSplitter, sView);
     wxBoxSizer *buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
-    buttonsSizer->AddSpacer(bestSpace);
+    buttonsSizer->AddSpacer(ict::BEST_SPACE);
     buttonsSizer->Add(apply);
-    buttonsSizer->AddSpacer(bestSpace);
+    buttonsSizer->AddSpacer(ict::BEST_SPACE);
     buttonsSizer->Add(reset);
     buttonsSizer->AddStretchSpacer();
     buttonsSizer->Add(zoom);
-    buttonsSizer->AddSpacer(bestSpace);
-    mainSizer->AddSpacer(bestSpace);
+    buttonsSizer->AddSpacer(ict::BEST_SPACE);
+    mainSizer->AddSpacer(ict::BEST_SPACE);
     mainSizer->Add(buttonsSizer, 0, wxEXPAND);
-    mainSizer->AddSpacer(bestSpace);
+    mainSizer->AddSpacer(ict::BEST_SPACE);
     wxStaticLine *hLine = new wxStaticLine(this);
     mainSizer->Add(hLine, 0, wxEXPAND);
     mainSizer->Add(mainSplitter, 1, wxEXPAND);
