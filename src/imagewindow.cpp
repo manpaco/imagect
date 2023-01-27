@@ -6,13 +6,20 @@
     #include <wx/wx.h>
 #endif
 
-ImageWindow::ImageWindow(wxWindow *parent, wxWindowID id, wxBitmap &bm, const wxPoint &pos, const wxSize &size) {
+ImageWindow::ImageWindow(wxWindow *parent,
+                         wxWindowID id,
+                         wxBitmap &bm,
+                         const wxPoint &pos,
+                         const wxSize &size) {
     Create(parent, id, pos, size);
     updateImage(bm);
     setBindings();
 }
 
-ImageWindow::ImageWindow(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wxSize &size) {
+ImageWindow::ImageWindow(wxWindow *parent,
+                         wxWindowID id,
+                         const wxPoint &pos,
+                         const wxSize &size) {
     Create(parent, id, pos, size);
     setBindings();
 }
