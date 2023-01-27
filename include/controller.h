@@ -33,13 +33,12 @@ class CropController {
         bool constraint() const;
 
     private:
-        void cropPosition(const wxPoint &p);
         void updateSizes();
         void pushToConstraint();
         void fitInConstraint();
         void accumulateX(int &dxToCalc, int &dyToUse);
         void accumulateY(int &dyToCalc, int &dxToUse);
-        void move(int dx, int dy);
+        void move(const wxPoint &t);
         void resize(const wxPoint &t);
         wxPoint relativeToZone(const wxPoint &p, ict::Zone z);
         bool cropRect(const wxRect &r, bool holdRatio, float initAx, float initAy);

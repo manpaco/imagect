@@ -77,8 +77,7 @@ bool CropController::modify(const wxPoint &target) {
     if(!zonePressed()) return false;
     wxRect prevCrop(crop);
     if(zonePressed() == ict::INNER) {
-        wxPoint newPos(target - relativePress);
-        cropPosition(newPos);
+        move(target);
     } else {
         resize(target);
     }
@@ -86,6 +85,13 @@ bool CropController::modify(const wxPoint &target) {
         updateSizes();
         return true;
     } else return false;
+}
+
+void CropController::move(const wxPoint &t) {
+    wxPoint newPos(t - relativePress);
+    if(newPos == crop.GetPosition()) return;
+    crop.SetPosition(newPos);
+    pushToConstraint();
 }
 
 void CropController::resize(const wxPoint &target) {
@@ -303,12 +309,6 @@ void CropController::setRatio(float r) {
 bool CropController::cropSize(const wxSize &s) {
     if(s == crop.GetSize()) return false;
     return cropRect(wxRect(crop.GetPosition(),s));
-}
-
-void CropController::cropPosition(const wxPoint &p) {
-    if(p == crop.GetPosition()) return;
-    crop.SetPosition(p);
-    pushToConstraint();
 }
 
 bool CropController::cropRect(const wxRect &r, bool holdRatio, float initAx, float initAy) {
