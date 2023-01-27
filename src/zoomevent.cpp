@@ -2,7 +2,9 @@
 
 wxDEFINE_EVENT(EVT_ZOOM_CHANGE, ZoomEvent);
 
-ZoomEvent::ZoomEvent(wxEventType eventType, int winId, float sf) : wxEvent(winId, eventType), scaleFactor(sf) {
+ZoomEvent::
+ZoomEvent(wxEventType eventType, int winId, float sf) :
+    wxEvent(winId, eventType), scaleFactor(sf) {
 
 }
 
