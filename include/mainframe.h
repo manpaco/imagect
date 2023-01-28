@@ -18,43 +18,84 @@ class ZoomEvent;
 #include "optscontainer.h"
 #include <stack>
 
+/**
+ * Implementation of a main frame.
+ *
+ * Panels, buttons, controls and event handlers are used to offer an intuitive
+ * main window.
+ */
 class MainFrame: public wxFrame {
     
     public:
+        /**
+         * Default Ctor.
+         */
         MainFrame();
+
+        /**
+         * Construct a main frame to handle a given image file.
+         */
         MainFrame(const wxString &initImg);
+
+        /**
+         * Dtor.
+         */
         ~MainFrame();
 
     private:
+        // ------------------------ EVENT HANDLERS ----------------------------
+        void saveState(wxCommandEvent &);
+        void redo(wxCommandEvent &);
+        void undo(wxCommandEvent &);
+        void onFixRatio(wxCommandEvent &);
+        void onAllowGrow(wxCommandEvent &event);
+        void onClose(wxCommandEvent &event);
+        void onOpen(wxCommandEvent &event);
+        void onExport(wxCommandEvent &event);
+        void onQuit(wxCommandEvent &event);
+        void onQuitFrame(wxCloseEvent &event);
+        void onAbout(wxCommandEvent &event);
+        void resetCrop(wxCommandEvent &event);
+        void onZoomChange(ZoomEvent &event);
+        void onCropChange(CropEvent &);
+        // ---------------------- END EVENT HANDLERS --------------------------
+
         void initParams();
         void allocateMem();
         void bindMenuBar();
         void bindElements();
         void unbindElements();
         void overlayPanels();
-        void saveState(wxCommandEvent &);
-        void composePreview();
-        void onCropChange(CropEvent &);
-        void updateHistory(OptionsContainer toSave);
-        void redo(wxCommandEvent &);
-        void undo(wxCommandEvent &);
-        void onFixRatio(wxCommandEvent &);
-        void onAllowGrow(wxCommandEvent &event);
         void createMenuBar();
-        void onClose(wxCommandEvent &event);
-        void onOpen(wxCommandEvent &event);
-        void onExport(wxCommandEvent &event);
-        void onQuit(wxCommandEvent &event);
-        void exportImage(const wxString &p);
-        void openImage(const wxString &p);
         void clear();
-        void onQuitFrame(wxCloseEvent &event);
+
+        /**
+         * Compose current state on the compressed image.
+         */
+        void composePreview();
+
+        /**
+         * Save the given container as current state and update stack.
+         */
+        void updateHistory(OptionsContainer toSave);
+
+        /**
+         * Show export dialog.
+         */
+        void exportImage(const wxString &p);
+
+        /**
+         * Show open dialog.
+         */
+        void openImage(const wxString &p);
+
+        /**
+         * Initialize frame dimensions based on the screen resolution.
+         */
+        void initDimensions();
+
         int showProceedMessage();
         int showCloseMessage();
-        void onAbout(wxCommandEvent &event);
-        void initDimensions();
-        void resetCrop(wxCommandEvent &event);
-        void onZoomChange(ZoomEvent &event);
 
         ScrolledView *sView = nullptr;
         ToolsPanel *tools = nullptr;
