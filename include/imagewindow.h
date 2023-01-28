@@ -3,6 +3,11 @@
 
 #include "wx/window.h"
 
+/**
+ * Implementation of a image container.
+ *
+ * This allow to manage the image with sizers.
+ */
 class ImageWindow: public wxWindow {
     public:
         ImageWindow(wxWindow *parent,
@@ -14,7 +19,15 @@ class ImageWindow: public wxWindow {
                     wxWindowID id,
                     const wxPoint &pos=wxDefaultPosition,
                     const wxSize &size=wxDefaultSize);
+
+        /**
+         * Update contained image.
+         */
         void updateImage(wxBitmap &bm);
+
+        /**
+         * Ask if accepts focus.
+         */
         bool AcceptsFocus() const;
         ~ImageWindow();
 
