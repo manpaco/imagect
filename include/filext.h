@@ -18,6 +18,11 @@ const std::string importWc = "Image files (*" +
         jpgExt + ";*" +
         jpegExt;
 
+/**
+ * Return the extension present in the file name.
+ *
+ * @return file extension. If not idenified returns ict::NONE_EXT
+ */
 ict::Extension extension(const std::string &filename);
 
 #endif // FILEXT_H
