@@ -3,6 +3,11 @@
 
 #include "wx/event.h"
 
+/**
+ * Implementation of a zoom event
+ *
+ * Contains information about zoom value.
+ */
 class ZoomEvent : public wxEvent {
     public:
         ZoomEvent(wxEventType, int, float);

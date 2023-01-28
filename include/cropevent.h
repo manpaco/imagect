@@ -3,6 +3,11 @@
 
 #include "wx/event.h"
 
+/**
+ * Implementation of a crop event
+ *
+ * Constains information about crop geometry.
+ */
 class CropEvent : public wxEvent {
     public:
         CropEvent(wxEventType, int, const wxSize &, wxPoint &o);
