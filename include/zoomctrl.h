@@ -11,6 +11,12 @@ static const ict::ZoomArray zValues = {
     0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0
 };
 
+/**
+ * Implementation of a zoom control
+ *
+ * Manages the zoom changes sending events.
+ * Offers buttons and display box.
+ */
 class ZoomCtrl : public wxControl {
     public:
         ZoomCtrl(wxWindow *parent, wxWindowID id);
