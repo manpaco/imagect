@@ -21,25 +21,85 @@ class wxStaticText;
 #include "optscontainer.h"
 #include "defs.h"
 
+/**
+ * Implementation of a tools panel.
+ *
+ * Offer options for differents topics:
+ * Aspect: Visual aspect of the crop area.
+ * Shape: Border and crop shape.
+ * Growing: Background of the overflow and/or transparent area.
+ * Validation of option values.
+ */
 class ToolsPanel: public wxScrolledCanvas {
     public:
+        /**
+         * Ctor.
+         */
         ToolsPanel(wxWindow *parent, wxWindowID id);
+
+        /**
+         * Get the crop width.
+         */
         unsigned int widthCrop() const;
+
+        /**
+         * Get the crop height.
+         */
         unsigned int hegihtCrop() const;
+
         void widthCrop(unsigned int width);
         void heightCrop(unsigned int height);
         void cropSize(const wxSize &s);
         void cropGeometry(const wxRect &r);
+
+        /**
+         * Get the crop width and height contained in a wxSize.
+         */
         wxSize cropSize() const;
+
+        /**
+         * If invalid options are found, then change them to default or minimum
+         * values.
+         *
+         * @return true if the background image can be opened, else false.
+         */
         bool valid();
+
+        /**
+         * Set the stroke width to be drawn.
+         */
         void strokeWidth(unsigned int sw);
+
+        /**
+         * Get the current options in a container.
+         */
         OptionsContainer currentOpts() const;
+
+        /**
+         * Set all options with the given container.
+         */
         void setOpts(const OptionsContainer &oc);
+
+        /**
+         * Reset the options to default values.
+         * Events are emited.
+         *
+         * @param enableOp Enable or disable the panel.
+         */
         void clear(bool enableOp);
+
+        /**
+         * Collapse all blocks.
+         */
         void collapseBlocks();
+
+        /**
+         * Dtor.
+         */
         ~ToolsPanel();
 
     private:
+        // ------------------------ EVENT HANDLERS ----------------------------
         void widthChange(wxCommandEvent &event);
         void heightChange(wxCommandEvent &event);
         void fixRatioChange(wxCommandEvent &event);
@@ -52,6 +112,7 @@ class ToolsPanel: public wxScrolledCanvas {
         void updateVirtualSize(wxCollapsiblePaneEvent &event);
         void strokeColorChange(wxColourPickerEvent &event);
         void strokeWidthChange(wxCommandEvent &event);
+        // ---------------------- END EVENT HANDLERS --------------------------
 
         void setBindings();
         void createTools();
@@ -64,6 +125,9 @@ class ToolsPanel: public wxScrolledCanvas {
         void growChoiceState(bool state, int choice);
         void updateGrowBlock();
         
+        /**
+         * Generic CheckBox but with unfocused behaviour.
+         */
         class UnfocusedCheckBox : public wxCheckBox {
             public:
                 UnfocusedCheckBox(wxWindow *parent,
