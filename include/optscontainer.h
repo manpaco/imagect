@@ -5,6 +5,9 @@
 #include "wx/colour.h"
 #include "wx/string.h"
 
+/**
+ * Container to storage tool options.
+ */
 struct OptionsContainer {
     wxSize cropSize;
     wxPoint cropOff;
