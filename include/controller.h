@@ -38,8 +38,7 @@ class CropController {
          * Change the crop size to given one. The constraint is used if its
          * active.
          *
-         * @return
-         *  true if crop size changes, else false.
+         * @return true if crop size changes, else false.
          */
         bool cropSize(const wxSize &s);
 
@@ -47,16 +46,15 @@ class CropController {
          * Change the crop rectangle to given one. The constraint is used if
          * its active.
          *
-         * @return
-         *  true if crop rectangle changes, else false.
+         * @return true if crop rectangle changes, else false.
          */
         bool cropRect(const wxRect &r);
 
         /**
          * Enable or disable the constraint area.
          *
-         * @return
-         *  true if crop rectangle changes after enable constraint, else false.
+         * @return true if crop rectangle changes after enable constraint,
+         *         else false.
          */
         bool constraint(bool op);
 
@@ -64,8 +62,7 @@ class CropController {
          * Set the constraint. This is used to delimit the area where the crop
          * rectangle can exist.
          *
-         * @params
-         *  cons Delimited area.
+         * @param cons Delimited area.
          */
         void constraint(wxRect &cons);
 
@@ -73,19 +70,16 @@ class CropController {
          * Modify the the crop rectangle. If inner zone is pressed the
          * rectangle is moved. Otherwise, the rectangle is resized.
          *
-         * @params
-         *  target Point used to move or resize.
-         * @return
-         *  true if crop rectangle changes, else false.
+         * @param target Point used to move or resize.
+         * @return true if crop rectangle changes, else false.
          */
         bool modify(const wxPoint &target);
 
         /**
          * Simulate pressure at a given zone.
          *
-         * @params
-         *  z Zone to press.
-         *  p Pressure point, used to calculate offset in pressure.
+         * @param z Zone to press.
+         * @param p Pressure point, used to calculate offset in pressure.
          */
         void press(const ict::Zone z, const wxPoint &p);
 
@@ -162,6 +156,8 @@ class CropController {
         /**
          * Internal function that allows to change the crop rectangle and hold
          * the ratio. It also allows to set new accumulators.
+         *          
+         * @return true if crop rectangle changes, else false.
          */
         bool cropRect(const wxRect &r,
                       bool holdRatio,
