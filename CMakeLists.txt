@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12.4)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-project(ImageCroppingTool)
+project(ImageCT)
 
 list(APPEND SRC_FILES
     "imagectapp.cpp"
@@ -21,9 +21,9 @@ list(APPEND SRC_FILES
     "zoomevent.cpp"
 )
 list(TRANSFORM SRC_FILES PREPEND "${PROJECT_SOURCE_DIR}/src/")
-add_executable(imgcrop ${SRC_FILES})
+add_executable(imagect ${SRC_FILES})
 
-target_include_directories(imgcrop PRIVATE "${PROJECT_SOURCE_DIR}/include")
+target_include_directories(imagect PRIVATE "${PROJECT_SOURCE_DIR}/include")
 
 # Magick++
 # Set search strings
@@ -49,10 +49,10 @@ else()
 endif()
 
 find_package(ImageMagick REQUIRED COMPONENTS Magick++ MagickWand MagickCore)
-target_include_directories(imgcrop PRIVATE ${ImageMagick_INCLUDE_DIRS})
-target_link_libraries(imgcrop ${ImageMagick_LIBRARIES})
+target_include_directories(imagect PRIVATE ${ImageMagick_INCLUDE_DIRS})
+target_link_libraries(imagect ${ImageMagick_LIBRARIES})
 
 # wxWidgets
 find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include(${wxWidgets_USE_FILE})
-target_link_libraries(imgcrop ${wxWidgets_LIBRARIES})
+target_link_libraries(imagect ${wxWidgets_LIBRARIES})
