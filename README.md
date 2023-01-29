@@ -73,4 +73,5 @@ This project follows the [Semantic Versioning](https://semver.org/) rules.
 The images used for the demonstrations were taken from the page of their authors.
 
 [Stone photo](https://unsplash.com/photos/u4ijcCaprRc) - Colin Watts
+
 [Computer image](https://github.com/GNOME/adwaita-icon-theme) - GNOME
