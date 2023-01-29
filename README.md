@@ -4,6 +4,10 @@
 
 Herramienta para recortar imagenes agregando la posibilidad de hacer "growing". Esto significa que, si el recorte queda por fuera de la imagen, la herramienta agregará los pixeles necesarios para no dejar areas vacías. Los pixeles que se agregan pueden ser elegidos por el usuario: "color" o "imagen".
 
+## License
+
+Licensed under [GPL-3.0-or-later](/docs/COPYING).
+
 ## Build
 
 ### Linux
