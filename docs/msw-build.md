@@ -1,6 +1,6 @@
 # Requirements
 
-To build ImageCT under Windows, I will use the [MSYS2](https://www.msys2.org/) environment.
+To build ImageCT under Windows, I will use the [MSYS2](https://www.msys2.org/#installation) environment.
 
 Globally required tools:
 

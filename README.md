@@ -6,6 +6,8 @@ ImageCT is a easy-to-use, free and open source image cropping tool.
 
 Tool to crop images adding the possibility of "growing". This means that if the crop is outside the image, the necessary pixels will be added to avoid leaving empty areas. The pixels that are added can be chosen by the user: color, image or void.
 
+This project is possible thanks to two large projects: [Legacy ImageMagick](https://legacy.imagemagick.org/) and [wxWidgets](https://www.wxwidgets.org/)
+
 ## Features
 
 ### Aspect
@@ -63,6 +65,8 @@ Licensed under [GPL-3.0-or-later](/docs/COPYING).
 ## Build
 
 For building this project, please see platform-specific documentation. For [Linux](/docs/linux-build.md) or [MSW](/docs/msw-build.md).
+
+I was able to compile this project on Windows thanks to the [MSYS2](https://www.msys2.org/) project.
 
 ## Versioning
 
