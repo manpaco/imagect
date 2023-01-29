@@ -50,6 +50,12 @@ Display box to show current zoom value.
 
 To show the cropping preview.
 
+### Canvas
+
+![canvas-panel](/images/canvas-panel.png)
+
+Contains the opened image and a draggable/resizable crop rectangle.
+
 ## License
 
 Licensed under [GPL-3.0-or-later](/docs/COPYING).
