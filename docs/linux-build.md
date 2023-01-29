@@ -33,4 +33,4 @@ Now, create a build directory and run CMake:
     cmake ..
     make
 
-For building on [MSW](/msw-build.md)
+For building on [MSW](/docs/msw-build.md)

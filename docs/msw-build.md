@@ -42,4 +42,4 @@ And finally, run CMake with Generator parameter:
     cmake -G "MinGW Makefiles" ..
     make
 
-For building on [Linux](/linux-build.md)
+For building on [Linux](/docs/linux-build.md)
