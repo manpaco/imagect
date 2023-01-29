@@ -5,7 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 project(ImageCroppingTool)
 
 list(APPEND SRC_FILES
-    "imgcropapp.cpp"
+    "imagectapp.cpp"
     "mainframe.cpp"
     "previewpanel.cpp"
     "toolspanel.cpp"
