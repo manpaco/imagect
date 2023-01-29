@@ -10,12 +10,7 @@ Licensed under [GPL-3.0-or-later](/docs/COPYING).
 
 ## Build
 
-### Linux
-
-	mkdir build
-	cd build
-	cmake ..
-	cmake --build .
+For building this project, please see platform-specific documentation. For [Linux](/docs/linux-build.txt) or [MSW](/docs/msw-build.txt).
 
 ## Funcionalidades importantes
 
