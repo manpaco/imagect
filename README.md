@@ -13,6 +13,7 @@ Tool to crop images adding the possibility of "growing". This means that if the 
 ![aspect-block](/images/aspect-block.png)
 
 Enable or disable the fix ratio.
+
 Width and height setters.
 
 ### Shape
@@ -20,7 +21,9 @@ Width and height setters.
 ![shape-block](/images/shape-block.png)
 
 Crop shape selector.
+
 Stroke width setter.
+
 Stroke color selector.
 
 ### Growing
@@ -28,7 +31,9 @@ Stroke color selector.
 ![grow-block](/images/grow-block.png)
 
 Fill pixel selector: Color, Image or Void.
+
 Color selector.
+
 Image selector and blur slider.
 
 ### Zoom
@@ -36,6 +41,7 @@ Image selector and blur slider.
 ![zoom-control](/images/zoom-control.png)
 
 Zoom-out and Zoom-in buttons.
+
 Display box to show current zoom value.
 
 ### Preview
