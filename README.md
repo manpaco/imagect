@@ -31,3 +31,7 @@ A continuacion se presentan las funcionalidades que deben ser reflejadas en el p
 La interfaz grafica tendrá una barra de menu superior, panel de canvas a la izquierda y panel de controles junto con la vista previa a la derecha. Los paneles deben estar separados por "splitters", permitiendo redimensionarlos.
 
 ![gui](/images/screenshot.png)
+
+## Versioning
+
+This project follows the [Semantic Versioning](https://semver.org/) rules.
