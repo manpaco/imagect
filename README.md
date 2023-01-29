@@ -1,4 +1,6 @@
-# Image Cropping Tool
+# ImageCT
+
+ImageCT is a easy-to-use, free and open source image cropping tool.
 
 ![logo](/images/ict-logo.svg)
 
