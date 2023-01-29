@@ -22,6 +22,7 @@
 #include "canvaspanel.h"
 #include "cropevent.h"
 #include "defs.h"
+#include "buildvalues.h"
 #include "optscontainer.h"
 #include "previewpanel.h"
 #include "toolspanel.h"
@@ -52,7 +53,7 @@ using Magick::Quantum;
 MainFrame::MainFrame(): 
     wxFrame(NULL,
             wxID_ANY,
-            "Image Cropping Tool",
+            projectName,
             wxDefaultPosition,
             wxDefaultSize,
             wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxSYSTEM_MENU |
@@ -186,8 +187,11 @@ void MainFrame::unbindElements() {
 }
 
 void MainFrame::onAbout(wxCommandEvent &event) {
-    wxMessageBox(_("Image Cropping Tool\rby manpaco"), _("About"),
-                 wxOK | wxICON_INFORMATION);
+    std::string aboutTxt = projectName;
+    aboutTxt += " - v";
+    aboutTxt += versionString;
+    aboutTxt += "\nby manpaco";
+    wxMessageBox(aboutTxt, _("About"), wxOK | wxICON_INFORMATION);
 }
 
 void MainFrame::onClose(wxCommandEvent &event) {
