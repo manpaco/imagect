@@ -4,7 +4,7 @@ To build ImageCT under Windows, I will use the [MSYS2](https://www.msys2.org/) e
 
 Globally required tools:
 
-    - git
+- git
 
 # Building for ``x86_64``
 
@@ -12,15 +12,15 @@ To build ImageCT for ``x86_64`` target system we need to run the UCRT64 subsyste
 
 ## Required Dependencies
 
-    - ``mingw-w64-ucrt-x86_64-toolchain``
+- mingw-w64-ucrt-x86_64-toolchain
     
-    - ``mingw-w64-ucrt-x86_64-wxwidgets3.x-msw``; with x = 0, 1, 2
+- mingw-w64-ucrt-x86_64-wxwidgets3.x-msw; with x = 0, 1, 2
 
-    - ``mingw-w64-ucrt-x86_64-cmake``
+- mingw-w64-ucrt-x86_64-cmake
 
 ImageCT require Legacy Magick++ (v6.x.x), but MSYS2 come with ImageMagick7 (v7.x.x). Therefore, we must to compile from source:
 
-    - Own compilation of Legacy Magick++ (v6.x.x)
+- Own compilation of Legacy Magick++ (v6.x.x)
 
 ## Build
 

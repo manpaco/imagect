@@ -2,19 +2,19 @@
 
 ImageCT depends on two components:
 
-    - [Magick++](https://github.com/ImageMagick/ImageMagick6) >= 6.9.11, <= 6.9.12
+- [Magick++](https://github.com/ImageMagick/ImageMagick6) >= 6.9.11, <= 6.9.12
 
-    - [wxWidgets](https://github.com/wxWidgets/wxWidgets) >= 3.0.5, <= 3.2
+- [wxWidgets](https://github.com/wxWidgets/wxWidgets) >= 3.0.5, <= 3.2
 
 Yout also need some tools:
 
-    - git
+- git
 
-    - cmake
+- cmake
 
-    - make
+- make
 
-    - A C++ compiler
+- A C++ compiler
 
 # Building
 
