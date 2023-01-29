@@ -62,7 +62,7 @@ Licensed under [GPL-3.0-or-later](/docs/COPYING).
 
 ## Build
 
-For building this project, please see platform-specific documentation. For [Linux](/docs/linux-build.txt) or [MSW](/docs/msw-build.txt).
+For building this project, please see platform-specific documentation. For [Linux](/docs/linux-build.md) or [MSW](/docs/msw-build.md).
 
 ## Versioning
 
