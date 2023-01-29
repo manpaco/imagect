@@ -17,8 +17,8 @@
  *     with Image Cropping Tool. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef ICTAPP_H
-#define ICTAPP_H
+#ifndef IMAGECTAPP_H
+#define IMAGECTAPP_H
 
 class wxString;
 
@@ -51,4 +51,4 @@ static const wxCmdLineEntryDesc cliDesc[] = {
 
 wxDECLARE_APP(ImgCropApp);
 
-#endif // ICTAPP_H
+#endif // IMAGECTAPP_H
