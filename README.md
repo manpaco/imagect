@@ -4,7 +4,45 @@ ImageCT is a easy-to-use, free and open source image cropping tool.
 
 ![logo](/images/ict-logo.svg)
 
-Herramienta para recortar imagenes agregando la posibilidad de hacer "growing". Esto significa que, si el recorte queda por fuera de la imagen, la herramienta agregará los pixeles necesarios para no dejar areas vacías. Los pixeles que se agregan pueden ser elegidos por el usuario: "color" o "imagen".
+Tool to crop images adding the possibility of "growing". This means that if the crop is outside the image, the necessary pixels will be added to avoid leaving empty areas. The pixels that are added can be chosen by the user: color, image or void.
+
+## Features
+
+### Aspect
+
+![aspect-block](/images/aspect-block.png)
+
+Enable or disable the fix ratio.
+Width and height setters.
+
+### Shape
+
+![shape-block](/images/shape-block.png)
+
+Crop shape selector.
+Stroke width setter.
+Stroke color selector.
+
+### Growing
+
+![grow-block](/images/grow-block.png)
+
+Fill pixel selector: Color, Image or Void.
+Color selector.
+Image selector and blur slider.
+
+### Zoom
+
+![zoom-control](/images/zoom-control.png)
+
+Zoom-out and Zoom-in buttons.
+Display box to show current zoom value.
+
+### Preview
+
+![preview-panel](/images/preview-panel.png)
+
+To show the cropping preview.
 
 ## License
 
@@ -14,15 +52,7 @@ Licensed under [GPL-3.0-or-later](/docs/COPYING).
 
 For building this project, please see platform-specific documentation. For [Linux](/docs/linux-build.txt) or [MSW](/docs/msw-build.txt).
 
-## Features
-
-A continuacion se presentan las funcionalidades que deben ser reflejadas en el programa final:
-
-- Elección de la relacion de aspecto: Libre o fija.
-- Forma de recorte: Cuadrilatero, circulo, triangulo, forma, etc.
-- Dibujar contorno del area de recorte. Permitir modificar su color, grosor y posicion (interior, exterior o en el medio).
-- Permitir growing y elegir su relleno (color o imagen). Si es una imagen debe existir un control de desenfoque o "blur".
-
 ## Versioning
 
 This project follows the [Semantic Versioning](https://semver.org/) rules.
+
