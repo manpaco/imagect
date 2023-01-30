@@ -22,6 +22,7 @@
 
 const char * const projectName = "ImageCT";
 const char * const versionString = "0.1.0";
+const char * const versionSuffix = "-10-g9268787";
 
 const unsigned int versionMajor = 0;
 const unsigned int versionMinor = 1;
