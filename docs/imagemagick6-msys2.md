@@ -2,6 +2,8 @@
 
 The ImageMagick repository provides a compilation guide, but under MSYS2 differs a bit.
 
+The environment variable ``MINGW_PREFIX`` stores the filesystem prefix of the running subsystem.
+
 ## Steps
 
 Download a tarball from Legacy ImageMagick repository and unpack it:

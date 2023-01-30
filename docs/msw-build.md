@@ -6,17 +6,21 @@ Globally required tools:
 
 - git
 
-# Building for ``x86_64``
+# Building for ``x86_64`` and ``i686``
 
-To build ImageCT for ``x86_64`` target system we need to run the UCRT64 subsystem of MSYS2.
+To build ImageCT for ``x86_64`` target system we need to run the UCRT64/MINGW64 subsystem of MSYS2.
+
+To build ImageCT for ``i686`` target system we need to run the MINGW32 subsystem of MSYS2.
+
+The environment variable ``MINGW_PACKAGE_PREFIX`` stores the package prefix for the runing subsystem.
 
 ## Required Dependencies
 
-- mingw-w64-ucrt-x86_64-toolchain
+- ``${MINGW_PACKAGE_PREFIX}``-toolchain
     
-- mingw-w64-ucrt-x86_64-wxwidgets3.x-msw; with x = 0, 1, 2
+- ``${MINGW_PACKAGE_PREFIX}``-wxwidgets3.x-msw; with x = 0, 1, 2
 
-- mingw-w64-ucrt-x86_64-cmake
+- ``${MINGW_PACKAGE_PREFIX}``-cmake
 
 ImageCT require Legacy Magick++ (v6.x.x), but MSYS2 come with ImageMagick7 (v7.x.x). Therefore, we must to compile from source:
 
