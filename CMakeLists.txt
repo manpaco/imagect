@@ -15,7 +15,8 @@ if(IMAGECT_VERSION_SUFFIX)
     set(IMAGECT_VERSION ${IMAGECT_VERSION}${IMAGECT_VERSION_SUFFIX})
 endif()
 
-configure_file(${PROJECT_SOURCE_DIR}/buildvalues.h.in ${PROJECT_SOURCE_DIR}/include/buildvalues.h @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/buildvalues.h.in
+               ${PROJECT_SOURCE_DIR}/include/buildvalues.h @ONLY)
 
 list(APPEND SRC_FILES
     "imagectapp.cpp"
@@ -43,7 +44,8 @@ target_include_directories(imagect PRIVATE "${PROJECT_SOURCE_DIR}/include")
 set(DISH "HDRI_ENABLE=0")
 set(LOWD "QUANTUM_DEPTH=8")
 # Ask about CXX flags
-execute_process(COMMAND "bash" "-c" "Magick++-config --cxxflags" OUTPUT_VARIABLE MAGICK_CXX_FLAGS)
+execute_process(COMMAND "bash" "-c" "Magick++-config --cxxflags"
+                OUTPUT_VARIABLE MAGICK_CXX_FLAGS)
 string(STRIP "${MAGICK_CXX_FLAGS}" MAGICK_CXX_FLAGS)
 # Find positions in flags
 string(FIND "${MAGICK_CXX_FLAGS}" "${DISH}" POSDH)
