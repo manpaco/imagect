@@ -24,7 +24,7 @@ The environment variable ``MINGW_PACKAGE_PREFIX`` stores the package prefix for 
 
 - ``${MINGW_PACKAGE_PREFIX}``-cmake
 
-ImageCT require Legacy Magick++ (v6.x.x), but MSYS2 come with ImageMagick7 (v7.x.x). Therefore, we must to compile from source:
+ImageCT require Legacy ImageMagick (v6.x.x), but MSYS2 come with ImageMagick7 (v7.x.x). Therefore, we must to compile from source:
 
 - Own [compilation of Legacy Magick++](/docs/imagemagick6-msys2.md) (v6.x.x)
 
