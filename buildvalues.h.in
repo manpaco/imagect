@@ -21,10 +21,11 @@
 #define BUILDVALUES_H
 
 const char * const projectName = "@PROJECT_NAME@";
-const char * const versionString = "@IMAGECT_VERSION@";
+const char * const versionString = "@VERSION_SHORT@";
+const char * const versionSuffix = "@VERSION_SUFFIX@";
 
-const unsigned int versionMajor = @IMAGECT_VERSION_MAJOR@;
-const unsigned int versionMinor = @IMAGECT_VERSION_MINOR@;
-const unsigned int versionPatch = @IMAGECT_VERSION_PATCH@;
+const unsigned int versionMajor = @VERSION_MAJOR@;
+const unsigned int versionMinor = @VERSION_MINOR@;
+const unsigned int versionPatch = @VERSION_PATCH@;
 
 #endif // BUILDVALUES_H
