@@ -6,6 +6,8 @@ Globally required tools:
 
 - git
 
+- make
+
 # Building for ``x86_64`` and ``i686``
 
 To build ImageCT for ``x86_64`` target system we need to run the UCRT64/MINGW64 subsystem of MSYS2.
