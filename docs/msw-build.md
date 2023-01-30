@@ -20,7 +20,7 @@ To build ImageCT for ``x86_64`` target system we need to run the UCRT64 subsyste
 
 ImageCT require Legacy Magick++ (v6.x.x), but MSYS2 come with ImageMagick7 (v7.x.x). Therefore, we must to compile from source:
 
-- Own compilation of Legacy Magick++ (v6.x.x)
+- Own [compilation of Legacy Magick++](/docs/imagemagick6-msys2.md) (v6.x.x)
 
 ## Build
 
