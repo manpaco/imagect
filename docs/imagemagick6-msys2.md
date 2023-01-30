@@ -38,7 +38,7 @@ To test the installation run:
     
     identify example.jpg
 
-You should get this output message:
+You should get something like this:
 
     example.jpg JPEG 2400x1600 2400x1600+0+0 8-bit sRGB 200286B 0.00u 0:00.001
 
