@@ -1,6 +1,6 @@
 # Compilation of Legacy ImageMagick on MSYS2
 
-The Legacy ImageMagick repository provides a compilation guide, but under MSYS2 differs a bit.
+The [Legacy ImageMagick repository](https://github.com/ImageMagick/ImageMagick6) provides a compilation guide, but under MSYS2 differs a bit.
 
 The environment variable ``MINGW_PREFIX`` stores the filesystem prefix of the running subsystem.
 

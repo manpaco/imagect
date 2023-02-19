@@ -2,9 +2,9 @@
 
 ImageCT depends on two components:
 
-- [Magick++](https://github.com/ImageMagick/ImageMagick6) >= 6.9.11, <= 6.9.12
+- [Magick++](https://github.com/ImageMagick/ImageMagick6) 6.x.x
 
-- [wxWidgets](https://github.com/wxWidgets/wxWidgets) >= 3.0.5, <= 3.2
+- [wxWidgets](https://github.com/wxWidgets/wxWidgets) >= 3.0.5
 
 Yout also need some tools:
 
@@ -16,7 +16,7 @@ Yout also need some tools:
 
 - A C++ compiler
 
-# Building
+# Build
 
 First clone a release branch:
 
@@ -24,12 +24,15 @@ First clone a release branch:
 
 For example:
 
-    git clone --branch 0.1.0 https://github.com/manpaco/imagect.git
+    git clone --branch v0.1.0 https://github.com/manpaco/imagect.git
 
-Now, create a build directory and run CMake:
+Now, create a build directory:
 
     cd imagect
     mkdir build & cd build
+
+And finally, run CMake:
+
     cmake ..
     make
 
