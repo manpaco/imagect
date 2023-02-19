@@ -35,7 +35,15 @@ list(APPEND SRC_FILES
     "zoomevent.cpp"
 )
 list(TRANSFORM SRC_FILES PREPEND "${PROJECT_SOURCE_DIR}/src/")
-add_executable(imagect ${SRC_FILES})
+
+if(CMAKE_SYSTEM MATCHES Windows)
+    list(APPEND RCS_FILES
+        "wimagect.rc"
+    )
+    list(TRANSFORM RCS_FILES PREPEND "${PROJECT_SOURCE_DIR}/win/")
+endif()
+
+add_executable(imagect ${SRC_FILES} ${RCS_FILES})
 
 target_include_directories(imagect PRIVATE "${PROJECT_SOURCE_DIR}/include")
 
