@@ -24,6 +24,7 @@ class ImageWindow;
 class wxStaticText;
 class wxBoxSizer;
 class wxGridSizer;
+class wxBitmap;
 
 #include "wx/panel.h"
 

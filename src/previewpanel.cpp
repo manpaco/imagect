@@ -20,6 +20,7 @@
 #include "previewpanel.h"
 #include "defs.h"
 #include "imagewindow.h"
+#include "wx/bitmap.h"
 #include "wx/sizer.h"
 #include "wx/stattext.h"
 
