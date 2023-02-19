@@ -20,7 +20,7 @@ The environment variable ``MINGW_PACKAGE_PREFIX`` stores the package prefix for 
 
 - ``${MINGW_PACKAGE_PREFIX}``-toolchain
     
-- ``${MINGW_PACKAGE_PREFIX}``-wxwidgets3.x-msw; with x = 0, 1, 2
+- ``${MINGW_PACKAGE_PREFIX}``-wxwidgets3.x-msw; with x >= 0
 
 - ``${MINGW_PACKAGE_PREFIX}``-cmake
 
@@ -36,7 +36,7 @@ First clone a release branch:
 
 For example:
 
-    git clone --branch 0.1.0 https://github.com/manpaco/imagect.git
+    git clone --branch v0.1.0 https://github.com/manpaco/imagect.git
 
 Now, create a build directory:
 
