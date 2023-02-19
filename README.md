@@ -60,7 +60,7 @@ Contains the opened image and a draggable/resizable crop rectangle.
 
 ## License
 
-Licensed under [GPL-3.0-or-later](/docs/COPYING).
+Licensed under [GPL-3.0-or-later](/COPYING).
 
 ## Build
 
