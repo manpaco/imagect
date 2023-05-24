@@ -1,0 +1,1 @@
+- Remove Magick++ and reimplement only with wxWidgets
