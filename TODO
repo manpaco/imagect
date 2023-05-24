@@ -1,1 +1,4 @@
-- Remove Magick++ and reimplement only with wxWidgets
+- Remove Magick++ lib.
+- Implement ScrolledCanvas, CanvasItem (BitmapItem, CropItem and RectItem) and PixelView.
+- Use new painting method with special buffer in BitmapItem.
+- Improve ZoomCtrl.
