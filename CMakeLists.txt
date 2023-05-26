@@ -47,34 +47,6 @@ add_executable(imagect ${SRC_FILES} ${RCS_FILES})
 
 target_include_directories(imagect PRIVATE "${PROJECT_SOURCE_DIR}/include")
 
-# Magick++
-# Set search strings
-set(DISH "HDRI_ENABLE=0")
-set(LOWD "QUANTUM_DEPTH=8")
-# Ask about CXX flags
-execute_process(COMMAND "bash" "-c" "Magick++-config --cxxflags"
-                OUTPUT_VARIABLE MAGICK_CXX_FLAGS)
-string(STRIP "${MAGICK_CXX_FLAGS}" MAGICK_CXX_FLAGS)
-# Find positions in flags
-string(FIND "${MAGICK_CXX_FLAGS}" "${DISH}" POSDH)
-string(FIND "${MAGICK_CXX_FLAGS}" "${LOWD}" POSLD)
-
-if(POSDH LESS 0)
-    add_definitions( -DMAGICKCORE_HDRI_ENABLE=1 )
-else()
-    add_definitions( -DMAGICKCORE_HDRI_ENABLE=0 )
-endif()
-
-if(POSLD LESS 0)
-    add_definitions( -DMAGICKCORE_QUANTUM_DEPTH=16 )
-else()
-    add_definitions( -DMAGICKCORE_QUANTUM_DEPTH=8 )
-endif()
-
-find_package(ImageMagick REQUIRED COMPONENTS Magick++ MagickWand MagickCore)
-target_include_directories(imagect PRIVATE ${ImageMagick_INCLUDE_DIRS})
-target_link_libraries(imagect ${ImageMagick_LIBRARIES})
-
 # wxWidgets
 find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include(${wxWidgets_USE_FILE})
