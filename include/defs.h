@@ -70,7 +70,7 @@ enum PanelID {
 };
 
 enum CollPaneID {
-    ASPECT_RATIO = wxID_HIGHEST + 200,
+    ASPECT = wxID_HIGHEST + 200,
     GROW,
     SHAPE
 };
@@ -87,7 +87,7 @@ enum SplitterID {
 enum GrowChoice {
     COLOR = 0,
     IMAGE,
-    VOID_G,
+    VOID,
     GROW_CHOICE_SIZE
 };
 
@@ -98,8 +98,8 @@ enum ShapeChoice {
     SHAPE_CHOICE_SIZE
 };
 
-enum Zone {
-    NONE = 0,
+enum ItemZone {
+    NONE = -1,
     INNER,
     N,
     NE,
@@ -108,17 +108,13 @@ enum Zone {
     SE,
     SW,
     E,
-    W
+    W,
+    NUM_ZONES
 };
 
 enum Channel {
     RGB,
     ALPHA
-};
-
-enum Depth {
-    DEPTH8,
-    DEPTH16
 };
 
 enum Wildcard {
@@ -132,12 +128,6 @@ enum Extension {
     PNG_EXT,
     JPG_EXT,
     JPEG_EXT
-};
-
-enum Tot {
-    SCALE_T = 0,
-    COMPRESS_T,
-    SNC_T
 };
 
 enum Dot {
