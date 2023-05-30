@@ -33,7 +33,7 @@ CanvasItem::CanvasItem() {
     this->disconnected = true;
     updateScaledZones();
     this->disconnected = false;
-    this->tempPortion = nullptr;
+    this->tempView = nullptr;
 }
 
 CanvasItem::CanvasItem(wxRect geometry, CanvasItem *parent, Scaler *scaler, bool locked) {
@@ -49,7 +49,7 @@ CanvasItem::CanvasItem(wxRect geometry, CanvasItem *parent, Scaler *scaler, bool
     this->disconnected = true;
     updateScaledZones();
     this->disconnected = false;
-    this->tempPortion = nullptr;
+    this->tempView = nullptr;
 }
 
 CanvasItem::~CanvasItem() {
@@ -65,18 +65,18 @@ void CanvasItem::updateScaledZones() {
     int sy2 = scaler->scaleValue(y2, ict::IN_D);
     wxPoint ipt(sx1, sy1);
     wxSize isz(sx2 - sx1, sy2 - sy1);
-    scaledZones.at(ict::INNER) = wxRect(ipt, isz);
+    scaledZones[ict::INNER] = wxRect(ipt, isz);
     if (!locked) {
-        scaledZones.at(ict::N) = wxRect(sx1, sy1 - ict::CORNER, isz.GetWidth(), ict::CORNER);
-        scaledZones.at(ict::S) = wxRect(sx1, sy2, isz.GetWidth(), ict::CORNER);
-        scaledZones.at(ict::E) = wxRect(sx2, sy1, ict::CORNER, isz.GetHeight());
-        scaledZones.at(ict::W) = wxRect(sx1 - ict::CORNER, sy1, ict::CORNER, isz.GetHeight());
-        scaledZones.at(ict::NE) = wxRect(sx2, sy1 - ict::CORNER, ict::CORNER, ict::CORNER);
-        scaledZones.at(ict::NW) = wxRect(sx1 - ict::CORNER, sy1 - ict::CORNER, ict::CORNER, ict::CORNER);
-        scaledZones.at(ict::SE) = wxRect(sx2, sy2, ict::CORNER, ict::CORNER);
-        scaledZones.at(ict::SW) = wxRect(sx1 - ict::CORNER, sy2, ict::CORNER, ict::CORNER);
+        scaledZones[ict::N] = wxRect(sx1, sy1 - ict::CORNER, isz.GetWidth(), ict::CORNER);
+        scaledZones[ict::S] = wxRect(sx1, sy2, isz.GetWidth(), ict::CORNER);
+        scaledZones[ict::E] = wxRect(sx2, sy1, ict::CORNER, isz.GetHeight());
+        scaledZones[ict::W] = wxRect(sx1 - ict::CORNER, sy1, ict::CORNER, isz.GetHeight());
+        scaledZones[ict::NE] = wxRect(sx2, sy1 - ict::CORNER, ict::CORNER, ict::CORNER);
+        scaledZones[ict::NW] = wxRect(sx1 - ict::CORNER, sy1 - ict::CORNER, ict::CORNER, ict::CORNER);
+        scaledZones[ict::SE] = wxRect(sx2, sy2, ict::CORNER, ict::CORNER);
+        scaledZones[ict::SW] = wxRect(sx1 - ict::CORNER, sy2, ict::CORNER, ict::CORNER);
     }
-    notifyChange(scaledZones.at(ict::INNER));
+    notifyChange(scaledZones[ict::INNER]);
 }
 
 wxPoint CanvasItem::relativeToEdge(const wxPoint &p, ict::ItemZone z) {
@@ -118,15 +118,15 @@ ict::ItemZone CanvasItem::zonePressed() const {
 }
 
 ict::ItemZone CanvasItem::getLocation(const wxPoint &p) const {
-    if(scaledZones.at(ict::NE).Contains(p)) return ict::NE;
-    if(scaledZones.at(ict::NW).Contains(p)) return ict::NW;
-    if(scaledZones.at(ict::SE).Contains(p)) return ict::SE;
-    if(scaledZones.at(ict::SW).Contains(p)) return ict::SW;
-    if(scaledZones.at(ict::N).Contains(p)) return ict::N;
-    if(scaledZones.at(ict::S).Contains(p)) return ict::S;
-    if(scaledZones.at(ict::E).Contains(p)) return ict::E;
-    if(scaledZones.at(ict::W).Contains(p)) return ict::W;
-    if(scaledZones.at(ict::INNER).Contains(p)) return ict::INNER;
+    if(scaledZones[ict::NE].Contains(p)) return ict::NE;
+    if(scaledZones[ict::NW].Contains(p)) return ict::NW;
+    if(scaledZones[ict::SE].Contains(p)) return ict::SE;
+    if(scaledZones[ict::SW].Contains(p)) return ict::SW;
+    if(scaledZones[ict::N].Contains(p)) return ict::N;
+    if(scaledZones[ict::S].Contains(p)) return ict::S;
+    if(scaledZones[ict::E].Contains(p)) return ict::E;
+    if(scaledZones[ict::W].Contains(p)) return ict::W;
+    if(scaledZones[ict::INNER].Contains(p)) return ict::INNER;
     return ict::NONE;
 }
 
@@ -168,12 +168,12 @@ wxRect CanvasItem::getGeometry() const {
 }
 
 wxSize CanvasItem::getScaledDimensions() const {
-    return scaledZones.at(ict::INNER).GetSize();
+    return scaledZones[ict::INNER].GetSize();
 }
 
 wxPoint CanvasItem::getScaledPosition(const bool relativeToParent) const {
     if (!isKey() && !relativeToParent) {
-        return parent->getScaledPosition(relativeToParent) + scaledZones.at(ict::INNER).GetPosition();
+        return parent->getScaledPosition(relativeToParent) + scaledZones[ict::INNER].GetPosition();
     }
     return geometry.GetPosition();
 }
@@ -464,5 +464,5 @@ void CanvasItem::notifyChange(const wxRect &damaged) {
 }
 
 void CanvasItem::drawEntries() {
-    if (!tempPortion) return;
+    if (!tempView) return;
 }

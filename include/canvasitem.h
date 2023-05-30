@@ -21,15 +21,14 @@
 #define CANVASITEM_H
 
 #include "defs.h"
-#include <wx/geometry.h>
-#include <array>
+#include <wx/gdicmn.h>
 
 class CanvasItem {
 public:
     CanvasItem();
     CanvasItem(wxRect geometry, CanvasItem *parent, Scaler *scaler, bool locked = true);
 
-    virtual void drawOn(CanvasPortion *cp) { }
+    virtual void drawOn(PixView *pv) = 0;
     void lockEntries(const bool opt);
     bool lockEntries();
     void disconnect(const bool opt);
@@ -153,10 +152,10 @@ private:
     ict::ItemZone zPressed;
     wxPoint relativePress;
     wxPoint lastPoint;
-    std::array<wxRect, ict::NUM_ZONES> scaledZones;
+    wxRect scaledZones[ict::NUM_ZONES];
 
     CanvasItem *parent;
-    CanvasPortion *tempPortion;
+    PixView *tempView;
     Scaler *scaler;
 };
 
