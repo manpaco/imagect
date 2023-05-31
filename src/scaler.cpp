@@ -7,23 +7,35 @@ Scaler::Scaler() {
 
 }
 
-Scaler::Scaler(double xxf, double yyf, ict::ScaleType st) {
-    setScaleFactor(xxf, yyf);
+Scaler::Scaler(double xf, double yf, ict::ScaleType st) {
+    setNewFactor(xf, yf);
     setScaleType(st);
 }
 
-void Scaler::setScaleFactor(double xxf, double yyf) {
-    this->xxFactor = xxf;
-    this->yyFactor = yyf;
+void Scaler::setNewFactor(double xf, double yf) {
+    this->xxOldFactor = this->xxFactor;
+    this->yyOldFactor = this->yyFactor;
+    this->xxFactor = xf;
+    this->yyFactor = yf;
 }
 
 void Scaler::setScaleType(ict::ScaleType st) {
     this->st = st;
 }
 
-void Scaler::getScaleFactor(double *xxf, double *yyf) const {
-    if (xxf) *xxf = this->xxFactor;
-    if (yyf) *yyf = this->yyFactor;
+void Scaler::getNewFactor(double *xf, double *yf) const {
+    if (xf) *xf = this->xxFactor;
+    if (yf) *yf = this->yyFactor;
+}
+
+void Scaler::getOldFactor(double *xof, double *yof) const {
+    if (xof) *xof = this->xxOldFactor;
+    if (yof) *yof = this->yyOldFactor;
+}
+
+void Scaler::getTransferFactor(double *xtf, double *ytf) const {
+    if (xtf) *xtf = xxFactor / xxOldFactor;
+    if (ytf) *ytf = yyFactor / yyOldFactor;
 }
 
 int Scaler::scale(const int v, const ict::Dot d, const double f) const {
@@ -36,11 +48,15 @@ int Scaler::scale(const int v, const ict::Dot d, const double f) const {
 }
 
 int Scaler::scaleX(const int v, ict::Dot d) const {
-    return scale(v, d, xxFactor);
+    double xf;
+    getNewFactor(&xf, nullptr);
+    return scale(v, d, xf);
 }
 
 int Scaler::scaleY(const int v, ict::Dot d) const {
-    return scale(v, d, yyFactor);
+    double yf;
+    getNewFactor(nullptr, &yf);
+    return scale(v, d, yf);
 }
 
 wxPoint Scaler::scalePoint(const wxPoint &p, ict::Dot d) const {
@@ -53,6 +69,30 @@ wxSize Scaler::scaleSize(const wxSize &s, ict::Dot d) const {
 
 wxRect Scaler::scaleRect(const wxRect &r, ict::Dot d) const {
     return wxRect(scalePoint(r.GetPosition(), d), scaleSize(r.GetSize(), d));
+}
+
+int Scaler::transferX(const int v, ict::Dot d) const {
+    double xtf;
+    getTransferFactor(&xtf, nullptr);
+    return scale(v, d, xtf);
+}
+
+int Scaler::transferY(const int v, ict::Dot d) const {
+    double ytf;
+    getTransferFactor(nullptr, &ytf);
+    return scale(v, d, ytf);
+}
+
+wxPoint Scaler::transferPoint(const wxPoint &p, ict::Dot d) const {
+    return wxPoint(transferX(p.x, d), transferY(p.y, d));
+}
+
+wxSize Scaler::transferSize(const wxSize &s, ict::Dot d) const {
+    return wxSize(transferX(s.GetWidth(), d), transferY(s.GetHeight(), d));
+}
+
+wxRect Scaler::transferRect(const wxRect &r, ict::Dot d) const {
+    return wxRect(transferPoint(r.GetPosition(), d), transferSize(r.GetSize(), d));
 }
 
 Scaler::~Scaler() {
