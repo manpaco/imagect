@@ -19,6 +19,7 @@
 
 #include "canvasitem.h"
 #include "defs.h"
+#include "scaler.h"
 
 CanvasItem::CanvasItem() {
     this->geometry = wxRect(0, 0, 1, 1);
@@ -30,10 +31,7 @@ CanvasItem::CanvasItem() {
     this->fixed = false;
     this->conState = false;
     this->zPressed = ict::NONE;
-    this->disconnected = true;
     updateScaledZones();
-    this->disconnected = false;
-    this->tempView = nullptr;
 }
 
 CanvasItem::CanvasItem(wxRect geometry, CanvasItem *parent, Scaler *scaler, bool locked) {
@@ -46,10 +44,7 @@ CanvasItem::CanvasItem(wxRect geometry, CanvasItem *parent, Scaler *scaler, bool
     this->fixed = false;
     this->conState = false;
     this->zPressed = ict::NONE;
-    this->disconnected = true;
     updateScaledZones();
-    this->disconnected = false;
-    this->tempView = nullptr;
 }
 
 CanvasItem::~CanvasItem() {
@@ -59,24 +54,22 @@ CanvasItem::~CanvasItem() {
 void CanvasItem::updateScaledZones() {
     int x1 = geometry.GetX(), x2 = geometry.GetX() + geometry.GetWidth();
     int y1 = geometry.GetY(), y2 = geometry.GetY() + geometry.GetHeight();
-    int sx1 = scaler->scaleValue(x1, ict::IN_D);
-    int sy1 = scaler->scaleValue(y1, ict::IN_D);
-    int sx2 = scaler->scaleValue(x2, ict::IN_D);
-    int sy2 = scaler->scaleValue(y2, ict::IN_D);
+    int sx1 = scaler->scaleX(x1, ict::IN_D);
+    int sy1 = scaler->scaleY(y1, ict::IN_D);
+    int sx2 = scaler->scaleX(x2, ict::IN_D);
+    int sy2 = scaler->scaleY(y2, ict::IN_D);
     wxPoint ipt(sx1, sy1);
     wxSize isz(sx2 - sx1, sy2 - sy1);
     scaledZones[ict::INNER] = wxRect(ipt, isz);
-    if (!locked) {
-        scaledZones[ict::N] = wxRect(sx1, sy1 - ict::CORNER, isz.GetWidth(), ict::CORNER);
-        scaledZones[ict::S] = wxRect(sx1, sy2, isz.GetWidth(), ict::CORNER);
-        scaledZones[ict::E] = wxRect(sx2, sy1, ict::CORNER, isz.GetHeight());
-        scaledZones[ict::W] = wxRect(sx1 - ict::CORNER, sy1, ict::CORNER, isz.GetHeight());
-        scaledZones[ict::NE] = wxRect(sx2, sy1 - ict::CORNER, ict::CORNER, ict::CORNER);
-        scaledZones[ict::NW] = wxRect(sx1 - ict::CORNER, sy1 - ict::CORNER, ict::CORNER, ict::CORNER);
-        scaledZones[ict::SE] = wxRect(sx2, sy2, ict::CORNER, ict::CORNER);
-        scaledZones[ict::SW] = wxRect(sx1 - ict::CORNER, sy2, ict::CORNER, ict::CORNER);
-    }
-    notifyChange(scaledZones[ict::INNER]);
+    if (locked) return;
+    scaledZones[ict::N] = wxRect(sx1, sy1 - ict::CORNER, isz.GetWidth(), ict::CORNER);
+    scaledZones[ict::S] = wxRect(sx1, sy2, isz.GetWidth(), ict::CORNER);
+    scaledZones[ict::E] = wxRect(sx2, sy1, ict::CORNER, isz.GetHeight());
+    scaledZones[ict::W] = wxRect(sx1 - ict::CORNER, sy1, ict::CORNER, isz.GetHeight());
+    scaledZones[ict::NE] = wxRect(sx2, sy1 - ict::CORNER, ict::CORNER, ict::CORNER);
+    scaledZones[ict::NW] = wxRect(sx1 - ict::CORNER, sy1 - ict::CORNER, ict::CORNER, ict::CORNER);
+    scaledZones[ict::SE] = wxRect(sx2, sy2, ict::CORNER, ict::CORNER);
+    scaledZones[ict::SW] = wxRect(sx1 - ict::CORNER, sy2, ict::CORNER, ict::CORNER);
 }
 
 wxPoint CanvasItem::relativeToEdge(const wxPoint &p, ict::ItemZone z) {
@@ -175,7 +168,7 @@ wxPoint CanvasItem::getScaledPosition(const bool relativeToParent) const {
     if (!isKey() && !relativeToParent) {
         return parent->getScaledPosition(relativeToParent) + scaledZones[ict::INNER].GetPosition();
     }
-    return geometry.GetPosition();
+    return scaledZones[ict::INNER].GetPosition();
 }
 
 wxRect CanvasItem::getScaledGeometry(const bool relativeToParent) const {
@@ -183,8 +176,9 @@ wxRect CanvasItem::getScaledGeometry(const bool relativeToParent) const {
 }
 
 bool CanvasItem::isKey() const {
-
+    return parent == nullptr;
 }
+
 bool CanvasItem::constraintOn() const {
     return conState;
 }
@@ -383,13 +377,13 @@ bool CanvasItem::constraintState(bool op) {
 }
 
 void CanvasItem::accumulateX(int &dxToCalc, int &dyToUse) {
-    accumX += (float)dyToUse * unmodRatio();
+    accumX += (double)dyToUse * unmodRatio();
     dxToCalc = std::floor(accumX);
     accumX -= dxToCalc;
 }
 
 void CanvasItem::accumulateY(int &dyToCalc, int &dxToUse) {
-    accumY += (float)dxToUse / unmodRatio();
+    accumY += (double)dxToUse / unmodRatio();
     dyToCalc = std::floor(accumY);
     accumY -= dyToCalc;
 }
@@ -427,42 +421,28 @@ bool CanvasItem::setPosition(const wxPoint &pos) {
     return setGeometry(wxRect(pos, geometry.GetSize()));
 }
 
-void CanvasItem::doMagnify(wxPoint canvasCenter, wxPoint mouseDelta) {
+void CanvasItem::doMagnify(wxPoint magCenter) {
     if (isKey()) {
-        wxPoint vOffset = scaler->scalePoint(canvasCenter, ict::OUT_D);
-        if (scaler->scaleFactor() < 1) {
-            vOffset -= scaler->scalePoint(mouseDelta, ict::OUT_D);
-        } else {
-            vOffset += scaler->scalePoint(mouseDelta, ict::OUT_D);
-        }
-        geometry.SetPosition(geometry.GetPosition() + vOffset);
+        // center magnify
+        wxPoint magPos = scaledZones[ict::INNER].GetPosition();
+        magPos -= magCenter;
+        magPos = scaler->transferPoint(magPos, ict::IN_D);
+        magPos += magCenter;
+        geometry.SetPosition(scaler->scalePoint(magPos, ict::OUT_D));
     }
     updateScaledZones();
 }
 
 void CanvasItem::doScroll(wxPoint motion) {
     if (!isKey()) return;
-    wxPoint scroll(scaler->scalePoint(motion, ict::OUT_D));
-    geometry.SetPosition(geometry.GetPosition() + scroll);
-    notifyChange(getScaledGeometry(false));
+    geometry.SetPosition(geometry.GetPosition() + motion);
+    updateScaledZones();
 }
 
-float CanvasItem::unmodRatio() const {
-    return (float)unmodGeo.GetWidth() / unmodGeo.GetHeight();
+double CanvasItem::unmodRatio() const {
+    return (double)unmodGeo.GetWidth() / unmodGeo.GetHeight();
 }
 
-void CanvasItem::disconnect(const bool opt) {
-    disconnected = opt;
-}
+void CanvasItem::drawEntries(PixView *pv) {
 
-bool CanvasItem::disconnect() {
-    return disconnected;
-}
-
-void CanvasItem::notifyChange(const wxRect &damaged) {
-    if(disconnected) return;
-}
-
-void CanvasItem::drawEntries() {
-    if (!tempView) return;
 }

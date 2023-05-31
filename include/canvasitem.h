@@ -23,6 +23,9 @@
 #include "defs.h"
 #include <wx/gdicmn.h>
 
+class PixView;
+class Scaler;
+
 class CanvasItem {
 public:
     CanvasItem();
@@ -31,8 +34,6 @@ public:
     virtual void drawOn(PixView *pv) = 0;
     void lockEntries(const bool opt);
     bool lockEntries();
-    void disconnect(const bool opt);
-    bool disconnect();
     wxRect getGeometry() const;
     wxPoint getPosition() const;
     wxSize getDimensions() const;
@@ -50,7 +51,7 @@ public:
     void setConstraint(const wxRect &constraint);
     void parentConstraint();
 
-    void doMagnify(wxPoint canvasCenter, wxPoint mouseDelta);
+    void doMagnify(wxPoint canvasCenter);
     void doScroll(wxPoint motion);
 
     /**
@@ -132,30 +133,28 @@ private:
 
     ict::ItemZone getLocation(const wxPoint &p) const;
 
-    float unmodRatio() const;
+    double unmodRatio() const;
 
     void resetAccums();
 
     virtual void updateBuffer() { }
-    void notifyChange(const wxRect &damaged);
-    void drawEntries();
+
+    void drawEntries(PixView *pv);
 
     wxRect geometry;
     wxRect constraint;
     wxRect unmodGeo;
     bool selected;
     bool locked;
-    bool disconnected;
     bool fixed;
     bool conState;
-    float accumX = 0.0, accumY = 0.0;
+    double accumX = 0.0, accumY = 0.0;
     ict::ItemZone zPressed;
     wxPoint relativePress;
     wxPoint lastPoint;
     wxRect scaledZones[ict::NUM_ZONES];
 
     CanvasItem *parent;
-    PixView *tempView;
     Scaler *scaler;
 };
 
