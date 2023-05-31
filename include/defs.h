@@ -22,7 +22,6 @@
 
 #include "wx/defs.h"
 #include <array>
-#include <limits>
 
 namespace ict {
 
