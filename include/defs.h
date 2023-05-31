@@ -22,6 +22,7 @@
 
 #include "wx/defs.h"
 #include <array>
+#include <limits>
 
 namespace ict {
 
@@ -133,6 +134,12 @@ enum Extension {
 enum Dot {
     IN_D = 0,
     OUT_D
+};
+
+enum ScaleType {
+    FLOOR_ST,
+    ROUND_ST,
+    CEILL_ST
 };
 
 }
