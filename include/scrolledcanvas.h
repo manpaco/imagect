@@ -22,17 +22,24 @@
 
 #include <wx/window.h>
 
+class wxScrollBar;
+class wxFlexGridSizer;
+class wxPanel;
+class CanvasItem;
+class Scaler;
+
 class ScrolledCanvas : public wxWindow {
 public:
-    ScrolledCanvas();
-    ScrolledCanvas(ScrolledCanvas &&);
-    ScrolledCanvas(const ScrolledCanvas &);
-    ScrolledCanvas &operator=(ScrolledCanvas &&);
-    ScrolledCanvas &operator=(const ScrolledCanvas &);
+    ScrolledCanvas(wxWindow *parent, wxWindowID id);
+
     ~ScrolledCanvas();
 
 private:
-    
+    wxScrollBar *vBar, *hBar;
+    wxFlexGridSizer *layout;
+    wxPanel *canvas;
+    Scaler *scaler;
+    CanvasItem *testRectangle;
 };
 
 #endif // !SCROLLEDCANVAS_H
