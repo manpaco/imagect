@@ -144,7 +144,7 @@ bool ToolsPanel::valid() {
     checking = strokeWidthCtrl->GetValue().ToStdString();
     if(checking.empty()) strokeWidth(ict::MIN_STROKE);
     if(opts.growChoice == ict::IMAGE) {
-        return tryOpen(opts.backImage, "Background image");
+//        return tryOpen(opts.backImage, "Background image");
     }
     return true;
 }
@@ -216,7 +216,7 @@ void ToolsPanel::createTools() {
 }
 
 void ToolsPanel::createAspectBlock() {
-    aspectBlock = new wxCollapsiblePane(this, ict::ASPECT_RATIO,
+    aspectBlock = new wxCollapsiblePane(this, ict::ASPECT,
                                         "Aspect", wxDefaultPosition,
                                         wxDefaultSize, wxCP_NO_TLW_RESIZE);
     wxWindow *winAspect = aspectBlock->GetPane();
@@ -397,7 +397,7 @@ void ToolsPanel::growChoiceState(bool state, int choice) {
 void ToolsPanel::initGrowChoices() {
     growChoices[ict::COLOR] = wxString("Color");
     growChoices[ict::IMAGE] = wxString("Image");
-    growChoices[ict::VOID_G] = wxString("Void");
+    growChoices[ict::VOID] = wxString("Void");
 }
 
 void ToolsPanel::initShapeChoices() {

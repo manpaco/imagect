@@ -27,15 +27,11 @@ class wxBoxSizer;
 class wxButton;
 class wxSplitterWindow;
 class ScrolledView;
-namespace Magick {
-    class Image;
-}
 class ZoomCtrl;
 class ZoomEvent;
+class ScrolledCanvas;
 
 #include "wx/frame.h"
-#include "optscontainer.h"
-#include <stack>
 
 /**
  * Implementation of a main frame.
@@ -64,8 +60,6 @@ class MainFrame: public wxFrame {
     private:
         // ------------------------ EVENT HANDLERS ----------------------------
         void saveState(wxCommandEvent &);
-        void redo(wxCommandEvent &);
-        void undo(wxCommandEvent &);
         void onFixRatio(wxCommandEvent &);
         void onAllowGrow(wxCommandEvent &event);
         void onClose(wxCommandEvent &event);
@@ -94,11 +88,6 @@ class MainFrame: public wxFrame {
         void composePreview();
 
         /**
-         * Save the given container as current state and update stack.
-         */
-        void updateHistory(OptionsContainer toSave);
-
-        /**
          * Show export dialog.
          */
         void exportImage(const wxString &p);
@@ -116,14 +105,12 @@ class MainFrame: public wxFrame {
         int showProceedMessage();
         int showCloseMessage();
 
-        ScrolledView *sView = nullptr;
+        ScrolledCanvas *sCanvas = nullptr;
         ToolsPanel *tools = nullptr;
         wxSplitterWindow *mainSplitter = nullptr;
         wxSplitterWindow *sideSplitter = nullptr;
         PreviewPanel *preview = nullptr;
         wxBoxSizer *mainSizer = nullptr;
-        Magick::Image *sourceImg = nullptr;
-        Magick::Image *compImg = nullptr;
 
         wxButton *apply;
         wxButton *reset;
@@ -131,10 +118,6 @@ class MainFrame: public wxFrame {
 
         wxMenuBar *topMenuBar;
         wxMenu *mFile, *mEdit, *mHelp;
-
-        std::stack<OptionsContainer> undoStack;
-        OptionsContainer currentState;
-        std::stack<OptionsContainer> redoStack;
 
         bool openedImg, exportedImg;
 

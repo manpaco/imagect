@@ -25,13 +25,14 @@
 
 class PixView;
 class Scaler;
+class wxPaintDC;
 
 class CanvasItem {
 public:
     CanvasItem();
     CanvasItem(wxRect geometry, CanvasItem *parent, Scaler *scaler, bool locked = true);
 
-    virtual void drawOn(PixView *pv) = 0;
+    virtual void drawOn(wxPaintDC *pv);
     void lockEntries(const bool opt);
     bool lockEntries();
     wxRect getGeometry() const;
@@ -139,7 +140,7 @@ private:
 
     virtual void updateBuffer() { }
 
-    void drawEntries(PixView *pv);
+    void drawEntries(PixView *pv) { }
 
     wxRect geometry;
     wxRect constraint;

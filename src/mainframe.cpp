@@ -18,19 +18,14 @@
  */
 
 #include "mainframe.h"
-#include "Magick++/Geometry.h"
-#include "canvaspanel.h"
 #include "cropevent.h"
 #include "defs.h"
 #include "buildvalues.h"
-#include "optscontainer.h"
 #include "previewpanel.h"
 #include "toolspanel.h"
 #include "imgtools.h"
 #include "filext.h"
 #include "exportdlg.h"
-#include <Magick++/Image.h>
-#include "scrolview.h"
 #include "zoomctrl.h"
 #include "zoomevent.h"
 #include "wx/settings.h"
@@ -39,6 +34,7 @@
 #include "wx/menu.h"
 #include "wx/msgdlg.h"
 #include <iostream>
+#include "scrolledcanvas.h"
 
 #if wxUSE_STATLINE
     #include <wx/statline.h>
@@ -47,8 +43,6 @@
 #if wxUSE_SPLITTER
     #include <wx/splitter.h>
 #endif
-
-using Magick::Quantum;
 
 MainFrame::MainFrame(): 
     wxFrame(NULL,
@@ -72,8 +66,7 @@ MainFrame::MainFrame(const wxString &initImg): MainFrame() {
 }
 
 MainFrame::~MainFrame() {
-    if(sourceImg) delete(sourceImg);
-    if(compImg) delete compImg;
+
 }
 
 void MainFrame::initDimensions() {
@@ -90,7 +83,7 @@ void MainFrame::initDimensions() {
 void MainFrame::allocateMem() {
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
-    sView = new ScrolledView(mainSplitter, ict::SCVIEW);
+    sCanvas = new ScrolledCanvas(mainSplitter, ict::SCVIEW);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxVERTICAL);
@@ -129,7 +122,7 @@ void MainFrame::createMenuBar() {
 
 void MainFrame::overlayPanels() {
     sideSplitter->SplitHorizontally(preview, tools);
-    mainSplitter->SplitVertically(sideSplitter, sView);
+    mainSplitter->SplitVertically(sideSplitter, sCanvas);
     wxBoxSizer *buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
     buttonsSizer->AddSpacer(ict::BEST_SPACE);
     buttonsSizer->Add(apply);
@@ -148,8 +141,6 @@ void MainFrame::overlayPanels() {
 }
 
 void MainFrame::bindMenuBar() {
-    Bind(wxEVT_MENU, &MainFrame::undo, this, wxID_UNDO);
-    Bind(wxEVT_MENU, &MainFrame::redo, this, wxID_REDO);
     Bind(wxEVT_MENU, &MainFrame::onOpen, this, wxID_OPEN);
     Bind(wxEVT_MENU, &MainFrame::onExport, this, ict::EXPORT_MI);
     Bind(wxEVT_MENU, &MainFrame::onQuit, this, wxID_EXIT);
@@ -159,8 +150,8 @@ void MainFrame::bindMenuBar() {
 }
 
 void MainFrame::bindElements() {
-    sView->
-        getCanvas()->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
+//    sView->
+//        getCanvas()->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
     Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Bind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->
@@ -172,8 +163,8 @@ void MainFrame::bindElements() {
 }
 
 void MainFrame::unbindElements() {
-    sView->
-        getCanvas()->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
+//    sView->
+//        getCanvas()->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
     Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Unbind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->
@@ -252,43 +243,43 @@ int MainFrame::showProceedMessage() {
 
 void MainFrame::exportImage(const wxString &p) {
     if(!openedImg) return;
-    try {
-        Magick::Image out(composeState(*sourceImg, currentState));
-        out.write(p.ToStdString());
-        exportedImg = true;
-    }
-    catch(Magick::Exception &e) {
-        wxMessageBox(e.what(), "Error exporting image");
-    }
+//    try {
+//        Magick::Image out(composeState(*sourceImg, currentState));
+//        out.write(p.ToStdString());
+//        exportedImg = true;
+//    }
+//    catch(Magick::Exception &e) {
+//        wxMessageBox(e.what(), "Error exporting image");
+//    }
 }
 
 void MainFrame::openImage(const wxString &p) {
     if(openedImg) clear();
-    try {
-        sourceImg = new Magick::Image(p.ToStdString());
-        compImg = new Magick::Image(*sourceImg);
-        sView->handle(compImg);
-        wxBitmap newBmp(createImage(*compImg));
-        preview->updatePreview(newBmp);
-        bindElements();
-        tools->clear(true);
-        tools->cropSize(sView->getCanvas()->cropSize());
-        currentState = tools->currentOpts();
-        mEdit->Enable(wxID_APPLY, true);
-        openedImg = true;
-    }
-    catch(Magick::Exception &e) {
-        std::cerr << e.what() << std::endl;
-        wxMessageBox(e.what(), "Error opening image");
-    }
+//    try {
+//        sourceImg = new Magick::Image(p.ToStdString());
+//        compImg = new Magick::Image(*sourceImg);
+//        sView->handle(compImg);
+//        wxBitmap newBmp(createImage(*compImg));
+//        preview->updatePreview(newBmp);
+//        bindElements();
+//        tools->clear(true);
+//        tools->cropSize(sView->getCanvas()->cropSize());
+//        currentState = tools->currentOpts();
+//        mEdit->Enable(wxID_APPLY, true);
+//        openedImg = true;
+//    }
+//    catch(Magick::Exception &e) {
+//        std::cerr << e.what() << std::endl;
+//        wxMessageBox(e.what(), "Error opening image");
+//    }
 }
 
 void MainFrame::onZoomChange(ZoomEvent &event) {
-    sView->scaleFactor(event.getScaleFactor());
+//    sView->scaleFactor(event.getScaleFactor());
 }
 
 void MainFrame::initParams() {
-    currentState = OptionsContainer();
+//    currentState = OptionsContainer();
     openedImg = false;
     exportedImg = false;
     mEdit->Enable(wxID_APPLY, false);
@@ -298,74 +289,38 @@ void MainFrame::initParams() {
 
 void MainFrame::clear() {
     unbindElements();
-    if(sourceImg) {
-        delete sourceImg;
-        sourceImg = nullptr;
-    }
-    if(compImg) {
-        delete compImg;
-        compImg = nullptr;
-    }
-    undoStack = std::stack<OptionsContainer>();
-    redoStack = std::stack<OptionsContainer>();
+//    if(sourceImg) {
+//        delete sourceImg;
+//        sourceImg = nullptr;
+//    }
+//    if(compImg) {
+//        delete compImg;
+//        compImg = nullptr;
+//    }
+//    undoStack = std::stack<OptionsContainer>();
+//    redoStack = std::stack<OptionsContainer>();
     initParams();
     tools->Enable(false);
     tools->collapseBlocks();
-    sView->clear();
+//    sView->clear();
     preview->clear();
 }
 
 void MainFrame::onFixRatio(wxCommandEvent &event) {
-    sView->getCanvas()->fixCrop(event.IsChecked());
+//    sView->getCanvas()->fixCrop(event.IsChecked());
     event.Skip();
 }
 
 void MainFrame::onAllowGrow(wxCommandEvent &event) {
-    if(sView->getCanvas()->allowGrow(event.IsChecked())) 
-        tools->cropGeometry(sView->getCanvas()->cropGeometry());
+//    if(sView->getCanvas()->allowGrow(event.IsChecked())) 
+//        tools->cropGeometry(sView->getCanvas()->cropGeometry());
     event.Skip();
 }
 
 void MainFrame::resetCrop(wxCommandEvent &event) {
-    wxRect rst(wxPoint(0, 0), wxSize(-1, -1));
-    sView->getCanvas()->cropGeometry(&rst);
-    tools->cropGeometry(rst);
-}
-
-void MainFrame::undo(wxCommandEvent &event) {
-    if(redoStack.empty()) mEdit->Enable(wxID_REDO, true);
-    redoStack.push(currentState);
-    currentState = undoStack.top();
-    undoStack.pop();
-    if(undoStack.empty()) mEdit->Enable(wxID_UNDO, false);
-    tools->setOpts(currentState);
-    wxRect upd(currentState.cropOff, currentState.cropSize);
-    sView->getCanvas()->cropGeometry(&upd);
-    composePreview();
-    exportedImg = false;
-}
-
-void MainFrame::redo(wxCommandEvent &event) {
-    if(undoStack.empty()) mEdit->Enable(wxID_UNDO, true);
-    undoStack.push(currentState);
-    currentState = redoStack.top();
-    redoStack.pop();
-    if(redoStack.empty()) mEdit->Enable(wxID_REDO, false);
-    tools->setOpts(currentState);
-    wxRect upd(currentState.cropOff, currentState.cropSize);
-    sView->getCanvas()->cropGeometry(&upd);
-    composePreview();
-    exportedImg = false;
-}
-
-void MainFrame::updateHistory(OptionsContainer toSave) {
-    if(undoStack.empty()) mEdit->Enable(wxID_UNDO, true);
-    mEdit->Enable(wxID_REDO, false);
-    redoStack = std::stack<OptionsContainer>();
-    undoStack.push(currentState);
-    currentState = toSave;
-    composePreview();
-    exportedImg = false;
+//    wxRect rst(wxPoint(0, 0), wxSize(-1, -1));
+//    sView->getCanvas()->cropGeometry(&rst);
+//    tools->cropGeometry(rst);
 }
 
 void MainFrame::onCropChange(CropEvent &event) {
@@ -374,29 +329,29 @@ void MainFrame::onCropChange(CropEvent &event) {
 }
 
 void MainFrame::composePreview() {
-    OptionsContainer aux(currentState);
-    aux.cropSize =
-        sView->getCanvas()->
-            translateSize(aux.cropSize, ict::COMPRESS_T, ict::IN_D);
-    aux.cropOff =
-        sView->getCanvas()->
-            translatePoint(aux.cropOff, ict::COMPRESS_T, ict::IN_D);
-    Magick::Image newImg = composeState(*compImg, aux);
-    wxBitmap newPreview(createImage(newImg));
-    preview->updatePreview(newPreview);
+//    OptionsContainer aux(currentState);
+//    aux.cropSize =
+//        sView->getCanvas()->
+//            translateSize(aux.cropSize, ict::COMPRESS_T, ict::IN_D);
+//    aux.cropOff =
+//        sView->getCanvas()->
+//            translatePoint(aux.cropOff, ict::COMPRESS_T, ict::IN_D);
+//    Magick::Image newImg = composeState(*compImg, aux);
+//    wxBitmap newPreview(createImage(newImg));
+//    preview->updatePreview(newPreview);
 }
 
 void MainFrame::saveState(wxCommandEvent &event) {
-    if(!tools->valid()) return;
-    OptionsContainer toSave = tools->currentOpts();
-    if(toSave.cropSize != currentState.cropSize) {
-        wxSize ts(toSave.cropSize); 
-        if(!sView->getCanvas()->cropSize(&ts)) {
-            tools->cropSize(ts);
-            toSave.cropSize = ts;
-        }
-    }
-    if(toSave == currentState) return;
-    updateHistory(toSave);
+//    if(!tools->valid()) return;
+//    OptionsContainer toSave = tools->currentOpts();
+//    if(toSave.cropSize != currentState.cropSize) {
+//        wxSize ts(toSave.cropSize); 
+//        if(!sView->getCanvas()->cropSize(&ts)) {
+//            tools->cropSize(ts);
+//            toSave.cropSize = ts;
+//        }
+//    }
+//    if(toSave == currentState) return;
+//    updateHistory(toSave);
 }
 

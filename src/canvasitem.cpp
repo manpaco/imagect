@@ -20,6 +20,8 @@
 #include "canvasitem.h"
 #include "defs.h"
 #include "scaler.h"
+#include <wx/dcclient.h>
+#include <wx/gdicmn.h>
 
 CanvasItem::CanvasItem() {
     this->geometry = wxRect(0, 0, 1, 1);
@@ -443,6 +445,7 @@ double CanvasItem::unmodRatio() const {
     return (double)unmodGeo.GetWidth() / unmodGeo.GetHeight();
 }
 
-void CanvasItem::drawEntries(PixView *pv) {
-
+void CanvasItem::drawOn(wxPaintDC *pv) {
+    pv->SetBrush(*wxRED_BRUSH);
+    pv->DrawRectangle(getScaledGeometry(false));
 }

@@ -23,16 +23,15 @@ list(APPEND SRC_FILES
     "mainframe.cpp"
     "previewpanel.cpp"
     "toolspanel.cpp"
-    "canvaspanel.cpp"
-    "imgtools.cpp"
     "cropevent.cpp"
     "imagewindow.cpp"
     "filext.cpp"
     "exportdlg.cpp"
-    "controller.cpp"
-    "scrolview.cpp"
     "zoomctrl.cpp"
     "zoomevent.cpp"
+    "scrolledcanvas.cpp"
+    "canvasitem.cpp"
+    "scaler.cpp"
 )
 list(TRANSFORM SRC_FILES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
