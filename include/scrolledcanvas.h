@@ -20,6 +20,7 @@
 #ifndef SCROLLEDCANVAS_H
 #define SCROLLEDCANVAS_H
 
+#include <wx/event.h>
 #include <wx/window.h>
 
 class wxScrollBar;
@@ -35,9 +36,14 @@ public:
     ~ScrolledCanvas();
 
 private:
+    void paintCanvas(wxPaintEvent &event);
+    void mouseMotion(wxMouseEvent &event);
+    void mousePress(wxMouseEvent &event);
+    void mouseRelease(wxMouseEvent &event);
+
     wxScrollBar *vBar, *hBar;
     wxFlexGridSizer *layout;
-    wxPanel *canvas;
+    wxWindow *canvas;
     Scaler *scaler;
     CanvasItem *testRectangle;
 };

@@ -188,7 +188,7 @@ bool CanvasItem::constraintOn() const {
 bool CanvasItem::modify(const wxPoint &target) {
     // calcular vTarget
     // actualizar lastPoint
-    if (!zonePressed()) return false;
+    if (zonePressed() == ict::NONE) return false;
     wxPoint pParent(0, 0);
     if (!isKey()) pParent = parent->getScaledPosition(false);
     wxPoint relPoint = target - pParent;
