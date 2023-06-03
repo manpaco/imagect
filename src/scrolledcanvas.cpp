@@ -31,9 +31,9 @@
 #include <wx/scrolbar.h>
 
 ScrolledCanvas::ScrolledCanvas(wxWindow *parent, wxWindowID id) : wxWindow(parent, id) {
-    SetBackgroundStyle(wxBG_STYLE_PAINT);
     layout = new wxFlexGridSizer(2, 2, 0, 0);
     canvas = new wxWindow(this, wxID_ANY);
+    canvas->SetBackgroundStyle(wxBG_STYLE_PAINT);
     vBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
     layout->AddGrowableCol(0);
