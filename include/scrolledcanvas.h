@@ -43,7 +43,7 @@ private:
 
     wxScrollBar *vBar, *hBar;
     wxFlexGridSizer *layout;
-    wxWindow *canvas, *zoom;
+    wxWindow *canvas, *navButton;
     Scaler *scaler;
     CanvasItem *testRectangle;
 };
