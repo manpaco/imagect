@@ -113,14 +113,16 @@ ict::ItemZone CanvasItem::zonePressed() const {
 }
 
 ict::ItemZone CanvasItem::getLocation(const wxPoint &p) const {
-    if(scaledZones[ict::NE].Contains(p)) return ict::NE;
-    if(scaledZones[ict::NW].Contains(p)) return ict::NW;
-    if(scaledZones[ict::SE].Contains(p)) return ict::SE;
-    if(scaledZones[ict::SW].Contains(p)) return ict::SW;
-    if(scaledZones[ict::N].Contains(p)) return ict::N;
-    if(scaledZones[ict::S].Contains(p)) return ict::S;
-    if(scaledZones[ict::E].Contains(p)) return ict::E;
-    if(scaledZones[ict::W].Contains(p)) return ict::W;
+    if (selected) {
+        if(scaledZones[ict::NE].Contains(p)) return ict::NE;
+        if(scaledZones[ict::NW].Contains(p)) return ict::NW;
+        if(scaledZones[ict::SE].Contains(p)) return ict::SE;
+        if(scaledZones[ict::SW].Contains(p)) return ict::SW;
+        if(scaledZones[ict::N].Contains(p)) return ict::N;
+        if(scaledZones[ict::S].Contains(p)) return ict::S;
+        if(scaledZones[ict::E].Contains(p)) return ict::E;
+        if(scaledZones[ict::W].Contains(p)) return ict::W;
+    }
     if(scaledZones[ict::INNER].Contains(p)) return ict::INNER;
     return ict::NONE;
 }
@@ -132,15 +134,19 @@ ict::ItemZone CanvasItem::press(const wxPoint &p) {
     if (!isKey()) pParent = parent->getScaledPosition(false);
     wxPoint relPoint = p - pParent;
     zPressed = getLocation(relPoint);
-    if (zPressed == ict::NONE) return zPressed;
+    if (zPressed == ict::NONE) {
+        selected = false;
+        return zPressed;
+    }
+    selected = true;
     lastPoint = scaler->scalePoint(relPoint, ict::OUT_D);
     relativePress = relativeToEdge(lastPoint, zPressed);
-    unmodGeo = geometry;
     return zPressed;
 }
 
 void CanvasItem::release() {
     zPressed = ict::NONE;
+    unmodGeo = geometry;
     if(!fixed && unmodGeo != geometry) {
         resetAccums();
     }
@@ -374,28 +380,30 @@ void CanvasItem::setConstraint(const wxRect &constraint) {
 
 bool CanvasItem::constraintState(bool op) {
     conState = op;
-    if(op) return setGeometry(geometry);
+    if(op) return applyGeometry(geometry);
     else return false;
 }
 
 void CanvasItem::accumulateX(int &dxToCalc, int &dyToUse) {
-    accumX += (double)dyToUse * unmodRatio();
+    accumX += (double)dyToUse * unmodAspectRatio();
     dxToCalc = std::floor(accumX);
     accumX -= dxToCalc;
 }
 
 void CanvasItem::accumulateY(int &dyToCalc, int &dxToUse) {
-    accumY += (double)dxToUse / unmodRatio();
+    accumY += (double)dxToUse / unmodAspectRatio();
     dyToCalc = std::floor(accumY);
     accumY -= dyToCalc;
 }
 
-void CanvasItem::fixRatio(bool op) {
-    if (zPressed == ict::NONE || zPressed == ict::INNER) return;
+void CanvasItem::aspectRatio(int xr, int yr) {
+
+}
+
+void CanvasItem::fixAspectRatio(bool op) {
     fixed = op;
-    if (fixed) {
-        geometry = unmodGeo;
-    }
+    if (zPressed == ict::NONE || zPressed == ict::INNER) return;
+    if (fixed) geometry = unmodGeo;
     modify(lastPoint);
 }
 
@@ -403,20 +411,26 @@ bool CanvasItem::setDimensions(const wxSize &dim) {
     return setGeometry(wxRect(getPosition(), dim));
 }
 
-bool CanvasItem::setGeometry(const wxRect &geo) {
-    if (geometry == geo) return false;
+bool CanvasItem::applyGeometry(const wxRect &geo) {
     wxRect prev = geometry;
     geometry = geo;
+    unmodGeo = geometry;
     if (constraintOn()) {
         if (!constraint.Contains(geometry.GetPosition())) {
             geometry.SetPosition(constraint.GetPosition());
         }
-        geometry.Intersect(constraint);
+        fitInConstraint();
     }
     if (prev != geometry) {
         updateScaledZones();
         return true;
     } else return false;
+}
+
+bool CanvasItem::setGeometry(const wxRect &geo) {
+    if (geometry == geo) return false;
+    if (geometry.GetSize() != geo.GetSize()) resetAccums();
+    return applyGeometry(geo);
 }
 
 bool CanvasItem::setPosition(const wxPoint &pos) {
@@ -441,8 +455,12 @@ void CanvasItem::doScroll(wxPoint motion) {
     updateScaledZones();
 }
 
-double CanvasItem::unmodRatio() const {
+double CanvasItem::unmodAspectRatio() const {
     return (double)unmodGeo.GetWidth() / unmodGeo.GetHeight();
+}
+
+double CanvasItem::aspectRatio() const {
+    return (double)geometry.GetWidth() / geometry.GetHeight();
 }
 
 void CanvasItem::drawOn(wxPaintDC *pv) {

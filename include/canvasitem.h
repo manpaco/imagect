@@ -51,6 +51,8 @@ public:
     bool constraintState(const bool state);
     void setConstraint(const wxRect &constraint);
     void parentConstraint();
+    double aspectRatio() const;
+    void aspectRatio(int xr, int yr);
 
     void doMagnify(wxPoint canvasCenter);
     void doScroll(wxPoint motion);
@@ -58,7 +60,7 @@ public:
     /**
      * Enable or disable the fix aspect ratio.
      */
-    void fixRatio(bool op);
+    void fixAspectRatio(bool op);
 
     /**
      * Modify the the item geometry.
@@ -88,6 +90,8 @@ public:
     ~CanvasItem();
 
 private:
+    bool applyGeometry(const wxRect &geo);
+
     /**
      * Move the crop rectangle such that it fits in the constraint.
      */
@@ -134,7 +138,7 @@ private:
 
     ict::ItemZone getLocation(const wxPoint &p) const;
 
-    double unmodRatio() const;
+    double unmodAspectRatio() const;
 
     void resetAccums();
 
