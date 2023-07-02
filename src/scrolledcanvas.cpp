@@ -36,6 +36,8 @@ ScrolledCanvas::ScrolledCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvas->SetBackgroundStyle(wxBG_STYLE_PAINT);
     vBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
+    zoom = new wxWindow(this, wxID_ANY);
+    zoom->SetBackgroundColour(wxColour(*wxYELLOW));
     layout->AddGrowableCol(0);
     layout->AddGrowableRow(0);
     layout->Add(canvas, 1, wxEXPAND);
@@ -43,6 +45,7 @@ ScrolledCanvas::ScrolledCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     vBar->SetScrollbar(0, 50, 100, 50);
     layout->Add(vBar, 1, wxEXPAND);
     layout->Add(hBar, 1, wxEXPAND);
+    layout->Add(zoom, 1, wxEXPAND);
     SetSizer(layout);
     scaler = new Scaler(1, 1, ict::FLOOR_ST);
     testRectangle = new CanvasItem(wxRect(0, 0, 40, 40), nullptr, scaler, false);
