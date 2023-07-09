@@ -23,17 +23,8 @@
 #include <wx/dcclient.h>
 #include <wx/gdicmn.h>
 
-CanvasItem::CanvasItem() {
-    this->geometry = wxRect(0, 0, 1, 1);
-    this->parent = nullptr;
-    this->scaler = nullptr;
-    this->locked = true;
-    this->constraint = geometry;
-    this->selected = false;
-    this->fixed = false;
-    this->conState = false;
-    this->zPressed = ict::NONE;
-    updateScaledZones();
+CanvasItem::CanvasItem() : CanvasItem(wxRect(0, 0, 1, 1), nullptr, nullptr, true) {
+
 }
 
 CanvasItem::CanvasItem(wxRect geometry, CanvasItem *parent, Scaler *scaler, bool locked) {
@@ -54,6 +45,7 @@ CanvasItem::~CanvasItem() {
 }
 
 void CanvasItem::updateScaledZones() {
+    if (!scaler) return;
     int x1 = geometry.GetX(), x2 = geometry.GetX() + geometry.GetWidth();
     int y1 = geometry.GetY(), y2 = geometry.GetY() + geometry.GetHeight();
     int sx1 = scaler->scaleX(x1, ict::IN_D);
