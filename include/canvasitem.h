@@ -23,39 +23,45 @@
 #include "defs.h"
 #include <wx/gdicmn.h>
 
-class PixView;
+class PixelView;
 class Scaler;
-class wxPaintDC;
+class wxMemoryDC;
 
 class CanvasItem {
 public:
     CanvasItem();
-    CanvasItem(wxRect geometry, CanvasItem *parent, Scaler *scaler, bool locked = true);
+    CanvasItem(int id, wxRect geometry);
 
-    virtual void drawOn(wxPaintDC *pv);
+    int getId() const;
+    virtual void drawOn(wxMemoryDC *pv);
     void lockEntries(const bool opt);
     bool lockEntries();
-    wxRect getGeometry() const;
-    wxPoint getPosition() const;
+    wxRect getGeometry(const bool relativeToParent) const;
+    wxPoint getPosition(const bool relativeToParent) const;
     wxSize getDimensions() const;
     wxRect getScaledGeometry(const bool relativeToParent) const;
     wxPoint getScaledPosition(const bool relativeToParent) const;
     wxSize getScaledDimensions() const;
+    wxRect getScaledArea(const bool relativeToParent) const;
     bool setGeometry(const wxRect &geo);
     bool setPosition(const wxPoint &pos);
     bool setDimensions(const wxSize &dim);
     bool toggleSelection();
     void setSelection(const bool select);
-    bool isKey() const;
     bool constraintOn() const;
     bool constraintState(const bool state);
     void setConstraint(const wxRect &constraint);
     void parentConstraint();
     double aspectRatio() const;
     void aspectRatio(int xr, int yr);
+    void setParent(CanvasItem *p);
+    void setScaler(Scaler *s);
+    bool hasParent() const;
 
-    void doMagnify(wxPoint canvasCenter);
-    void doScroll(wxPoint motion);
+    /**
+     * Update zones based in crop rectangle.
+     */
+    void updateScaledZones();
 
     /**
      * Enable or disable the fix aspect ratio.
@@ -86,6 +92,9 @@ public:
      * Get the zone pressed.
      */
     ict::ItemZone zonePressed() const;
+
+    bool operator==(const CanvasItem &);
+    bool operator!=(const CanvasItem &);
 
     ~CanvasItem();
 
@@ -127,11 +136,6 @@ private:
     void resize(const wxPoint &t);
 
     /**
-     * Update zones based in crop rectangle.
-     */
-    void updateScaledZones();
-
-    /**
      * Get offset from p to respective zone.
      */
     wxPoint relativeToEdge(const wxPoint &p, ict::ItemZone z);
@@ -144,8 +148,11 @@ private:
 
     virtual void updateBuffer() { }
 
-    void drawEntries(PixView *pv) { }
+    void drawEntries(wxMemoryDC *pv);
+    
+    wxPoint relativeToScaledParent(wxPoint scaledPoint);
 
+    int id;
     wxRect geometry;
     wxRect constraint;
     wxRect unmodGeo;

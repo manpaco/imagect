@@ -20,18 +20,20 @@
 #include "canvasitem.h"
 #include "defs.h"
 #include "scaler.h"
-#include <wx/dcclient.h>
+#include "scrolledcanvas.h"
+#include <wx/dcmemory.h>
 #include <wx/gdicmn.h>
 
-CanvasItem::CanvasItem() : CanvasItem(wxRect(0, 0, 1, 1), nullptr, nullptr, true) {
+CanvasItem::CanvasItem() : CanvasItem(-1, wxRect(0, 0, 1, 1)) {
 
 }
 
-CanvasItem::CanvasItem(wxRect geometry, CanvasItem *parent, Scaler *scaler, bool locked) {
+CanvasItem::CanvasItem(int id, wxRect geometry) {
+    this->id = id;
     this->geometry = geometry;
-    this->parent = parent;
-    this->scaler = scaler;
-    this->locked = locked;
+    this->parent = nullptr;
+    this->scaler = nullptr;
+    this->locked = true;
     this->constraint = geometry;
     this->selected = false;
     this->fixed = false;
@@ -55,6 +57,7 @@ void CanvasItem::updateScaledZones() {
     wxPoint ipt(sx1, sy1);
     wxSize isz(sx2 - sx1, sy2 - sy1);
     scaledZones[ict::INNER] = wxRect(ipt, isz);
+    updateBuffer();
     if (locked) return;
     scaledZones[ict::N] = wxRect(sx1, sy1 - ict::CORNER, isz.GetWidth(), ict::CORNER);
     scaledZones[ict::S] = wxRect(sx1, sy2, isz.GetWidth(), ict::CORNER);
@@ -119,12 +122,16 @@ ict::ItemZone CanvasItem::getLocation(const wxPoint &p) const {
     return ict::NONE;
 }
 
+wxPoint CanvasItem::relativeToScaledParent(wxPoint p) {
+    wxPoint pParent(0, 0);
+    if (hasParent()) pParent = parent->getScaledPosition(false);
+    return p - pParent;
+}
+
 ict::ItemZone CanvasItem::press(const wxPoint &p) {
     if(locked) return ict::NONE;
     // convert p to coordinates relative to parent
-    wxPoint pParent(0, 0);
-    if (!isKey()) pParent = parent->getScaledPosition(false);
-    wxPoint relPoint = p - pParent;
+    wxPoint relPoint = relativeToScaledParent(p);
     zPressed = getLocation(relPoint);
     if (zPressed == ict::NONE) {
         selected = false;
@@ -152,12 +159,15 @@ wxSize CanvasItem::getDimensions() const {
     return geometry.GetSize();
 }
 
-wxPoint CanvasItem::getPosition() const {
+wxPoint CanvasItem::getPosition(const bool relativeToParent) const {
+    if (hasParent() && !relativeToParent) {
+        return parent->getPosition(relativeToParent) + geometry.GetPosition();
+    }
     return geometry.GetPosition();
 }
 
-wxRect CanvasItem::getGeometry() const {
-    return wxRect(getPosition(), getDimensions());
+wxRect CanvasItem::getGeometry(const bool relativeToParent) const {
+    return wxRect(getPosition(relativeToParent), getDimensions());
 }
 
 wxSize CanvasItem::getScaledDimensions() const {
@@ -165,7 +175,7 @@ wxSize CanvasItem::getScaledDimensions() const {
 }
 
 wxPoint CanvasItem::getScaledPosition(const bool relativeToParent) const {
-    if (!isKey() && !relativeToParent) {
+    if (hasParent() && !relativeToParent) {
         return parent->getScaledPosition(relativeToParent) + scaledZones[ict::INNER].GetPosition();
     }
     return scaledZones[ict::INNER].GetPosition();
@@ -175,8 +185,8 @@ wxRect CanvasItem::getScaledGeometry(const bool relativeToParent) const {
     return wxRect(getScaledPosition(relativeToParent), getScaledDimensions());
 }
 
-bool CanvasItem::isKey() const {
-    return parent == nullptr;
+wxRect CanvasItem::getScaledArea(const bool relativeToParent) const {
+    return getScaledGeometry(relativeToParent).Inflate(ict::CORNER);
 }
 
 bool CanvasItem::constraintOn() const {
@@ -184,12 +194,8 @@ bool CanvasItem::constraintOn() const {
 }
 
 bool CanvasItem::modify(const wxPoint &target) {
-    // calcular vTarget
-    // actualizar lastPoint
     if (zonePressed() == ict::NONE) return false;
-    wxPoint pParent(0, 0);
-    if (!isKey()) pParent = parent->getScaledPosition(false);
-    wxPoint relPoint = target - pParent;
+    wxPoint relPoint = relativeToScaledParent(target);
     lastPoint = scaler->scalePoint(relPoint, ict::OUT_D);
     wxRect prev = geometry;
     if (zonePressed() == ict::INNER) {
@@ -400,7 +406,7 @@ void CanvasItem::fixAspectRatio(bool op) {
 }
 
 bool CanvasItem::setDimensions(const wxSize &dim) {
-    return setGeometry(wxRect(getPosition(), dim));
+    return setGeometry(wxRect(getPosition(true), dim));
 }
 
 bool CanvasItem::applyGeometry(const wxRect &geo) {
@@ -429,24 +435,6 @@ bool CanvasItem::setPosition(const wxPoint &pos) {
     return setGeometry(wxRect(pos, geometry.GetSize()));
 }
 
-void CanvasItem::doMagnify(wxPoint magCenter) {
-    if (isKey()) {
-        // center magnify
-        wxPoint magPos = scaledZones[ict::INNER].GetPosition();
-        magPos -= magCenter;
-        magPos = scaler->transferPoint(magPos, ict::IN_D);
-        magPos += magCenter;
-        geometry.SetPosition(scaler->scalePoint(magPos, ict::OUT_D));
-    }
-    updateScaledZones();
-}
-
-void CanvasItem::doScroll(wxPoint motion) {
-    if (!isKey()) return;
-    geometry.SetPosition(geometry.GetPosition() + motion);
-    updateScaledZones();
-}
-
 double CanvasItem::unmodAspectRatio() const {
     return (double)unmodGeo.GetWidth() / unmodGeo.GetHeight();
 }
@@ -455,7 +443,61 @@ double CanvasItem::aspectRatio() const {
     return (double)geometry.GetWidth() / geometry.GetHeight();
 }
 
-void CanvasItem::drawOn(wxPaintDC *pv) {
+void CanvasItem::drawOn(wxMemoryDC *pv) {
+    drawEntries(pv);
     pv->SetBrush(*wxRED_BRUSH);
     pv->DrawRectangle(getScaledGeometry(false));
+}
+
+void CanvasItem::drawEntries(wxMemoryDC *pv) { 
+    if (!selected) return;
+    pv->SetBrush(*wxBLUE_BRUSH);
+    pv->DrawRectangle(getScaledArea(false));
+}
+
+bool CanvasItem::operator==(const CanvasItem &c) {
+    return getId() == c.getId();
+}
+
+bool CanvasItem::operator!=(const CanvasItem &c) {
+    return getId() != c.getId();
+}
+
+int CanvasItem::getId() const {
+    return id;
+}
+
+void CanvasItem::setParent(CanvasItem *p) {
+    wxPoint app;
+    if (!p) app = wxPoint(0, 0);
+    else app = p->getPosition(false);
+    wxPoint aip(getPosition(false));
+    constraintState(false);
+    parent = p;
+    aip -= app;
+    setPosition(aip);
+    updateScaledZones();
+}
+
+void CanvasItem::parentConstraint() {
+    if (!hasParent()) return;
+    constraint = parent->getGeometry(true);
+    constraint.SetPosition(wxPoint(0, 0));
+}
+
+bool CanvasItem::hasParent() const {
+    return parent;
+}
+
+void CanvasItem::setScaler(Scaler *s) {
+    scaler = s;
+    updateScaledZones();
+}
+
+void CanvasItem::setSelection(const bool select) {
+    selected = select;
+}
+
+void CanvasItem::lockEntries(const bool opt) {
+    locked = opt;
 }

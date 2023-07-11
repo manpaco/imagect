@@ -35,6 +35,7 @@
 #include "wx/msgdlg.h"
 #include <iostream>
 #include "scrolledcanvas.h"
+#include "canvasitem.h"
 
 #if wxUSE_STATLINE
     #include <wx/statline.h>
@@ -84,6 +85,12 @@ void MainFrame::allocateMem() {
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
     sCanvas = new ScrolledCanvas(mainSplitter, ict::SCVIEW);
+    CanvasItem *it1 = new CanvasItem(1, wxRect(0, 0, 50, 50));
+    it1->lockEntries(false);
+    sCanvas->addItem(it1, 0);
+    CanvasItem *it2 = new CanvasItem(2, wxRect(0, 0, 50, 50));
+    it2->lockEntries(false);
+    sCanvas->addItem(it2, 0);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
     mainSizer = new wxBoxSizer(wxVERTICAL);

@@ -23,6 +23,18 @@ void Scaler::setScaleType(ict::ScaleType st) {
     this->st = st;
 }
 
+bool Scaler::hasTransfer() const {
+    double xtf, ytf;
+    getTransferFactor(&xtf, &ytf);
+    return xtf != 1.0 || ytf != 1.0;
+}
+
+void Scaler::clearTransfer() {
+    double xf, yf;
+    getNewFactor(&xf, &yf);
+    setNewFactor(xf, yf);
+}
+
 void Scaler::getNewFactor(double *xf, double *yf) const {
     if (xf) *xf = this->xxFactor;
     if (yf) *yf = this->yyFactor;

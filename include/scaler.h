@@ -14,6 +14,8 @@ public:
     void getNewFactor(double *xf, double *yf) const;
     void getOldFactor(double *xof, double *yof) const;
     void getTransferFactor(double *xtf, double *ytf) const;
+    bool hasTransfer() const;
+    void clearTransfer();
 
     int scaleX(const int v, ict::Dot d) const;
     int scaleY(const int v, ict::Dot d) const;

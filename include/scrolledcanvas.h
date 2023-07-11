@@ -20,6 +20,7 @@
 #ifndef SCROLLEDCANVAS_H
 #define SCROLLEDCANVAS_H
 
+#include <vector>
 #include <wx/event.h>
 #include <wx/window.h>
 
@@ -32,6 +33,9 @@ class Scaler;
 class ScrolledCanvas : public wxWindow {
 public:
     ScrolledCanvas(wxWindow *parent, wxWindowID id);
+    
+    void addItem(CanvasItem *item, int parentId);
+    CanvasItem * getItem(int itemId);
 
     ~ScrolledCanvas();
 
@@ -40,12 +44,24 @@ private:
     void mouseMotion(wxMouseEvent &event);
     void mousePress(wxMouseEvent &event);
     void mouseRelease(wxMouseEvent &event);
+    void canvasResize(wxSizeEvent &event);
+
+    void doMagnify(const wxPoint magCenter);
+    void doScroll(const wxPoint motion);
+    CanvasItem * pressCanvas(const wxPoint p);
+    void updateItemsZones();
+    void refreshCanvas();
+    void refreshCanvasRect(const wxRect &r);
 
     wxScrollBar *vBar, *hBar;
     wxFlexGridSizer *layout;
-    wxWindow *canvas, *navButton;
+    wxWindow *canvas;
+    //NavigationPopup *nav;
     Scaler *scaler;
-    CanvasItem *testRectangle;
+    std::vector<CanvasItem *> zOrder;
+    CanvasItem *pressItem, *keyItem, *oldSelectedItem;
+
+    wxBitmap *canvasBuffer;
 };
 
 #endif // !SCROLLEDCANVAS_H
