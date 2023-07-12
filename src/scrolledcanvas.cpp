@@ -109,12 +109,14 @@ void ScrolledCanvas::paintCanvas(wxPaintEvent &event) {
     wxPaintDC canvasPainter(canvas);
     wxRegion damaged = canvas->GetUpdateRegion();
     wxRect toPaint(damaged.GetBox());
+    {
     wxMemoryDC bufferPainter(*canvasBuffer);
     //bufferPainter.SetPen(*wxRED_PEN);
     bufferPainter.SetBrush(*wxBLACK_BRUSH);
     bufferPainter.DrawRectangle(toPaint);
     for (std::vector<CanvasItem *>::iterator it = zOrder.begin(); it != zOrder.end(); it++) {
         (*it)->drawOn(&bufferPainter);
+    }
     }
     canvasPainter.DrawBitmap(*canvasBuffer, 0, 0);
 }
@@ -140,10 +142,6 @@ void ScrolledCanvas::addItem(CanvasItem *item, int parentId) {
     }
     zOrder.push_back(item);
     refreshCanvasRect(item->getScaledArea(false));
-}
-
-void ScrolledCanvas::drawItemsOn() {
-
 }
 
 void ScrolledCanvas::updateItemsZones() {
