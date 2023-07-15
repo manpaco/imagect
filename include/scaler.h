@@ -4,6 +4,14 @@
 #include <wx/gdicmn.h>
 #include "defs.h"
 
+const double minScaleFactor = 1.0 / 256;
+const double maxScaleFactor = 256;
+
+enum ScaleTarget {
+    IN_TARGET = 0,
+    OUT_TARGET
+};
+
 class Scaler {
 public:
     Scaler();
@@ -16,7 +24,9 @@ public:
     void getTransferFactor(double *xtf, double *ytf) const;
     bool hasTransfer() const;
     void clearTransfer();
+    void addFactor(double axf, double ayf);
 
+    int scale(const int v, const ict::Dot d, const double f) const;
     int scaleX(const int v, ict::Dot d) const;
     int scaleY(const int v, ict::Dot d) const;
     wxPoint scalePoint(const wxPoint &p, ict::Dot d) const;
@@ -32,7 +42,6 @@ public:
     ~Scaler();
 
 private:
-    int scale(const int v, const ict::Dot d, const double f) const;
     double xxFactor = 1.0, yyFactor = 1.0;
     double xxOldFactor = 1.0, yyOldFactor = 1.0;
     ict::ScaleType st = ict::FLOOR_ST;

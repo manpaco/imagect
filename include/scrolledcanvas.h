@@ -34,7 +34,7 @@ class ScrolledCanvas : public wxWindow {
 public:
     ScrolledCanvas(wxWindow *parent, wxWindowID id);
     
-    void addItem(CanvasItem *item, int parentId);
+    void addItem(CanvasItem *item);
     CanvasItem * getItem(int itemId);
 
     ~ScrolledCanvas();
@@ -45,21 +45,21 @@ private:
     void mousePress(wxMouseEvent &event);
     void mouseRelease(wxMouseEvent &event);
     void canvasResize(wxSizeEvent &event);
-
+    void magnification(wxMouseEvent &event);
     void doMagnify(const wxPoint magCenter);
     void doScroll(const wxPoint motion);
     CanvasItem * pressCanvas(const wxPoint p);
-    void updateItemsZones();
     void refreshCanvas();
     void refreshCanvasRect(const wxRect &r);
 
     wxScrollBar *vBar, *hBar;
     wxFlexGridSizer *layout;
     wxWindow *canvas;
-    //NavigationPopup *nav;
+    wxWindow *zoom;
     Scaler *scaler;
     std::vector<CanvasItem *> zOrder;
-    CanvasItem *pressItem, *keyItem, *oldSelectedItem;
+    CanvasItem *pressItem, *oldSelectedItem, *referenceItem;
+    double xMagError, yMagError;
 
     wxBitmap *canvasBuffer;
 };

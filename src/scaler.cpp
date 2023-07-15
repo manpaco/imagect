@@ -2,6 +2,7 @@
 #include "defs.h"
 #include <cmath>
 #include <math.h>
+#include <iostream>
 
 Scaler::Scaler() {
 
@@ -13,10 +14,14 @@ Scaler::Scaler(double xf, double yf, ict::ScaleType st) {
 }
 
 void Scaler::setNewFactor(double xf, double yf) {
-    this->xxOldFactor = this->xxFactor;
-    this->yyOldFactor = this->yyFactor;
-    this->xxFactor = xf;
-    this->yyFactor = yf;
+    if (xf > 0.0) {
+        this->xxOldFactor = this->xxFactor;
+        this->xxFactor = xf;
+    }
+    if (yf > 0.0) {
+        this->yyOldFactor = this->yyFactor;
+        this->yyFactor = yf;
+    }
 }
 
 void Scaler::setScaleType(ict::ScaleType st) {
@@ -32,6 +37,14 @@ bool Scaler::hasTransfer() const {
 void Scaler::clearTransfer() {
     double xf, yf;
     getNewFactor(&xf, &yf);
+    setNewFactor(xf, yf);
+}
+
+void Scaler::addFactor(double axf, double ayf) {
+    double xf, yf;
+    getNewFactor(&xf, &yf);
+    xf += axf;
+    yf += ayf;
     setNewFactor(xf, yf);
 }
 

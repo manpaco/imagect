@@ -23,6 +23,11 @@
 #include "defs.h"
 #include <wx/gdicmn.h>
 
+enum ItemContext {
+    VIRTUAL_CONTEXT,
+    CANVAS_CONTEXT
+};
+
 class PixelView;
 class Scaler;
 class wxMemoryDC;
@@ -34,34 +39,36 @@ public:
 
     int getId() const;
     virtual void drawOn(wxMemoryDC *pv);
-    void lockEntries(const bool opt);
-    bool lockEntries();
-    wxRect getGeometry(const bool relativeToParent) const;
-    wxPoint getPosition(const bool relativeToParent) const;
-    wxSize getDimensions() const;
-    wxRect getScaledGeometry(const bool relativeToParent) const;
-    wxPoint getScaledPosition(const bool relativeToParent) const;
-    wxSize getScaledDimensions() const;
-    wxRect getScaledArea(const bool relativeToParent) const;
-    bool setGeometry(const wxRect &geo);
-    bool setPosition(const wxPoint &pos);
-    bool setDimensions(const wxSize &dim);
+    void lock(const bool opt);
+    bool isLocked();
+    void hide(bool opt);
+    bool isHidden() const;
+    int getX(ItemContext ic) const;
+    int getY(ItemContext ic) const;
+    int xVirtualUnref() const;
+    int yVirtualUnref() const;
+    int getWidth(ItemContext ic) const;
+    int getHeight(ItemContext ic) const;
+    wxRect getGeometry(ItemContext ic) const;
+    wxPoint getPosition(ItemContext ic) const;
+    wxSize getDimensions(ItemContext ic) const;
+    wxRect getArea() const;
+    wxRect getZone(ict::ItemZone z) const;
+    bool setVirtualGeometry(const wxRect &geo);
+    bool setVirtualPosition(const wxPoint &pos);
+    bool setVirtualDimensions(const wxSize &dim);
     bool toggleSelection();
-    void setSelection(const bool select);
-    bool constraintOn() const;
-    bool constraintState(const bool state);
-    void setConstraint(const wxRect &constraint);
-    void parentConstraint();
-    double aspectRatio() const;
-    void aspectRatio(int xr, int yr);
-    void setParent(CanvasItem *p);
+    void select(const bool select);
+    bool isSelected() const;
+    bool restrict(const bool state);
+    bool isRestricted() const;
+    void setVirtualRestriction(const wxRect &restriction);
+    double getAspectRatio() const;
+    void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
-    bool hasParent() const;
-
-    /**
-     * Update zones based in crop rectangle.
-     */
-    void updateScaledZones();
+    void setOffset(wxPoint vo);
+    wxPoint getOffset() const;
+    void setCanvasReference(CanvasItem *r);
 
     /**
      * Enable or disable the fix aspect ratio.
@@ -74,14 +81,14 @@ public:
      * @param target Point used to move or resize.
      * @return true if crop rectangle changes, else false.
      */
-    bool modify(const wxPoint &target);
+    bool modify(const wxPoint &avp);
 
     /**
      * Simulate pressure at a given point.
      *
      * @param p point, used to calculate zone and offset in pressure.
      */
-    ict::ItemZone press(const wxPoint &p);
+    ict::ItemZone press(const wxPoint &avp);
 
     /**
      * Release the simulated pressure.
@@ -91,7 +98,7 @@ public:
     /**
      * Get the zone pressed.
      */
-    ict::ItemZone zonePressed() const;
+    ict::ItemZone getZonePressed() const;
 
     bool operator==(const CanvasItem &);
     bool operator!=(const CanvasItem &);
@@ -99,18 +106,23 @@ public:
     ~CanvasItem();
 
 private:
+    int getRight(ItemContext ic) const;
+    int getLeft(ItemContext ic) const;
+    int getTop(ItemContext ic) const;
+    int getBottom(ItemContext ic) const;
+
     bool applyGeometry(const wxRect &geo);
 
     /**
      * Move the crop rectangle such that it fits in the constraint.
      */
-    void pushToConstraint();
+    void pushToRestriction();
 
     /**
      * Fit the crop rectangle in the constraint holding the position. That
      * means the size is modified.
      */
-    void fitInConstraint();
+    void fitInRestriction(ict::ItemZone simulation);
 
     /**
      * Use delta in y axis to calculate delta in x axis. Here the ratio is
@@ -138,36 +150,33 @@ private:
     /**
      * Get offset from p to respective zone.
      */
+    
     wxPoint relativeToEdge(const wxPoint &p, ict::ItemZone z);
 
-    ict::ItemZone getLocation(const wxPoint &p) const;
+    ict::ItemZone getLocation(const wxPoint &vp) const;
 
-    double unmodAspectRatio() const;
+    double getUnmodAspectRatio() const;
 
     void resetAccums();
 
-    virtual void updateBuffer() { }
-
     void drawEntries(wxMemoryDC *pv);
     
-    wxPoint relativeToScaledParent(wxPoint scaledPoint);
-
     int id;
     wxRect geometry;
-    wxRect constraint;
-    wxRect unmodGeo;
+    wxRect restriction;
+    wxRect unmodGeometry;
     bool selected;
     bool locked;
     bool fixed;
-    bool conState;
+    bool restricted;
+    bool hidden;
     double accumX = 0.0, accumY = 0.0;
-    ict::ItemZone zPressed;
+    ict::ItemZone zonePressed;
     wxPoint relativePress;
     wxPoint lastPoint;
-    wxRect scaledZones[ict::NUM_ZONES];
-
-    CanvasItem *parent;
+    wxPoint offset;
     Scaler *scaler;
+    CanvasItem *reference;
 };
 
 #endif // !CANVASITEM_H
