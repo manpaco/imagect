@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+
+CC="g++"
+CLANG="c++"
+CSTD="${CLANG}11"
+
+rootdir="$(realpath "$0")"
+rootdir="${rootdir%/*}"
+
+_srcdir="src"
+_incdir="include"
+
+cxxflags="$(wx-config --cxxflags)"
+libs="$(wx-config --libs core,base)"
+
+echo "$rootdir $rootdir/$_srcdir $rootdir/$_incdir $cxxflags $libs"
+
+create_compile_flags ()
+{
+    echo "Creating compile flags..."
+}
