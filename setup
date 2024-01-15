@@ -35,8 +35,7 @@ cxxflags="$(trim "$cxxflags")"
 libs="$(trim "$libs")"
 
 create_compile_flags () {
-    echo "Creating $COMPILE_FLAGS_FN in $compile_flags_file..."
-    touch "$compile_flags_file"
+    echo "Creating $COMPILE_FLAGS_FN in $compile_flags_file ..."
     true > "$compile_flags_file"
     local compile_flags="$cxxflags -I$incdir $STDFLAG $LANGFLAG"
     for flag in $compile_flags; do
@@ -46,7 +45,7 @@ create_compile_flags () {
 }
 
 create_makefile () {
-    echo "Creating $MAKEFILE_FN..."
+    echo "Creating $MAKEFILE_FN ..."
     echo "Done!"
 }
 
