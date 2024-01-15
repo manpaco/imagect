@@ -1,3 +1,4 @@
 build/
 .cache/
 include/buildvalues.h
+compile_flags.txt
