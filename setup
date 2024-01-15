@@ -3,19 +3,51 @@
 CC="g++"
 CLANG="c++"
 CSTD="${CLANG}11"
+STDFLAG="-std=${CSTD}"
+LANGFLAG="-x${CLANG}"
+COMPILE_FLAGS_FN="compile_flags.txt"
+MAKEFILE_FN="Makefile"
 
 rootdir="$(realpath "$0")"
 rootdir="${rootdir%/*}"
 
 _srcdir="src"
 _incdir="include"
+_builddir="build"
+srcdir="${rootdir}/${_srcdir}"
+incdir="${rootdir}/${_incdir}"
+builddir="${rootdir}/${_builddir}"
+compile_flags_file="${rootdir}/${COMPILE_FLAGS_FN}"
+
+trim() {
+    local var="$*"
+    # remove leading whitespace characters
+    var="${var#"${var%%[![:space:]]*}"}"
+    # remove trailing whitespace characters
+    var="${var%"${var##*[![:space:]]}"}"
+    printf '%s' "$var"
+}
 
 cxxflags="$(wx-config --cxxflags)"
 libs="$(wx-config --libs core,base)"
 
-echo "$rootdir $rootdir/$_srcdir $rootdir/$_incdir $cxxflags $libs"
+cxxflags="$(trim "$cxxflags")"
+libs="$(trim "$libs")"
 
-create_compile_flags ()
-{
-    echo "Creating compile flags..."
+create_compile_flags () {
+    echo "Creating $COMPILE_FLAGS_FN in $compile_flags_file..."
+    touch "$compile_flags_file"
+    true > "$compile_flags_file"
+    local compile_flags="$cxxflags -I$incdir $STDFLAG $LANGFLAG"
+    for flag in $compile_flags; do
+        echo "$flag" >> "$compile_flags_file"
+    done
+    echo "Done!"
 }
+
+create_makefile () {
+    echo "Creating $MAKEFILE_FN..."
+    echo "Done!"
+}
+
+create_compile_flags
