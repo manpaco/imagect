@@ -7,17 +7,31 @@ STDFLAG="-std=${CSTD}"
 LANGFLAG="-x${CLANG}"
 COMPILE_FLAGS_FN="compile_flags.txt"
 MAKEFILE_FN="Makefile"
+MAKEFILE_IN_FN="${MAKEFILE_FN}.in"
+REPLACE_REGEXP="@[a-zA-Z]*@"
+PROJDIR_R="@PROJDIR@"
+SRCDIR_R="@SRCDIR@"
+SUBDIRS_R="@SRCSUBS@"
+INCDIR_R="@INCDIR@"
+WINDIR_R="@WINDIR@"
+BUILDDIR_R="@BUILDDIR@"
 
-rootdir="$(realpath "$0")"
-rootdir="${rootdir%/*}"
+projdir="$(realpath "$0")"
+projdir="${projdir%/*}"
 
 _srcdir="src"
+_subdirs=""
 _incdir="include"
-_builddir="build"
-srcdir="${rootdir}/${_srcdir}"
-incdir="${rootdir}/${_incdir}"
-builddir="${rootdir}/${_builddir}"
-compile_flags_file="${rootdir}/${COMPILE_FLAGS_FN}"
+_windir="win"
+srcdir="${projdir}/${_srcdir}"
+incdir="${projdir}/${_incdir}"
+windir="${projdir}/${_windir}"
+
+builddir="$(pwd)"
+
+compile_flags_file="${projdir}/${COMPILE_FLAGS_FN}"
+makefile_file="${builddir}/${MAKEFILE_FN}"
+makefile_in_file="${projdir}/${MAKEFILE_IN_FN}"
 
 trim() {
     local var="$*"
@@ -42,11 +56,36 @@ create_compile_flags () {
         echo "$flag" >> "$compile_flags_file"
     done
     echo "Done!"
+    return 0
 }
 
 create_makefile () {
-    echo "Creating $MAKEFILE_FN ..."
+    ! [[ -e $makefile_in_file ]] && echo "Missing ${MAKEFILE_IN_FN}." &&
+        return 1
+    echo "Creating $MAKEFILE_FN in $makefile_file ..."
+    while IFS='' read -r rline; do
+        if [[ "$rline" =~ $REPLACE_REGEXP ]]; then
+            local out
+            case "$BASH_REMATCH" in
+                "$PROJDIR_R") out="$projdir"
+                    ;;
+                "$SRCDIR_R") out="$srcdir"
+                    ;;
+                "$SUBDIRS_R") out="$_subdirs"
+                    ;;
+                "$INCDIR_R") out="$incdir"
+                    ;;
+                "$WINDIR_R") out="$windir"
+                    ;;
+                "$BUILDDIR_R") out="$builddir"
+                    ;;
+                *) out=""
+                    ;;
+            esac
+            echo "${rline//$BASH_REMATCH/$out}"
+        fi
+    done < "$makefile_in_file" > "$makefile_file"
     echo "Done!"
+    return 0
 }
 
-create_compile_flags
