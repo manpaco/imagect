@@ -220,6 +220,7 @@ done
 [[ $cfo -eq 1 ]] && create_compile_flags
 [[ $eco -eq 1 ]] && create_editorconfig
 if [[ $cco -eq 1 ]]; then
+    create_build_values
     if [[ $msys2 -eq 1 ]]; then
         srcdir="$(cygpath -m "$srcdir")"
         incdir="$(cygpath -m "$incdir")"
@@ -229,6 +230,5 @@ if [[ $cco -eq 1 ]]; then
         configdir="$(cygpath -m "$configdir")"
     fi
     create_makefile
-    create_build_values
 fi
 
