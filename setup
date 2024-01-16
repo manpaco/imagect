@@ -7,7 +7,7 @@ STDFLAG="-std=${CSTD}"
 LANGFLAG="-x${CLANG}"
 
 COMPILE_FLAGS_OPT="--compile_flags"
-WIN_OPT="--win"
+MSYS2_OPT="--msys2"
 EDITORCONFIG_OPT="--editorconfig"
 COMPILATION_OPT="--compilation"
 
@@ -213,9 +213,9 @@ for a in $args; do
         "$COMPILATION_OPT")
             cco=1
             ;;
-        "$WIN_OPT")
+        "$MSYS2_OPT")
+            msys2=1
             target="${target}.${WIN_FMT}"
-            # also change CC var if needed
             ;;
         *)
             ;;
@@ -224,6 +224,14 @@ done
 [[ $cfo -eq 1 ]] && create_compile_flags
 [[ $eco -eq 1 ]] && create_editorconfig
 if [[ $cco -eq 1 ]]; then
+    if [[ $msys2 -eq 1 ]]; then
+        srcdir="$(cygpath -m "$srcdir")"
+        incdir="$(cygpath -m "$incdir")"
+        windir="$(cygpath -m "$windir")"
+        curdir="$(cygpath -m "$curdir")"
+        outdir="$(cygpath -m "$outdir")"
+        configdir="$(cygpath -m "$configdir")"
+    fi
     create_makefile
     create_build_values
 fi
