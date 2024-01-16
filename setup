@@ -5,33 +5,53 @@ CLANG="c++"
 CSTD="${CLANG}11"
 STDFLAG="-std=${CSTD}"
 LANGFLAG="-x${CLANG}"
+
+COMPILE_FLAGS_OPT="-cf"
 COMPILE_FLAGS_FN="compile_flags.txt"
 MAKEFILE_FN="Makefile"
 MAKEFILE_IN_FN="${MAKEFILE_FN}.in"
-REPLACE_REGEXP="@[a-zA-Z]*@"
+BUILDVALUES_H="buildvalues.h"
+BUILDVALUES_IN_H="buildvalues.h.in"
+
+REPLACE_REGEX="@[a-zA-Z]+@"
+CC_R="@CC@"
+PROJECT_R="@PROJECT@"
 PROJDIR_R="@PROJDIR@"
 SRCDIR_R="@SRCDIR@"
-SUBDIRS_R="@SRCSUBS@"
 INCDIR_R="@INCDIR@"
 WINDIR_R="@WINDIR@"
 BUILDDIR_R="@BUILDDIR@"
+SUBDIRS_R="@SUBDIRS@"
 
+VERSION_SHORT_R="@VERSIONSHORT@"
+VERSION_MAJOR_R="@VERSIONMAJOR@"
+VERSION_MINOR_R="@VERSIONMINOR@"
+VERSION_PATCH_R="@VERSIONPATCH@"
+VERSION_SUFFIX_R="@VERSIONSUFFIX@"
+
+VERSION_MAJOR_M1="^v([0-9]+).*"
+VERSION_MINOR_M1="^v[0-9]+\.([0-9]+).*"
+VERSION_PATCH_M1="^v[0-9]+\.[0-9]+\.([0-9]+).*"
+VERSION_SUFFIX_M1="^v[0-9]+\.[0-9]+\.[0-9]+(.*)"
+
+projname="imagect"
 projdir="$(realpath "$0")"
 projdir="${projdir%/*}"
 
 _srcdir="src"
-_subdirs=""
 _incdir="include"
 _windir="win"
 srcdir="${projdir}/${_srcdir}"
 incdir="${projdir}/${_incdir}"
 windir="${projdir}/${_windir}"
-
 builddir="$(pwd)"
+_subdirs=""
 
 compile_flags_file="${projdir}/${COMPILE_FLAGS_FN}"
 makefile_file="${builddir}/${MAKEFILE_FN}"
 makefile_in_file="${projdir}/${MAKEFILE_IN_FN}"
+buildvalues_file="${incdir}/${BUILDVALUES_H}"
+buildvalues_in_file="${projdir}/${BUILDVALUES_IN_H}"
 
 trim() {
     local var="$*"
@@ -55,7 +75,7 @@ create_compile_flags () {
     for flag in $compile_flags; do
         echo "$flag" >> "$compile_flags_file"
     done
-    echo "Done!"
+    echo "Done !"
     return 0
 }
 
@@ -64,28 +84,77 @@ create_makefile () {
         return 1
     echo "Creating $MAKEFILE_FN in $makefile_file ..."
     while IFS='' read -r rline; do
-        if [[ "$rline" =~ $REPLACE_REGEXP ]]; then
-            local out
-            case "$BASH_REMATCH" in
-                "$PROJDIR_R") out="$projdir"
-                    ;;
-                "$SRCDIR_R") out="$srcdir"
-                    ;;
-                "$SUBDIRS_R") out="$_subdirs"
-                    ;;
-                "$INCDIR_R") out="$incdir"
-                    ;;
-                "$WINDIR_R") out="$windir"
-                    ;;
-                "$BUILDDIR_R") out="$builddir"
-                    ;;
-                *) out=""
-                    ;;
-            esac
-            echo "${rline//$BASH_REMATCH/$out}"
-        fi
+        [[ "$rline" =~ $REPLACE_REGEX ]]
+        local out
+        case "${BASH_REMATCH[0]}" in
+            "$CC_R") out="$CC"
+                ;;
+            "$PROJECT_R") out="$projname"
+                ;;
+            "$PROJDIR_R") out="$projdir"
+                ;;
+            "$SRCDIR_R") out="$srcdir"
+                ;;
+            "$INCDIR_R") out="$incdir"
+                ;;
+            "$WINDIR_R") out="$windir"
+                ;;
+            "$BUILDDIR_R") out="$builddir"
+                ;;
+            "$SUBDIRS_R") out="$_subdirs"
+                ;;
+            *) out=""
+                ;;
+        esac
+        echo "${rline//${BASH_REMATCH[0]}/$out}"
     done < "$makefile_in_file" > "$makefile_file"
-    echo "Done!"
+    echo "Done !"
     return 0
 }
+
+get_git_tag() {
+    git_tag=$(git -C "$projdir" describe --tags)
+    [[ "$git_tag" =~ $VERSION_MAJOR_M1 ]]
+    v_major=${BASH_REMATCH[1]}
+    [[ "$git_tag" =~ $VERSION_MINOR_M1 ]]
+    v_minor=${BASH_REMATCH[1]}
+    [[ "$git_tag" =~ $VERSION_PATCH_M1 ]]
+    v_patch=${BASH_REMATCH[1]}
+    [[ "$git_tag" =~ $VERSION_SUFFIX_M1 ]]
+    v_suffix=${BASH_REMATCH[1]}
+}
+
+create_build_values() {
+    ! [[ -e $buildvalues_in_file ]] && echo "Missing ${BUILDVALUES_IN_H}." &&
+        return 1
+    echo "Creating $BUILDVALUES_H in $buildvalues_file ..."
+    get_git_tag
+    while IFS='' read -r rline; do
+        [[ "$rline" =~ $REPLACE_REGEX ]]
+        local out
+        case "${BASH_REMATCH[0]}" in
+            "$PROJECT_R") out="$projname"
+                ;;
+            "$VERSION_SHORT_R") out="$v_major.$v_minor.$v_patch"
+                ;;
+            "$VERSION_MAJOR_R") out="$v_major"
+                ;;
+            "$VERSION_MINOR_R") out="$v_minor"
+                ;;
+            "$VERSION_PATCH_R") out="$v_patch"
+                ;;
+            "$VERSION_SUFFIX_R") out="$v_suffix"
+                ;;
+            *) out=""
+                ;;
+        esac
+        echo "${rline//${BASH_REMATCH[0]}/$out}"
+    done < "$buildvalues_in_file" > "$buildvalues_file"
+    echo "Done !"
+    return 0
+}
+
+[[ $1 == "$COMPILE_FLAGS_OPT" ]] && create_compile_flags
+create_makefile
+create_build_values
 
