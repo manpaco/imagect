@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -20,12 +20,12 @@
 #ifndef BUILDVALUES_H
 #define BUILDVALUES_H
 
-const char * const projectName = "@PROJECT_NAME@";
-const char * const versionString = "@VERSION_SHORT@";
-const char * const versionSuffix = "@VERSION_SUFFIX@";
+const char * const projectName = "@PROJECT@";
+const char * const versionString = "@VERSIONSHORT@";
+const char * const versionSuffix = "@VERSIONSUFFIX@";
 
-const unsigned int versionMajor = @VERSION_MAJOR@;
-const unsigned int versionMinor = @VERSION_MINOR@;
-const unsigned int versionPatch = @VERSION_PATCH@;
+const unsigned int versionMajor = @VERSIONMAJOR@;
+const unsigned int versionMinor = @VERSIONMINOR@;
+const unsigned int versionPatch = @VERSIONPATCH@;
 
 #endif // BUILDVALUES_H
