@@ -8,12 +8,16 @@ LANGFLAG="-x${CLANG}"
 
 COMPILE_FLAGS_OPT="--compile_flags"
 WIN_OPT="--win"
+EDITORCONFIG_OPT="--editorconfig"
+COMPILATION_OPT="--compilation"
 
+EDITORCONFIG_FN=".editorconfig"
+EDITORCONFIG_IN_FN="${EDITORCONFIG_FN}.in"
 COMPILE_FLAGS_FN="compile_flags.txt"
 MAKEFILE_FN="Makefile"
 MAKEFILE_IN_FN="${MAKEFILE_FN}.in"
-BUILDVALUES_H="buildvalues.h"
-BUILDVALUES_IN_H="buildvalues.h.in"
+BUILDVALUES_FN="buildvalues.h"
+BUILDVALUES_IN_FN="${BUILDVALUES_FN}.in"
 WIN_FMT="exe"
 
 REPLACE_REGEX="@[a-zA-Z]+@"
@@ -38,6 +42,8 @@ VERSION_MINOR_M1="^v[0-9]+\.([0-9]+).*"
 VERSION_PATCH_M1="^v[0-9]+\.[0-9]+\.([0-9]+).*"
 VERSION_SUFFIX_M1="^v[0-9]+\.[0-9]+\.[0-9]+(.*)"
 
+MAKEFILE_IN_FN_R="@MAKEFILE_IN_FN@"
+
 CXXFLAGS_R="@CXXFLAGS@"
 LIBS_R="@LIBS@"
 
@@ -51,18 +57,22 @@ _srcdir="src"
 _incdir="include"
 _windir="win"
 _output="output"
+_config="config"
 srcdir="${projdir}/${_srcdir}"
 incdir="${projdir}/${_incdir}"
 windir="${projdir}/${_windir}"
 curdir="$(pwd)"
 outdir="${curdir}/${_output}"
+configdir="${projdir}/${_config}"
 _subdirs=""
 
 compile_flags_file="${projdir}/${COMPILE_FLAGS_FN}"
 makefile_file="${curdir}/${MAKEFILE_FN}"
 makefile_in_file="${projdir}/${MAKEFILE_IN_FN}"
-buildvalues_file="${incdir}/${BUILDVALUES_H}"
-buildvalues_in_file="${projdir}/${BUILDVALUES_IN_H}"
+buildvalues_file="${incdir}/${BUILDVALUES_FN}"
+buildvalues_in_file="${projdir}/${BUILDVALUES_IN_FN}"
+editorconfig_file="${projdir}/${EDITORCONFIG_FN}"
+editorconfig_in_file="${configdir}/${EDITORCONFIG_IN_FN}"
 
 trim() {
     local var="$*"
@@ -142,9 +152,9 @@ get_git_tag() {
 }
 
 create_build_values() {
-    ! [[ -e $buildvalues_in_file ]] && echo "Missing ${BUILDVALUES_IN_H}." &&
+    ! [[ -e $buildvalues_in_file ]] && echo "Missing ${BUILDVALUES_IN_FN}." &&
         return 1
-    echo "Creating $BUILDVALUES_H in $buildvalues_file ..."
+    echo "Creating $BUILDVALUES_FN in $buildvalues_file ..."
     get_git_tag
     while IFS='' read -r rline; do
         [[ "$rline" =~ $REPLACE_REGEX ]]
@@ -171,11 +181,37 @@ create_build_values() {
     return 0
 }
 
+create_editorconfig() {
+    ! [[ -e $editorconfig_in_file ]] && echo "Missing ${EDITORCONFIG_IN_FN}." &&
+        return 1
+    echo "Creating $EDITORCONFIG_FN in $editorconfig_file ..."
+    get_git_tag
+    while IFS='' read -r rline; do
+        [[ "$rline" =~ $REPLACE_REGEX ]]
+        local out
+        case "${BASH_REMATCH[0]}" in
+            "$MAKEFILE_IN_FN_R") out="${MAKEFILE_IN_FN}"
+                ;;
+            *) out=""
+                ;;
+        esac
+        echo "${rline//${BASH_REMATCH[0]}/$out}"
+    done < "$editorconfig_in_file" > "$editorconfig_file"
+    echo "Done !"
+    return 0
+}
+
 args="$*"
 for a in $args; do
     case "$a" in
         "$COMPILE_FLAGS_OPT")
-            create_compile_flags && exit 0
+            cfo=1
+            ;;
+        "$EDITORCONFIG_OPT")
+            eco=1
+            ;;
+        "$COMPILATION_OPT")
+            cco=1
             ;;
         "$WIN_OPT")
             target="${target}.${WIN_FMT}"
@@ -185,6 +221,10 @@ for a in $args; do
             ;;
     esac
 done
-create_makefile
-create_build_values
+[[ $cfo -eq 1 ]] && create_compile_flags
+[[ $eco -eq 1 ]] && create_editorconfig
+if [[ $cco -eq 1 ]]; then
+    create_makefile
+    create_build_values
+fi
 
