@@ -78,6 +78,6 @@ directories:
 
 # Remove all objects, dependencies and executable files generated during the build
 clean:
-	$(HIDE)$(RMDIR) $(OUTDIRS)
+	$(HIDE)$(RM) $(OUTDIRS)
 	$(HIDE)$(RM) $(TARGET) $(ERRIGNORE)
 	@echo Cleaning done !
