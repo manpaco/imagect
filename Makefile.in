@@ -41,9 +41,6 @@ CC = g++
 RM = rm -rf
 MKDIR = mkdir -p
 
-# Remove space after separator
-PSEP = $(strip $(SEP))
-
 # Hide or not the calls depending of VERBOSE
 ifeq ($(VERBOSE),TRUE)
 	HIDE =
@@ -55,7 +52,7 @@ endif
 define generateRules
 $(1)/%.o: %.cpp
 	@echo Building $$@
-	$(HIDE)$(CC) -c $$(CXXFLAGS) -o $$(subst /,$$(PSEP),$$@) $$(subst /,$$(PSEP),$$<) -MMD -MP
+	$(HIDE)$(CC) -c $$(CXXFLAGS) -o $$@ $$< -MMD -MP
 endef
 
 # Indicate to make which targets are not files
