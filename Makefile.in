@@ -38,20 +38,8 @@ LIBS = @LIBS@
 # Name the compiler
 CC = @CC@
 
-# OS specific part
-ifeq ($(OS),Windows_NT)
-	RM = del /F /Q
-	RMDIR = -RMDIR /S /Q
-	MKDIR = -mkdir
-	ERRIGNORE = 2>NUL || true
-	SEP=\\
-else
-	RM = rm -rf
-	RMDIR = rm -rf
-	MKDIR = mkdir -p
-	ERRIGNORE = 2>/dev/null
-	SEP=/
-endif
+RM = rm -rf
+MKDIR = mkdir -p
 
 # Remove space after separator
 PSEP = $(strip $(SEP))
@@ -86,10 +74,10 @@ $(TARGET): $(OBJS)
 $(foreach rdir, $(OUTDIRS), $(eval $(call generateRules, $(rdir))))
 
 directories:
-	$(HIDE)$(MKDIR) $(subst /,$(PSEP),$(OUTDIRS)) $(ERRIGNORE)
+	$(HIDE)$(MKDIR) $(OUTDIRS)
 
 # Remove all objects, dependencies and executable files generated during the build
 clean:
-	$(HIDE)$(RMDIR) $(subst /,$(PSEP),$(OUTDIRS)) $(ERRIGNORE)
+	$(HIDE)$(RMDIR) $(OUTDIRS)
 	$(HIDE)$(RM) $(TARGET) $(ERRIGNORE)
 	@echo Cleaning done !
