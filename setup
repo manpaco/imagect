@@ -7,15 +7,19 @@ STDFLAG="-std=${CSTD}"
 LANGFLAG="-x${CLANG}"
 
 COMPILE_FLAGS_OPT="--compile_flags"
+WIN_OPT="--win"
+
 COMPILE_FLAGS_FN="compile_flags.txt"
 MAKEFILE_FN="Makefile"
 MAKEFILE_IN_FN="${MAKEFILE_FN}.in"
 BUILDVALUES_H="buildvalues.h"
 BUILDVALUES_IN_H="buildvalues.h.in"
+WIN_FMT="exe"
 
 REPLACE_REGEX="@[a-zA-Z]+@"
 CC_R="@CC@"
 PROJECT_R="@PROJECT@"
+TARGET_R="@TARGET@"
 PROJDIR_R="@PROJDIR@"
 SRCDIR_R="@SRCDIR@"
 INCDIR_R="@INCDIR@"
@@ -35,6 +39,8 @@ VERSION_PATCH_M1="^v[0-9]+\.[0-9]+\.([0-9]+).*"
 VERSION_SUFFIX_M1="^v[0-9]+\.[0-9]+\.[0-9]+(.*)"
 
 projname="imagect"
+target="$projname"
+
 projdir="$(realpath "$0")"
 projdir="${projdir%/*}"
 
@@ -92,6 +98,8 @@ create_makefile () {
             "$CC_R") out="$CC"
                 ;;
             "$PROJECT_R") out="$projname"
+                ;;
+            "$TARGET_R") out="$target"
                 ;;
             "$PROJDIR_R") out="$projdir"
                 ;;
@@ -156,7 +164,20 @@ create_build_values() {
     return 0
 }
 
-[[ $1 == "$COMPILE_FLAGS_OPT" ]] && create_compile_flags && exit 0
+args="$*"
+for a in $args; do
+    case "$a" in
+        "$COMPILE_FLAGS_OPT")
+            create_compile_flags && exit 0
+            ;;
+        "$WIN_OPT")
+            target="${target}.${WIN_FMT}"
+            # also change CC var if needed
+            ;;
+        *)
+            ;;
+    esac
+done
 create_makefile
 create_build_values
 
