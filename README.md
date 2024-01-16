@@ -6,57 +6,7 @@ ImageCT is a easy-to-use, free and open source image cropping tool.
 
 Tool to crop images adding the possibility of "growing". This means that if the crop is outside the image, the necessary pixels will be added to avoid leaving empty areas. The pixels that are added can be chosen by the user: color, image or void.
 
-This project use [Legacy ImageMagick](https://legacy.imagemagick.org/) and [wxWidgets](https://www.wxwidgets.org/)
-
-## Features
-
-### Aspect
-
-![aspect-block](/images/aspect-block.png)
-
-Enable or disable the fix ratio.
-
-Width and height setters.
-
-### Shape
-
-![shape-block](/images/shape-block.png)
-
-Crop shape selector.
-
-Stroke width setter.
-
-Stroke color selector.
-
-### Growing
-
-![grow-block](/images/grow-block.png)
-
-Fill pixel selector: Color, Image or Void.
-
-Color selector.
-
-Image selector and blur slider.
-
-### Zoom
-
-![zoom-control](/images/zoom-control.png)
-
-Zoom-out and Zoom-in buttons.
-
-Display box to show current zoom value.
-
-### Preview
-
-![preview-panel](/images/preview-panel.png)
-
-To show the cropping preview.
-
-### Canvas
-
-![canvas-panel](/images/canvas-panel.png)
-
-Contains the opened image and a draggable/resizable crop rectangle.
+This project use [wxWidgets](https://www.wxwidgets.org/)
 
 ## License
 
@@ -64,9 +14,46 @@ Licensed under [GPL-3.0-or-later](/COPYING).
 
 ## Build
 
-For building this project, please see platform-specific documentation. For [Linux](/docs/linux-build.md) or [MSW](/docs/msw-build.md).
+### Required Dependencies
 
-To compile this project on Windows you can use [MSYS2](https://www.msys2.org/).
+ImageCT depends on one component:
+
+- [wxWidgets](https://github.com/wxWidgets/wxWidgets) > v3.2.0
+
+Yout also need some tools:
+
+- git
+
+- make
+
+- A C++ compiler
+
+- To compile this project on Windows you can use [MSYS2](https://www.msys2.org/).
+
+### Build
+
+Here I will you how to build in Linux. For Windows build go to [MSW guide](/docs/msys2-build.md).
+
+First clone a release branch:
+
+    git clone --branch <tag_name> https://github.com/manpaco/imagect.git
+
+For example:
+
+    git clone --branch v0.1.0 https://github.com/manpaco/imagect.git
+
+This project implement an out-of-source building process, so do mkdir and cd into build directory:
+
+    cd imagect
+    mkdrir build && cd build
+
+Run setup scripts from build directory with options that you want:
+
+    ../setup [--editorconfig] [--compile_flags] [--compilation]
+
+And finally run make:
+
+    make
 
 ## Versioning
 
