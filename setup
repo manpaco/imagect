@@ -38,6 +38,9 @@ VERSION_MINOR_M1="^v[0-9]+\.([0-9]+).*"
 VERSION_PATCH_M1="^v[0-9]+\.[0-9]+\.([0-9]+).*"
 VERSION_SUFFIX_M1="^v[0-9]+\.[0-9]+\.[0-9]+(.*)"
 
+CXXFLAGS_R="@CXXFLAGS@"
+LIBS_R="@LIBS@"
+
 projname="imagect"
 target="$projname"
 
@@ -112,6 +115,10 @@ create_makefile () {
             "$OUTDIR_R") out="$outdir"
                 ;;
             "$SUBDIRS_R") out="$_subdirs"
+                ;;
+            "$CXXFLAGS_R") out="$cxxflags"
+                ;;
+            "$LIBS_R") out="$libs"
                 ;;
             *) out=""
                 ;;
