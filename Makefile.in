@@ -41,16 +41,16 @@ ERRIGNORE = 2>/dev/null
 
 # Hide or not the calls depending of VERBOSE
 ifeq ($(VERBOSE),TRUE)
-    HIDE =
+	HIDE =  
 else
-    HIDE = @
+	HIDE = @
 endif
 
 # Define the function that will generate each rule
 define generateRules
 $(1)/%.o: %.c
-    @echo Building $$@
-    $(HIDE)$(CC) -c -I$$(INCDIR) -o $$@ $$< -MMD -MP
+	@echo Building $$@
+	$(HIDE)$(CC) -c -I$$(INCDIR) -o $$@ $$< -MMD -MP
 endef
 
 # Indicate to make which targets are not files
@@ -59,8 +59,8 @@ endef
 all: directories $(TARGET)
 
 $(TARGET): $(OBJS)
-    $(HIDE)echo Linking $@
-    $(HIDE)$(CC) $(OBJS) -o $(TARGET)
+	$(HIDE)echo Linking $@
+	$(HIDE)$(CC) $(OBJS) -o $(TARGET)
 
 # Include dependencies
 -include $(DEPS)
@@ -69,10 +69,10 @@ $(TARGET): $(OBJS)
 $(foreach rdir, $(OUTDIRS), $(eval $(call generateRules, $(rdir))))
 
 directories:
-    $(HIDE)$(MKDIR) $(OUTDIRS) $(ERRIGNORE)
+	$(HIDE)$(MKDIR) $(OUTDIRS) $(ERRIGNORE)
 
 # Remove all objects, dependencies and executable files generated during the build
 clean:
-    $(HIDE)$(RMDIR) $(OUTDIRS) $(ERRIGNORE)
-    $(HIDE)$(RM) $(TARGET) $(ERRIGNORE)
-    @echo Cleaning done !
+	$(HIDE)$(RMDIR) $(OUTDIRS) $(ERRIGNORE)
+	$(HIDE)$(RM) $(TARGET) $(ERRIGNORE)
+	@echo Cleaning done !
