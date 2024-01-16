@@ -3,7 +3,7 @@ PROJDIR := @PROJDIR@
 SRCDIR := @SRCDIR@
 INCDIR := @INCDIR@
 WINDIR := @WINDIR@
-BUILDDIR := @BUILDDIR@
+OUTDIR := @OUTDIR@
 
 # Name of the final executable
 PROJECT = @PROJECT@
@@ -19,7 +19,8 @@ VERBOSE = TRUE
 SUBDIRS = @SUBDIRS@
 SRCDIRS = $(SRCDIR)
 SRCDIRS += $(foreach dir, $(SUBDIRS), $(addprefix $(SRCDIR)/, $(dir)))
-BUILDDIRS = $(foreach dir, $(SUBDIRS), $(addprefix $(BUILDDIR)/, $(dir)))
+OUTDIRS = $(OUTDIR)
+OUTDIRS += $(foreach dir, $(SUBDIRS), $(addprefix $(OUTDIR)/, $(dir)))
 
 # Add this list to VPATH, the place make will look for the source files
 VPATH = $(SRCDIRS)
@@ -28,7 +29,7 @@ VPATH = $(SRCDIRS)
 SOURCES = $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c))
 
 # Define objects for all sources
-OBJS := $(subst $(SRCDIR),$(BUILDDIR),$(SOURCES:.c=.o))
+OBJS := $(subst $(SRCDIR),$(OUTDIR),$(SOURCES:.c=.o))
 
 # Define dependencies files for all objects
 DEPS = $(OBJS:.o=.d)
@@ -68,13 +69,13 @@ $(TARGET): $(OBJS)
 -include $(DEPS)
 
 # Generate rules
-$(foreach rdir, $(BUILDDIRS), $(eval $(call generateRules, $(rdir))))
+$(foreach rdir, $(OUTDIRS), $(eval $(call generateRules, $(rdir))))
 
 directories:
-    $(HIDE)$(MKDIR) $(BUILDDIRS) $(ERRIGNORE)
+    $(HIDE)$(MKDIR) $(OUTDIRS) $(ERRIGNORE)
 
 # Remove all objects, dependencies and executable files generated during the build
 clean:
-    $(HIDE)$(RMDIR) $(BUILDDIRS) $(ERRIGNORE)
+    $(HIDE)$(RMDIR) $(OUTDIRS) $(ERRIGNORE)
     $(HIDE)$(RM) $(TARGET) $(ERRIGNORE)
     @echo Cleaning done !

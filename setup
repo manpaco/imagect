@@ -6,7 +6,7 @@ CSTD="${CLANG}11"
 STDFLAG="-std=${CSTD}"
 LANGFLAG="-x${CLANG}"
 
-COMPILE_FLAGS_OPT="-cf"
+COMPILE_FLAGS_OPT="--compile_flags"
 COMPILE_FLAGS_FN="compile_flags.txt"
 MAKEFILE_FN="Makefile"
 MAKEFILE_IN_FN="${MAKEFILE_FN}.in"
@@ -20,7 +20,7 @@ PROJDIR_R="@PROJDIR@"
 SRCDIR_R="@SRCDIR@"
 INCDIR_R="@INCDIR@"
 WINDIR_R="@WINDIR@"
-BUILDDIR_R="@BUILDDIR@"
+OUTDIR_R="@OUTDIR@"
 SUBDIRS_R="@SUBDIRS@"
 
 VERSION_SHORT_R="@VERSIONSHORT@"
@@ -41,14 +41,16 @@ projdir="${projdir%/*}"
 _srcdir="src"
 _incdir="include"
 _windir="win"
+_output="output"
 srcdir="${projdir}/${_srcdir}"
 incdir="${projdir}/${_incdir}"
 windir="${projdir}/${_windir}"
-builddir="$(pwd)"
+curdir="$(pwd)"
+outdir="${curdir}/${_output}"
 _subdirs=""
 
 compile_flags_file="${projdir}/${COMPILE_FLAGS_FN}"
-makefile_file="${builddir}/${MAKEFILE_FN}"
+makefile_file="${curdir}/${MAKEFILE_FN}"
 makefile_in_file="${projdir}/${MAKEFILE_IN_FN}"
 buildvalues_file="${incdir}/${BUILDVALUES_H}"
 buildvalues_in_file="${projdir}/${BUILDVALUES_IN_H}"
@@ -99,7 +101,7 @@ create_makefile () {
                 ;;
             "$WINDIR_R") out="$windir"
                 ;;
-            "$BUILDDIR_R") out="$builddir"
+            "$OUTDIR_R") out="$outdir"
                 ;;
             "$SUBDIRS_R") out="$_subdirs"
                 ;;
@@ -154,7 +156,7 @@ create_build_values() {
     return 0
 }
 
-[[ $1 == "$COMPILE_FLAGS_OPT" ]] && create_compile_flags
+[[ $1 == "$COMPILE_FLAGS_OPT" ]] && create_compile_flags && exit 0
 create_makefile
 create_build_values
 
