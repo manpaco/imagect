@@ -22,14 +22,18 @@ OUTDIRS += $(foreach dir, $(SUBDIRS), $(addprefix $(OUTDIR)/, $(dir)))
 # Add this list to VPATH, the place make will look for the source files
 VPATH = $(SRCDIRS)
 
-# Create a list of *.c sources in DIRS
-SOURCES = $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c))
+# Create a list of *.cpp sources in DIRS
+SOURCES = $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.cpp))
 
 # Define objects for all sources
-OBJS := $(subst $(SRCDIR),$(OUTDIR),$(SOURCES:.c=.o))
+OBJS := $(subst $(SRCDIR),$(OUTDIR),$(SOURCES:.cpp=.o))
 
 # Define dependencies files for all objects
 DEPS = $(OBJS:.o=.d)
+
+CXXFLAGS = -I$(INCDIR) @CXXFLAGS@
+
+LIBS = @LIBS@
 
 # Name the compiler
 CC = @CC@
@@ -48,9 +52,9 @@ endif
 
 # Define the function that will generate each rule
 define generateRules
-$(1)/%.o: %.c
+$(1)/%.o: %.cpp
 	@echo Building $$@
-	$(HIDE)$(CC) -c -I$$(INCDIR) -o $$@ $$< -MMD -MP
+	$(HIDE)$(CC) -c $$(CXXFLAGS) -o $$@ $$< -MMD -MP
 endef
 
 # Indicate to make which targets are not files
@@ -60,7 +64,7 @@ all: directories $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(HIDE)echo Linking $@
-	$(HIDE)$(CC) $(OBJS) -o $(TARGET)
+	$(HIDE)$(CC) $(OBJS) $(LIBS) -o $(TARGET)
 
 # Include dependencies
 -include $(DEPS)
