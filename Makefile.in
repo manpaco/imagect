@@ -7,10 +7,7 @@ OUTDIR := @OUTDIR@
 
 # Name of the final executable
 PROJECT = @PROJECT@
-TARGET = $(PROJECT)
-ifeq ($(OSTARGET),Windows)
-    TARGET = $(PROJECT).exe
-endif
+TARGET = @TARGET@
 
 # Decide whether the commands will be shown or not
 VERBOSE = TRUE
@@ -53,7 +50,7 @@ endif
 define generateRules
 $(1)/%.o: %.c
     @echo Building $$@
-    $(HIDE)$(CC) -c -I$$(INCDIR) -o $$@ $$< -MMD
+    $(HIDE)$(CC) -c -I$$(INCDIR) -o $$@ $$< -MMD -MP
 endef
 
 # Indicate to make which targets are not files
