@@ -1,6 +1,5 @@
 #!/usr/bin/bash
 
-CC="g++"
 CLANG="c++"
 CSTD="${CLANG}11"
 STDFLAG="-std=${CSTD}"
@@ -21,7 +20,6 @@ BUILDVALUES_IN_FN="${BUILDVALUES_FN}.in"
 WIN_FMT="exe"
 
 REPLACE_REGEX="@[a-zA-Z]+@"
-CC_R="@CC@"
 PROJECT_R="@PROJECT@"
 TARGET_R="@TARGET@"
 PROJDIR_R="@PROJDIR@"
@@ -108,8 +106,6 @@ create_makefile () {
         [[ "$rline" =~ $REPLACE_REGEX ]]
         local out
         case "${BASH_REMATCH[0]}" in
-            "$CC_R") out="$CC"
-                ;;
             "$PROJECT_R") out="$projname"
                 ;;
             "$TARGET_R") out="$target"
