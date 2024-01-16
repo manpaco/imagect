@@ -1,4 +1,0 @@
-- Remove Magick++ lib.
-- Implement ScrolledCanvas, CanvasItem (BitmapItem, CropItem and PolygonItem) and PixelView.
-- Use new painting method with special buffer in BitmapItem.
-- Improve ZoomCtrl.
