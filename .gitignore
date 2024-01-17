@@ -1,5 +1,5 @@
 build/
 .cache/
-include/buildvalues.h
+include/buildvalues.hpp
 compile_flags.txt
 .editorconfig
