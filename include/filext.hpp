@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -17,29 +17,31 @@
  *     with ImageCT. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CROPEVENT_H
-#define CROPEVENT_H
+#ifndef FILEXT_H
+#define FILEXT_H
 
-#include "wx/event.h"
+#include <string>
+#include "defs.hpp"
+
+const std::string pngExt = ".png";
+const std::string jpgExt = ".jpg";
+const std::string jpegExt = ".jpeg";
+const std::string pngWc = "PNG image (*" + pngExt + ")|*" + pngExt;
+const std::string jpegWc = "JPEG image (*" + jpgExt +  ";*" + jpegExt + ")|*" +
+                           jpgExt + ";*" +jpegExt;
+const std::string importWc = "Image files (*" +
+    pngExt + ";*" +
+    jpgExt + ";*" +
+    jpegExt + ")|*" +
+        pngExt + ";*" +
+        jpgExt + ";*" +
+        jpegExt;
 
 /**
- * Implementation of a crop event
+ * Return the extension present in the file name.
  *
- * Constains information about crop geometry.
+ * @return file extension. If not idenified returns ict::NONE_EXT
  */
-class CropEvent : public wxEvent {
-    public:
-        CropEvent(wxEventType, int, const wxSize &, wxPoint &o);
-        wxSize getSize() const;
-        wxPoint getOffset() const;
-        virtual wxEvent * Clone() const;
+ict::Extension extension(const std::string &filename);
 
-    private:
-        wxSize size;
-        wxPoint offset;
-
-};
-
-wxDECLARE_EVENT(EVT_CROP_CHANGE, CropEvent);
-
-#endif // RECTANGLEEVENT_H
+#endif // FILEXT_H

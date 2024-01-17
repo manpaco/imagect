@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -17,11 +17,10 @@
  *     with ImageCT. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "toolspanel.h"
+#include "toolspanel.hpp"
 #include <string>
-#include "defs.h"
-#include "filext.h"
-#include "imgtools.h"
+#include "defs.hpp"
+#include "filext.hpp"
 #include "wx/textctrl.h"
 #include "wx/choice.h"
 #include "wx/slider.h"
@@ -65,9 +64,9 @@ void ToolsPanel::collapseBlocks() {
 
 void ToolsPanel::setBindings() {
     Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, &ToolsPanel::updateVirtualSize, this);
-    Bind(wxEVT_CHECKBOX, &ToolsPanel::growStateChange, this, 
+    Bind(wxEVT_CHECKBOX, &ToolsPanel::growStateChange, this,
             ict::GROW_CHECK_CB);
-    Bind(wxEVT_CHOICE, &ToolsPanel::growChoiceChange, this, 
+    Bind(wxEVT_CHOICE, &ToolsPanel::growChoiceChange, this,
             ict::GROW_SELECTOR_CH);
     Bind(wxEVT_TEXT, &ToolsPanel::widthChange, this, ict::WIDTH_TC);
     Bind(wxEVT_TEXT, &ToolsPanel::heightChange, this, ict::HEIGHT_TC);
@@ -265,7 +264,7 @@ void ToolsPanel::createAspectBlock() {
 }
 
 void ToolsPanel::createGrowBlock() {
-    growBlock = new wxCollapsiblePane(this, ict::GROW, "Grow", 
+    growBlock = new wxCollapsiblePane(this, ict::GROW, "Grow",
             wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
     wxWindow *winGrow = growBlock->GetPane();
 
@@ -277,7 +276,7 @@ void ToolsPanel::createGrowBlock() {
                                 wxArrayString(ict::GROW_CHOICE_SIZE,
                                 growChoices));
     growSelector->Enable(false);
-    colorPicker = new wxColourPickerCtrl(winGrow, ict::PICK_COLOUR_BT, 
+    colorPicker = new wxColourPickerCtrl(winGrow, ict::PICK_COLOUR_BT,
                                          *wxBLACK, wxDefaultPosition,
                                          wxDefaultSize, wxCLRP_SHOW_LABEL);
     colorPicker->Enable(false);
@@ -334,8 +333,8 @@ void ToolsPanel::createShapeBlock() {
     wxWindow *winShape = shapeBlock->GetPane();
     initShapeChoices();
     swVal.SetMin(ict::MIN_STROKE);
-    shapeSelector = new wxChoice(winShape, ict::SHAPE_CH, wxDefaultPosition, 
-                                 wxDefaultSize, 
+    shapeSelector = new wxChoice(winShape, ict::SHAPE_CH, wxDefaultPosition,
+                                 wxDefaultSize,
                                  wxArrayString(ict::SHAPE_CHOICE_SIZE,
                                                shapeChoices));
     shapeSelector->SetSelection(0);
@@ -347,7 +346,7 @@ void ToolsPanel::createShapeBlock() {
                                                *wxBLACK, wxDefaultPosition,
                                                wxDefaultSize,
                                                wxCLRP_SHOW_LABEL);
-    
+
     wxBoxSizer *shapeSizer = new wxBoxSizer(wxVERTICAL);
     shapeSizer->AddSpacer(ict::BEST_SPACE);
     shapeSizer->Add(shapeSelector, 0, wxALIGN_CENTER);

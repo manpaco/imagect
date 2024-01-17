@@ -2,7 +2,7 @@
 #define SCALER_H
 
 #include <wx/gdicmn.h>
-#include "defs.h"
+#include "defs.hpp"
 
 const double minScaleFactor = 1.0 / 256;
 const double maxScaleFactor = 256;
@@ -32,7 +32,7 @@ public:
     wxPoint scalePoint(const wxPoint &p, ict::Dot d) const;
     wxSize scaleSize(const wxSize &s, ict::Dot d) const;
     wxRect scaleRect(const wxRect &r, ict::Dot d) const;
-    
+
     int transferX(const int v, ict::Dot d) const;
     int transferY(const int v, ict::Dot d) const;
     wxPoint transferPoint(const wxPoint &p, ict::Dot d) const;

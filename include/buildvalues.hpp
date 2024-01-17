@@ -17,20 +17,15 @@
  *     with ImageCT. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "zoomevent.hpp"
+#ifndef BUILDVALUES_H
+#define BUILDVALUES_H
 
-wxDEFINE_EVENT(EVT_ZOOM_CHANGE, ZoomEvent);
+const char * const projectName = "imagect";
+const char * const versionString = "0.1.0";
+const char * const versionSuffix = "-81-gf60faf0";
 
-ZoomEvent::
-ZoomEvent(wxEventType eventType, int winId, float sf) :
-    wxEvent(winId, eventType), scaleFactor(sf) {
+const unsigned int versionMajor = 0;
+const unsigned int versionMinor = 1;
+const unsigned int versionPatch = 0;
 
-}
-
-float ZoomEvent::getScaleFactor() const {
-    return scaleFactor;
-}
-
-wxEvent * ZoomEvent::Clone() const {
-    return new ZoomEvent(*this);
-}
+#endif // BUILDVALUES_H

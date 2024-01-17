@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -17,25 +17,24 @@
  *     with ImageCT. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "mainframe.h"
-#include "cropevent.h"
-#include "defs.h"
-#include "buildvalues.h"
-#include "previewpanel.h"
-#include "toolspanel.h"
-#include "imgtools.h"
-#include "filext.h"
-#include "exportdlg.h"
-#include "zoomctrl.h"
-#include "zoomevent.h"
+#include "mainframe.hpp"
+#include "cropevent.hpp"
+#include "defs.hpp"
+#include "buildvalues.hpp"
+#include "previewpanel.hpp"
+#include "toolspanel.hpp"
+#include "filext.hpp"
+#include "exportdlg.hpp"
+#include "zoomctrl.hpp"
+#include "zoomevent.hpp"
 #include "wx/settings.h"
 #include "wx/button.h"
 #include "wx/sizer.h"
 #include "wx/menu.h"
 #include "wx/msgdlg.h"
 #include <iostream>
-#include "scrolledcanvas.h"
-#include "canvasitem.h"
+#include "scrolledcanvas.hpp"
+#include "canvasitem.hpp"
 
 #if wxUSE_STATLINE
     #include <wx/statline.h>
@@ -45,7 +44,7 @@
     #include <wx/splitter.h>
 #endif
 
-MainFrame::MainFrame(): 
+MainFrame::MainFrame():
     wxFrame(NULL,
             wxID_ANY,
             projectName,
@@ -123,7 +122,7 @@ void MainFrame::createMenuBar() {
     topMenuBar->Append(mFile, "File");
     topMenuBar->Append(mEdit, "Edit");
     topMenuBar->Append(mHelp, "More");
-    
+
     SetMenuBar(topMenuBar);
 }
 
@@ -204,7 +203,7 @@ void MainFrame::onOpen(wxCommandEvent &event) {
     if(openedImg && !exportedImg) {
         if(showProceedMessage() != wxYES) return;
     }
-    wxFileDialog openDlg(this, _("Open image"), "", "", _(importWc), 
+    wxFileDialog openDlg(this, _("Open image"), "", "", _(importWc),
             wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     if(openDlg.ShowModal() == wxID_CANCEL) return;
     openImage(openDlg.GetPath());
@@ -319,7 +318,7 @@ void MainFrame::onFixRatio(wxCommandEvent &event) {
 }
 
 void MainFrame::onAllowGrow(wxCommandEvent &event) {
-//    if(sView->getCanvas()->allowGrow(event.IsChecked())) 
+//    if(sView->getCanvas()->allowGrow(event.IsChecked()))
 //        tools->cropGeometry(sView->getCanvas()->cropGeometry());
     event.Skip();
 }
@@ -352,7 +351,7 @@ void MainFrame::saveState(wxCommandEvent &event) {
 //    if(!tools->valid()) return;
 //    OptionsContainer toSave = tools->currentOpts();
 //    if(toSave.cropSize != currentState.cropSize) {
-//        wxSize ts(toSave.cropSize); 
+//        wxSize ts(toSave.cropSize);
 //        if(!sView->getCanvas()->cropSize(&ts)) {
 //            tools->cropSize(ts);
 //            toSave.cropSize = ts;

@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -37,7 +37,7 @@ class wxStaticText;
     #include <wx/collpane.h>
 #endif
 
-#include "defs.h"
+#include "defs.hpp"
 
 /**
  * Container to storage tool options.
@@ -57,7 +57,7 @@ struct OptionsContainer {
     wxString backImage;
     int backBlur;
 
-    OptionsContainer() : 
+    OptionsContainer() :
         cropSize(1, 1),
         cropOff(0, 0),
         fixRatio(false),
@@ -197,7 +197,7 @@ class ToolsPanel: public wxScrolledCanvas {
         void initShapeChoices();
         void growChoiceState(bool state, int choice);
         void updateGrowBlock();
-        
+
         /**
          * Generic CheckBox but with unfocused behaviour.
          */

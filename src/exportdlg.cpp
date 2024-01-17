@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -17,11 +17,11 @@
  *     with ImageCT. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "exportdlg.h"
-#include "defs.h"
-#include "filext.h"
+#include "exportdlg.hpp"
+#include "defs.hpp"
+#include "filext.hpp"
 
-ExportDialog::ExportDialog(wxWindow *parent): 
+ExportDialog::ExportDialog(wxWindow *parent):
     wxFileDialog(parent, _("Export image"), wxEmptyString, wxEmptyString,
                  wxEmptyString, wxFD_SAVE | wxFD_OVERWRITE_PROMPT) {
     initWildcards();

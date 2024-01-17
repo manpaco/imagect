@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -17,10 +17,10 @@
  *     with ImageCT. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "canvasitem.h"
-#include "defs.h"
-#include "scaler.h"
-#include "scrolledcanvas.h"
+#include "canvasitem.hpp"
+#include "defs.hpp"
+#include "scaler.hpp"
+#include "scrolledcanvas.hpp"
 #include <wx/dcmemory.h>
 #include <wx/gdicmn.h>
 #include <iostream>
@@ -244,52 +244,52 @@ void CanvasItem::resize(const wxPoint &target) {
         deltaX += target.x - (geometry.x + geometry.GetWidth());
         deltaY += target.y - (geometry.y + geometry.GetHeight());
         if(fixed) accumulateX(deltaX, deltaY);
-        geometry = wxRect(geometry.x, geometry.y, geometry.GetWidth() + deltaX, 
+        geometry = wxRect(geometry.x, geometry.y, geometry.GetWidth() + deltaX,
                 geometry.GetHeight() + deltaY);
     } else if(zonePressed == ict::NW) {
         deltaX += target.x - geometry.x;
         deltaY += target.y - geometry.y;
         if(fixed) accumulateX(deltaX, deltaY);
         geometry = wxRect(geometry.x + deltaX, geometry.y + deltaY,
-                geometry.GetWidth() - deltaX, 
+                geometry.GetWidth() - deltaX,
                 geometry.GetHeight() - deltaY);
     } else if(zonePressed == ict::NE) {
         deltaX += target.x - (geometry.x + geometry.GetWidth());
         deltaY += target.y - geometry.y;
         if(fixed) { accumulateX(deltaX, deltaY); deltaX = -deltaX; }
-        geometry = wxRect(geometry.x, geometry.y + deltaY, 
-                geometry.GetWidth() + deltaX, 
+        geometry = wxRect(geometry.x, geometry.y + deltaY,
+                geometry.GetWidth() + deltaX,
                 geometry.GetHeight() - deltaY);
     } else if(zonePressed == ict::SW) {
         deltaX += target.x - geometry.x;
         deltaY += target.y - (geometry.y + geometry.GetHeight());
         if(fixed) { accumulateX(deltaX, deltaY); deltaX = -deltaX; }
-        geometry = wxRect(geometry.x + deltaX, geometry.y, 
-                geometry.GetWidth() - deltaX, 
+        geometry = wxRect(geometry.x + deltaX, geometry.y,
+                geometry.GetWidth() - deltaX,
                 geometry.GetHeight() + deltaY);
     } else if(zonePressed == ict::N) {
         deltaY += target.y - geometry.y;
         if(fixed) accumulateX(deltaX, deltaY);
-        geometry = wxRect(geometry.x + deltaX, geometry.y + deltaY, 
-                geometry.GetWidth() - deltaX, 
+        geometry = wxRect(geometry.x + deltaX, geometry.y + deltaY,
+                geometry.GetWidth() - deltaX,
                 geometry.GetHeight() - deltaY);
     } else if(zonePressed == ict::S) {
         deltaY += target.y - (geometry.y + geometry.GetHeight());
         if(fixed) accumulateX(deltaX, deltaY);
-        geometry = wxRect(geometry.x, geometry.y, 
-                geometry.GetWidth() + deltaX, 
+        geometry = wxRect(geometry.x, geometry.y,
+                geometry.GetWidth() + deltaX,
                 geometry.GetHeight() + deltaY);
     } else if(zonePressed == ict::W) {
         deltaX += target.x - geometry.x;
         if(fixed) { accumulateY(deltaY, deltaX); deltaY = -deltaY; }
-        geometry = wxRect(geometry.x + deltaX, geometry.y, 
-                geometry.GetWidth() - deltaX, 
+        geometry = wxRect(geometry.x + deltaX, geometry.y,
+                geometry.GetWidth() - deltaX,
                 geometry.GetHeight() + deltaY);
     } else if(zonePressed == ict::E) {
         deltaX += target.x - (geometry.x + geometry.GetWidth());
         if(fixed) { accumulateY(deltaY, deltaX); deltaY = -deltaY; }
-        geometry = wxRect(geometry.x, geometry.y + deltaY, 
-                geometry.GetWidth() + deltaX, 
+        geometry = wxRect(geometry.x, geometry.y + deltaY,
+                geometry.GetWidth() + deltaX,
                 geometry.GetHeight() - deltaY);
     }
     fitInRestriction(zonePressed);
@@ -476,7 +476,7 @@ void CanvasItem::drawOn(wxMemoryDC *pv) {
     pv->DrawRectangle(getGeometry(CANVAS_CONTEXT));
 }
 
-void CanvasItem::drawEntries(wxMemoryDC *pv) { 
+void CanvasItem::drawEntries(wxMemoryDC *pv) {
     if (!selected) return;
     pv->SetBrush(*wxBLUE_BRUSH);
     pv->DrawRectangle(getArea());

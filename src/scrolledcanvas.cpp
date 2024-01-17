@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -20,10 +20,10 @@
 #include <cmath>
 #include <math.h>
 #include <iostream>
-#include "scrolledcanvas.h"
-#include "canvasitem.h"
-#include "defs.h"
-#include "scaler.h"
+#include "scrolledcanvas.hpp"
+#include "canvasitem.hpp"
+#include "defs.hpp"
+#include "scaler.hpp"
 #include <wx/dcmemory.h>
 #include <wx/dcclient.h>
 #include <wx/defs.h>

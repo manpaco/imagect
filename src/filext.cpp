@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -17,11 +17,11 @@
  *     with ImageCT. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "filext.h"
+#include "filext.hpp"
 
 ict::Extension extension(const std::string &filename) {
     int dotPos = filename.rfind('.');
-    std::string s; 
+    std::string s;
     if(dotPos != std::string::npos) s = filename.substr(dotPos);
     if(s == pngExt) return ict::PNG_EXT;
     if(s == jpgExt) return ict::JPG_EXT;

@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -20,7 +20,7 @@
 #ifndef CANVASITEM_H
 #define CANVASITEM_H
 
-#include "defs.h"
+#include "defs.hpp"
 #include <wx/gdicmn.h>
 
 enum ItemContext {
@@ -150,7 +150,7 @@ private:
     /**
      * Get offset from p to respective zone.
      */
-    
+
     wxPoint relativeToEdge(const wxPoint &p, ict::ItemZone z);
 
     ict::ItemZone getLocation(const wxPoint &vp) const;
@@ -160,7 +160,7 @@ private:
     void resetAccums();
 
     void drawEntries(wxMemoryDC *pv);
-    
+
     int id;
     wxRect geometry;
     wxRect restriction;

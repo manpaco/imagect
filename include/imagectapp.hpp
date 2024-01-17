@@ -7,7 +7,7 @@
  *     the terms of the GNU General Public License as published by the Free
  *     Software Foundation, either version 3 of the License, or (at your
  *     option) any later version.
- * 
+ *
  *     ImageCT is distributed in the hope that it will be useful, but WITHOUT
  *     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *     FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
@@ -17,39 +17,38 @@
  *     with ImageCT. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef ZOOMCTRL_H
-#define ZOOMCTRL_H
+#ifndef IMAGECTAPP_H
+#define IMAGECTAPP_H
 
-class wxButton;
-class wxTextCtrl;
+class wxString;
 
-#include "wx/control.h"
-#include "defs.h"
+#include "wx/app.h"
 
-static const ict::ZoomArray zValues = {
-    0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0
-};
+#if wxUSE_CMDLINE_PARSER
+    #include <wx/cmdline.h>
+#endif
 
-/**
- * Implementation of a zoom control
- *
- * Manages the zoom changes sending events.
- * Offers buttons and display box.
- */
-class ZoomCtrl : public wxControl {
+class ImgCropApp: public wxApp {
     public:
-        ZoomCtrl(wxWindow *parent, wxWindowID id);
-        ~ZoomCtrl();
+        virtual bool OnInit();
+        virtual void OnInitCmdLine(wxCmdLineParser &parser);
+        virtual bool OnCmdLineParsed(wxCmdLineParser &parser);
+        virtual int OnExit();
 
     private:
-        void onZout(wxCommandEvent &event);
-        void onZin(wxCommandEvent &event);
-        void sendZoomEvent();
-        void showPercent(float sf);
-
-        ict::ZoomArray::const_iterator zIt;
-        wxButton *zIn, *zOut;
-        wxTextCtrl *percent;
+        wxString *cliFile = nullptr;
 };
 
-#endif // ZOOMCTRL_H
+static const wxCmdLineEntryDesc cliDesc[] = {
+    { wxCMD_LINE_PARAM,
+        nullptr,
+        nullptr,
+        "input image",
+        wxCMD_LINE_VAL_STRING,
+        wxCMD_LINE_PARAM_OPTIONAL },
+    { wxCMD_LINE_NONE }
+};
+
+wxDECLARE_APP(ImgCropApp);
+
+#endif // IMAGECTAPP_H
