@@ -1,8 +1,8 @@
-# MSYS2
+# Building in MSYS2
 
 To build ImageCT under Windows, I will use the [MSYS2](https://www.msys2.org/#installation) environment.
 
-## Info
+### Info
 
 To build ImageCT for ``x86_64`` target system we need to run the UCRT64 or MINGW64 subsystem.
 
@@ -12,21 +12,21 @@ The environment variable ``MINGW_PREFIX`` stores the filesystem prefix of the ru
 
 The environment variable ``MINGW_PACKAGE_PREFIX`` stores the package prefix for the runing subsystem.
 
-# Requirements
+## Requirements
+
+For more info about package management go to MSYS2 docs.
 
 Globally required tools:
 
 - git
 
-## Subsystems requirements
+### Subsystems requirements
 
 - ``${MINGW_PACKAGE_PREFIX}``-toolchain
     
-- ``${MINGW_PACKAGE_PREFIX}``-wxwidgets3.x-msw; with x >= 2
+- ``${MINGW_PACKAGE_PREFIX}``-wxwidgets3.x-msw
 
-For more info about package management go to MSYS2 docs.
-
-# Build
+## Steps
 
 First clone a release branch:
 
@@ -43,7 +43,7 @@ Now, create a build directory:
 
 Run setup process:
 
-    ../setup --msys2 --compilation
+    ../setup --msys2
 
 Finally run make:
 

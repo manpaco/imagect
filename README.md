@@ -2,9 +2,7 @@
 
 ImageCT is a easy-to-use, free and open source image cropping tool.
 
-![logo](/images/ict-logo.svg)
-
-Tool to crop images adding the possibility of "growing". This means that if the crop is outside the image, the necessary pixels will be added to avoid leaving empty areas. The pixels that are added can be chosen by the user: color, image or void.
+Tool to crop images using an arbitrary shape and, if the crop is outside the image the necessary, pixels will be added to avoid leaving empty areas. The pixels that are added can be chosen by the user: color, image or void.
 
 This project use [wxWidgets](https://www.wxwidgets.org/)
 
@@ -14,13 +12,13 @@ Licensed under [GPL-3.0-or-later](/COPYING).
 
 ## Build
 
-### Required Dependencies
+### Required dependencies
 
 ImageCT depends on one component:
 
-- [wxWidgets](https://github.com/wxWidgets/wxWidgets) > v3.2.0
+- [wxWidgets](https://github.com/wxWidgets/wxWidgets) >= v3.2.0
 
-Yout also need some tools:
+Yout also need some build tools:
 
 - git
 
@@ -30,9 +28,9 @@ Yout also need some tools:
 
 - To compile this project on Windows you can use [MSYS2](https://www.msys2.org/).
 
-### Build
+### Steps
 
-Here I will you how to build in Linux. For Windows build go to [MSW guide](/docs/msys2-build.md).
+Here, I will show you how to build in Linux. For Windows build go to [MSW guide](/docs/msys2-build.md).
 
 First clone a release branch:
 
@@ -45,11 +43,11 @@ For example:
 This project implement an out-of-source building process, so do mkdir and cd into build directory:
 
     cd imagect
-    mkdrir build && cd build
+    mkdir build && cd build
 
 Run setup scripts from build directory with options that you want:
 
-    ../setup [--editorconfig] [--compile_flags] [--compilation]
+    ../setup [--editorconfig] [--compile_flags] --linux
 
 And finally run make:
 
