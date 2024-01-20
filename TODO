@@ -1,0 +1,6 @@
+Canvas:
+- Change from integer to float/double (best precision)
+- Due to the above, implement canvas grid (1x1 px)
+- Improve item resize (limits, fixed ratio, etc)
+- Improve canvas magnification
+- Canvas scrolling
