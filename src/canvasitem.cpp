@@ -151,34 +151,34 @@ ict::ItemZone CanvasItem::getZonePressed() const {
     return zonePressed;
 }
 
-ict::ItemZone CanvasItem::getLocation(const wxPoint &virtualPoint) const {
+ict::ItemZone CanvasItem::getLocation(const wxPoint &canvasPoint) const {
     if (selected) {
-        if(getZone(ict::NE).Contains(virtualPoint)) return ict::NE;
-        if(getZone(ict::NW).Contains(virtualPoint)) return ict::NW;
-        if(getZone(ict::SE).Contains(virtualPoint)) return ict::SE;
-        if(getZone(ict::SW).Contains(virtualPoint)) return ict::SW;
-        if(getZone(ict::N).Contains(virtualPoint)) return ict::N;
-        if(getZone(ict::S).Contains(virtualPoint)) return ict::S;
-        if(getZone(ict::E).Contains(virtualPoint)) return ict::E;
-        if(getZone(ict::W).Contains(virtualPoint)) return ict::W;
+        if(getZone(ict::NE).Contains(canvasPoint)) return ict::NE;
+        if(getZone(ict::NW).Contains(canvasPoint)) return ict::NW;
+        if(getZone(ict::SE).Contains(canvasPoint)) return ict::SE;
+        if(getZone(ict::SW).Contains(canvasPoint)) return ict::SW;
+        if(getZone(ict::N).Contains(canvasPoint)) return ict::N;
+        if(getZone(ict::S).Contains(canvasPoint)) return ict::S;
+        if(getZone(ict::E).Contains(canvasPoint)) return ict::E;
+        if(getZone(ict::W).Contains(canvasPoint)) return ict::W;
     }
-    if(getZone(ict::INNER).Contains(virtualPoint)) return ict::INNER;
+    if(getZone(ict::INNER).Contains(canvasPoint)) return ict::INNER;
     return ict::NONE;
 }
 
-ict::ItemZone CanvasItem::press(const wxPoint &absVirtualPoint) {
+ict::ItemZone CanvasItem::press(const wxPoint &canvasPoint) {
     if(locked) return ict::NONE;
     // convert p to coordinates relative to parent
-    zonePressed = getLocation(absVirtualPoint);
+    zonePressed = getLocation(canvasPoint);
     if (zonePressed == ict::NONE) {
         selected = false;
         return zonePressed;
     }
     selected = true;
-    lastPoint = absVirtualPoint;
-    if (reference) lastPoint = reference->relativeToEdge(absVirtualPoint, ict::INNER);
+    lastPoint = canvasPoint;
+    if (reference) lastPoint = reference->relativeToEdge(canvasPoint, ict::INNER);
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
-    relativePress = relativeToEdge(absVirtualPoint, zonePressed);
+    relativePress = relativeToEdge(canvasPoint, zonePressed);
     relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
     return zonePressed;
 }
@@ -215,10 +215,10 @@ bool CanvasItem::isRestricted() const {
     return restricted;
 }
 
-bool CanvasItem::modify(const wxPoint &target) {
+bool CanvasItem::modify(const wxPoint &canvasPoint) {
     if (zonePressed == ict::NONE) return false;
-    lastPoint = target;
-    if (reference) lastPoint = reference->relativeToEdge(target, ict::INNER);
+    lastPoint = canvasPoint;
+    if (reference) lastPoint = reference->relativeToEdge(canvasPoint, ict::INNER);
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
     wxRect prev = geometry;
     if (zonePressed == ict::INNER) {
@@ -230,8 +230,8 @@ bool CanvasItem::modify(const wxPoint &target) {
     else return false;
 }
 
-void CanvasItem::move(const wxPoint &t) {
-    wxPoint newPos(t - relativePress);
+void CanvasItem::move(const wxPoint &target) {
+    wxPoint newPos(target - relativePress);
     if(newPos == geometry.GetPosition()) return;
     geometry.SetPosition(newPos);
     pushToRestriction();
