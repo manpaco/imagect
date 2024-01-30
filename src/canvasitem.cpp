@@ -39,7 +39,6 @@ CanvasItem::CanvasItem(int id, wxRect geometry) {
     this->fixed = false;
     this->restricted = false;
     this->zonePressed = ict::NONE;
-    this->offset = wxPoint(0, 0);;
     this->reference = nullptr;
 }
 
@@ -466,14 +465,6 @@ double CanvasItem::getUnmodAspectRatio() const {
 
 double CanvasItem::getAspectRatio() const {
     return (double)geometry.GetWidth() / geometry.GetHeight();
-}
-
-wxPoint CanvasItem::getOffset() const {
-    return offset;
-}
-
-void CanvasItem::setOffset(wxPoint vo) {
-    offset = vo;
 }
 
 void CanvasItem::drawOn(wxMemoryDC *pv) {

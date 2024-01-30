@@ -67,8 +67,6 @@ public:
     double getAspectRatio() const;
     void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
-    void setOffset(wxPoint vo);
-    wxPoint getOffset() const;
     void setVirtualReference(wxPoint2DDouble *r);
 
     /**
@@ -175,7 +173,6 @@ private:
     ict::ItemZone zonePressed;
     wxPoint relativePress;
     wxPoint lastPoint;
-    wxPoint offset;
     Scaler *scaler;
     wxPoint2DDouble *reference;
 };
