@@ -44,11 +44,6 @@ ScrolledCanvas::ScrolledCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvasBuffer = nullptr;
     pressItem = nullptr;
     oldSelectedItem = nullptr;
-    referenceItem = new CanvasItem(-1, wxRect(0, 0, 10, 10));
-    referenceItem->setScaler(scaler);
-    zOrder.push_back(referenceItem);
-    xMagError = 0.0;
-    yMagError = 0.0;
     zoom = new wxWindow(this, wxID_ANY);
     zoom->SetBackgroundColour(wxColour(*wxYELLOW));
     layout->AddGrowableCol(0);
@@ -147,7 +142,7 @@ void ScrolledCanvas::addItem(CanvasItem *item) {
     if (!item) return;
     if (getItem(item->getId())) return;
     item->setScaler(scaler);
-    item->setCanvasReference(referenceItem);
+    item->setVirtualReference(&canvasReference);
     zOrder.push_back(item);
     refreshCanvasRect(item->getArea());
 }
@@ -156,30 +151,23 @@ void ScrolledCanvas::doMagnify(const wxPoint mousePosition) {
     if (scaler && !scaler->hasTransfer()) return;
     if (mousePosition.x < 0 || mousePosition.y < 0) return;
 
-    std::cout << "mp: " << mousePosition.x << " - " << mousePosition.y << std::endl;
     double of, tf, nf;
     scaler->getOldFactor(&of, nullptr);
     scaler->getTransferFactor(&tf, nullptr);
     scaler->getNewFactor(&nf, nullptr);
     double xip, yip;
-    xip = (referenceItem->getX(VIRTUAL_CONTEXT) + std::floor(xMagError)) * of;
-    yip = (referenceItem->getY(VIRTUAL_CONTEXT) + std::floor(yMagError)) * of;
-    std::cout << "ip: " << xip << " - " << yip << std::endl;
+    xip = canvasReference.m_x * of;
+    yip = canvasReference.m_y * of;
     xip -= mousePosition.x;
     yip -= mousePosition.y;
     xip = xip * tf;
     yip = yip * tf;
     xip += mousePosition.x;
     yip += mousePosition.y;
-    std::cout << "nip: " << xip << " - " << yip << std::endl;
     xip = xip / nf;
     yip = yip / nf;
-    xMagError = xip - std::floor(xip);
-    yMagError = yip - std::floor(yip);
-    std::cout << "vnip: " << xip << " - " << yip << std::endl;
-    referenceItem->setVirtualPosition(wxPoint(xip, yip));
-    std::cout << "errors: " << xMagError << " - " << yMagError << std::endl;
-    std::cout << "-------------------------------" << std::endl;
+    canvasReference.m_x = xip;
+    canvasReference.m_y = yip;
 
     scaler->clearTransfer();
     refreshCanvas();

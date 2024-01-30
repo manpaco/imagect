@@ -23,6 +23,7 @@
 #include <vector>
 #include <wx/event.h>
 #include <wx/window.h>
+#include <wx/geometry.h>
 
 class wxScrollBar;
 class wxFlexGridSizer;
@@ -58,8 +59,8 @@ private:
     wxWindow *zoom;
     Scaler *scaler;
     std::vector<CanvasItem *> zOrder;
-    CanvasItem *pressItem, *oldSelectedItem, *referenceItem;
-    double xMagError, yMagError;
+    CanvasItem *pressItem, *oldSelectedItem;
+    wxPoint2DDouble canvasReference;
 
     wxBitmap *canvasBuffer;
 };
