@@ -69,8 +69,8 @@ int CanvasItem::getX(ItemContext ic) const {
 }
 
 int CanvasItem::getY(ItemContext ic) const {
-    int ry = 0;
     if (ic == VIRTUAL_CONTEXT) {
+        int ry = 0;
         if (reference) ry = reference->getY(ic);
         return geometry.GetY() + ry;
     }
@@ -79,12 +79,12 @@ int CanvasItem::getY(ItemContext ic) const {
 
 int CanvasItem::getWidth(ItemContext ic) const {
     if (ic == VIRTUAL_CONTEXT) return geometry.GetWidth();
-    else return scaler->scaleX(getRight(VIRTUAL_CONTEXT) - getLeft(VIRTUAL_CONTEXT), ict::IN_D);
+    else return scaler->scaleX(getWidth(VIRTUAL_CONTEXT), ict::IN_D);
 }
 
 int CanvasItem::getHeight(ItemContext ic) const {
     if (ic == VIRTUAL_CONTEXT) return geometry.GetHeight();
-    else return scaler->scaleY(getBottom(VIRTUAL_CONTEXT) - getTop(VIRTUAL_CONTEXT), ict::IN_D);
+    else return scaler->scaleY(getHeight(VIRTUAL_CONTEXT), ict::IN_D);
 }
 
 int CanvasItem:: getRight(ItemContext ic) const {
