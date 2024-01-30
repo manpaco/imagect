@@ -11,7 +11,7 @@ const double maxScaleFactor = 256;
 class Scaler {
 public:
     Scaler();
-    Scaler(double xxf, double yyf, ict::ScaleType st);
+    Scaler(double xxf, double yyf);
 
     void setNewFactor(double xf, double yf);
     void getNewFactor(double *xf, double *yf) const;
@@ -19,17 +19,15 @@ public:
     void getTransferFactor(double *xtf, double *ytf) const;
     bool hasTransfer() const;
     void clearTransfer();
-    void addFactor(double axf, double ayf);
+    void plusFactor(double axf, double ayf);
 
     double scaleX(const double v, ict::Dot d) const;
     double scaleY(const double v, ict::Dot d) const;
     wxPoint2DDouble scalePoint(const wxPoint2DDouble &p, ict::Dot d) const;
-    wxRect2DDouble scaleRect(const wxRect2DDouble &r, ict::Dot d) const;
 
     double transferX(const double v, ict::Dot d) const;
     double transferY(const double v, ict::Dot d) const;
     wxPoint2DDouble transferPoint(const wxPoint2DDouble &p, ict::Dot d) const;
-    wxRect2DDouble transferRect(const wxRect2DDouble &r, ict::Dot d) const;
 
     ~Scaler();
 
