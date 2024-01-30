@@ -47,7 +47,7 @@ CanvasItem::~CanvasItem() {
 
 }
 
-void CanvasItem::setCanvasReference(CanvasItem *r) {
+void CanvasItem::setVirtualReference(wxPoint2DDouble *r) {
     reference = r;
 }
 
@@ -62,7 +62,7 @@ int CanvasItem::xVirtualUnref() const {
 int CanvasItem::getX(ItemContext ic) const {
     if (ic == VIRTUAL_CONTEXT) {
         int rx = 0;
-        if (reference) rx = reference->getX(ic);
+        if (reference) rx = reference->m_x;
         return geometry.GetX() + rx;
     }
     else return scaler->scaleX(getX(VIRTUAL_CONTEXT), ict::IN_D);
@@ -71,7 +71,7 @@ int CanvasItem::getX(ItemContext ic) const {
 int CanvasItem::getY(ItemContext ic) const {
     if (ic == VIRTUAL_CONTEXT) {
         int ry = 0;
-        if (reference) ry = reference->getY(ic);
+        if (reference) ry = reference->m_y;
         return geometry.GetY() + ry;
     }
     else return scaler->scaleY(getY(VIRTUAL_CONTEXT), ict::IN_D);
@@ -176,7 +176,10 @@ ict::ItemZone CanvasItem::press(const wxPoint &canvasPoint) {
     }
     selected = true;
     lastPoint = canvasPoint;
-    if (reference) lastPoint = reference->relativeToEdge(canvasPoint, ict::INNER);
+    if (reference) {
+        wxPoint ref = scaler->scalePoint(wxPoint(reference->m_x, reference->m_y), ict::IN_D);
+        lastPoint = lastPoint - ref;
+    }
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
     relativePress = relativeToEdge(canvasPoint, zonePressed);
     relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
@@ -218,7 +221,10 @@ bool CanvasItem::isRestricted() const {
 bool CanvasItem::modify(const wxPoint &canvasPoint) {
     if (zonePressed == ict::NONE) return false;
     lastPoint = canvasPoint;
-    if (reference) lastPoint = reference->relativeToEdge(canvasPoint, ict::INNER);
+    if (reference) {
+        wxPoint ref = scaler->scalePoint(wxPoint(reference->m_x, reference->m_y), ict::IN_D);
+        lastPoint = lastPoint - ref;
+    }
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
     wxRect prev = geometry;
     if (zonePressed == ict::INNER) {

@@ -22,6 +22,7 @@
 
 #include "defs.hpp"
 #include <wx/gdicmn.h>
+#include <wx/geometry.h>
 
 enum ItemContext {
     VIRTUAL_CONTEXT,
@@ -68,7 +69,7 @@ public:
     void setScaler(Scaler *s);
     void setOffset(wxPoint vo);
     wxPoint getOffset() const;
-    void setCanvasReference(CanvasItem *r);
+    void setVirtualReference(wxPoint2DDouble *r);
 
     /**
      * Enable or disable the fix aspect ratio.
@@ -176,7 +177,7 @@ private:
     wxPoint lastPoint;
     wxPoint offset;
     Scaler *scaler;
-    CanvasItem *reference;
+    wxPoint2DDouble *reference;
 };
 
 #endif // !CANVASITEM_H
