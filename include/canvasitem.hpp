@@ -36,7 +36,7 @@ class wxMemoryDC;
 class CanvasItem {
 public:
     CanvasItem();
-    CanvasItem(int id, wxRect geometry);
+    CanvasItem(int id, wxRect2DDouble geometry);
 
     int getId() const;
     virtual void drawOn(wxMemoryDC *pv);
@@ -44,30 +44,29 @@ public:
     bool isLocked();
     void hide(bool opt);
     bool isHidden() const;
-    int getX(ItemContext ic) const;
-    int getY(ItemContext ic) const;
-    int xVirtualUnref() const;
-    int yVirtualUnref() const;
-    int getWidth(ItemContext ic) const;
-    int getHeight(ItemContext ic) const;
-    wxRect getGeometry(ItemContext ic) const;
-    wxPoint getPosition(ItemContext ic) const;
-    wxSize getDimensions(ItemContext ic) const;
-    wxRect getArea() const;
-    wxRect getZone(ict::ItemZone z) const;
-    bool setVirtualGeometry(const wxRect &geo);
-    bool setVirtualPosition(const wxPoint &pos);
-    bool setVirtualDimensions(const wxSize &dim);
+    double getX(ItemContext ic, bool unref = false) const;
+    double getY(ItemContext ic, bool unref = false) const;
+    double getWidth(ItemContext ic) const;
+    double getHeight(ItemContext ic) const;
+    wxRect2DDouble getGeometry(ItemContext ic, bool unref = false) const;
+    wxPoint2DDouble getPosition(ItemContext ic, bool unref = false) const;
+    wxPoint2DDouble getDimensions(ItemContext ic) const;
+    wxRect2DDouble getArea() const;
+    wxRect2DDouble getZone(ict::ItemZone z) const;
+    bool setVirtualGeometry(const wxRect2DDouble &geo);
+    bool setVirtualPosition(const wxPoint2DDouble &pos);
+    bool setVirtualDimensions(const wxPoint2DDouble &dim);
     bool toggleSelection();
     void select(const bool select);
     bool isSelected() const;
     bool restrict(const bool state);
     bool isRestricted() const;
-    void setVirtualRestriction(const wxRect &restriction);
+    void setVirtualRestriction(const wxRect2DDouble &restriction);
     double getAspectRatio() const;
     void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
     void setVirtualReference(wxPoint2DDouble *r);
+    wxPoint2DDouble getReference(ItemContext c);
 
     /**
      * Enable or disable the fix aspect ratio.
@@ -105,12 +104,12 @@ public:
     ~CanvasItem();
 
 private:
-    int getRight(ItemContext ic) const;
-    int getLeft(ItemContext ic) const;
-    int getTop(ItemContext ic) const;
-    int getBottom(ItemContext ic) const;
+    double getRight(ItemContext ic, bool unref = false) const;
+    double getLeft(ItemContext ic, bool unref = false) const;
+    double getTop(ItemContext ic, bool unref = false) const;
+    double getBottom(ItemContext ic, bool unref = false) const;
 
-    bool applyGeometry(const wxRect &geo);
+    bool applyGeometry(const wxRect2DDouble &geo);
 
     /**
      * Move the crop rectangle such that it fits in the constraint.
@@ -124,55 +123,42 @@ private:
     void fitInRestriction(ict::ItemZone simulation);
 
     /**
-     * Use delta in y axis to calculate delta in x axis. Here the ratio is
-     * considered
-     */
-    void accumulateX(int &dxToCalc, int &dyToUse);
-
-    /**
-     * Use delta in x axis to calculate delta in y axis. Here the ratio is
-     * considered
-     */
-    void accumulateY(int &dyToCalc, int &dxToUse);
-
-    /**
      * Move to target point. Relative pressure is considered.
      */
-    void move(const wxPoint &t);
+    void move(const wxPoint2DDouble &t);
 
     /**
      * Resize to target point. Relative pressure and edge zones are
      * considered.
      */
-    void resize(const wxPoint &t);
+    void resize(const wxPoint2DDouble &t);
 
     /**
      * Get offset from p to respective zone.
      */
 
-    wxPoint relativeToEdge(const wxPoint &p, ict::ItemZone z);
+    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, ict::ItemZone z, ItemContext c);
 
-    ict::ItemZone getLocation(const wxPoint &vp) const;
+    void inflateRect(wxRect2DDouble &r) const;
+
+    ict::ItemZone getLocation(const wxPoint2DDouble &vp) const;
 
     double getUnmodAspectRatio() const;
-
-    void resetAccums();
 
     void drawEntries(wxMemoryDC *pv);
 
     int id;
-    wxRect geometry;
-    wxRect restriction;
-    wxRect unmodGeometry;
+    wxRect2DDouble geometry;
+    wxRect2DDouble restriction;
+    wxRect2DDouble unmodGeometry;
     bool selected;
     bool locked;
     bool fixed;
     bool restricted;
     bool hidden;
-    double accumX = 0.0, accumY = 0.0;
     ict::ItemZone zonePressed;
-    wxPoint relativePress;
-    wxPoint lastPoint;
+    wxPoint2DDouble relativePress;
+    wxPoint2DDouble lastPoint;
     Scaler *scaler;
     wxPoint2DDouble *reference;
 };

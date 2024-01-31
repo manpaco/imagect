@@ -84,10 +84,10 @@ void MainFrame::allocateMem() {
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
     sCanvas = new ScrolledCanvas(mainSplitter, ict::SCVIEW);
-    CanvasItem *it1 = new CanvasItem(1, wxRect(0, 0, 50, 50));
+    CanvasItem *it1 = new CanvasItem(1, wxRect2DDouble(0, 0, 50, 50));
     it1->lock(false);
     sCanvas->addItem(it1);
-    CanvasItem *it2 = new CanvasItem(2, wxRect(0, 0, 50, 50));
+    CanvasItem *it2 = new CanvasItem(2, wxRect2DDouble(0, 0, 50, 50));
     it2->lock(false);
     sCanvas->addItem(it2);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);

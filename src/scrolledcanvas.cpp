@@ -40,7 +40,7 @@ ScrolledCanvas::ScrolledCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvas->SetBackgroundStyle(wxBG_STYLE_PAINT);
     vBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
-    scaler = new Scaler(1.0, 1.0, ict::FLOOR_ST);
+    scaler = new Scaler(1.0, 1.0);
     canvasBuffer = nullptr;
     pressItem = nullptr;
     oldSelectedItem = nullptr;
@@ -65,8 +65,8 @@ ScrolledCanvas::ScrolledCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
 
 void ScrolledCanvas::magnification(wxMouseEvent &event) {
     int wheelRotation = event.GetWheelRotation();
-    if (wheelRotation > 0) scaler->addFactor(0.3, 0.3);
-    else scaler->addFactor(-0.3, -0.3);
+    if (wheelRotation > 0) scaler->plusFactor(0.3, 0.3);
+    else scaler->plusFactor(-0.3, -0.3);
     doMagnify(event.GetPosition());
     //doMagnify(wxPoint(0, 0));
     event.Skip();
@@ -144,7 +144,8 @@ void ScrolledCanvas::addItem(CanvasItem *item) {
     item->setScaler(scaler);
     item->setVirtualReference(&canvasReference);
     zOrder.push_back(item);
-    refreshCanvasRect(item->getArea());
+    wxRect2DDouble fresh(item->getArea());
+    refreshCanvasRect(wxRect(fresh.m_x, fresh.m_y, fresh.m_width, fresh.m_height));
 }
 
 void ScrolledCanvas::doMagnify(const wxPoint mousePosition) {
