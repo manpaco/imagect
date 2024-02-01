@@ -44,10 +44,10 @@ public:
     bool isLocked();
     void hide(bool opt);
     bool isHidden() const;
-    double getX(ItemContext ic, bool unref = false) const;
-    double getY(ItemContext ic, bool unref = false) const;
-    double getWidth(ItemContext ic) const;
-    double getHeight(ItemContext ic) const;
+    wxDouble getX(ItemContext ic, bool unref = false) const;
+    wxDouble getY(ItemContext ic, bool unref = false) const;
+    wxDouble getWidth(ItemContext ic) const;
+    wxDouble getHeight(ItemContext ic) const;
     wxRect2DDouble getGeometry(ItemContext ic, bool unref = false) const;
     wxPoint2DDouble getPosition(ItemContext ic, bool unref = false) const;
     wxPoint2DDouble getDimensions(ItemContext ic) const;
@@ -62,7 +62,7 @@ public:
     bool restrict(const bool state);
     bool isRestricted() const;
     void setVirtualRestriction(const wxRect2DDouble &restriction);
-    double getAspectRatio() const;
+    wxDouble getAspectRatio() const;
     void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
     void setVirtualReference(wxPoint2DDouble *r);
@@ -104,10 +104,10 @@ public:
     ~CanvasItem();
 
 private:
-    double getRight(ItemContext ic, bool unref = false) const;
-    double getLeft(ItemContext ic, bool unref = false) const;
-    double getTop(ItemContext ic, bool unref = false) const;
-    double getBottom(ItemContext ic, bool unref = false) const;
+    wxDouble getRight(ItemContext ic, bool unref = false) const;
+    wxDouble getLeft(ItemContext ic, bool unref = false) const;
+    wxDouble getTop(ItemContext ic, bool unref = false) const;
+    wxDouble getBottom(ItemContext ic, bool unref = false) const;
 
     bool applyGeometry(const wxRect2DDouble &geo);
 
@@ -141,9 +141,17 @@ private:
 
     void inflateRect(wxRect2DDouble &r) const;
 
+    void modifyPosition(wxDouble x, wxDouble y);
+    void modifySize(wxDouble w, wxDouble h);
+
     ict::ItemZone getLocation(const wxPoint2DDouble &vp) const;
 
-    double getUnmodAspectRatio() const;
+    wxDouble getUnmodAspectRatio() const;
+
+    bool exceedsBottomRestriction() const;
+    bool exceedsTopRestriction() const;
+    bool exceedsRightRestriction() const;
+    bool exceedsLeftRestriction() const;
 
     void drawEntries(wxMemoryDC *pv);
 

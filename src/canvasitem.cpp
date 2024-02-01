@@ -50,47 +50,47 @@ void CanvasItem::setVirtualReference(wxPoint2DDouble *r) {
     reference = r;
 }
 
-double CanvasItem::getX(ItemContext ic, bool unref) const {
+wxDouble CanvasItem::getX(ItemContext ic, bool unref) const {
     if (ic == VIRTUAL_CONTEXT) {
-        double rx = 0;
+        wxDouble rx = 0.0;
         if (reference && !unref) rx = reference->m_x;
         return geometry.m_x + rx;
     }
     else return scaler->scaleX(getX(VIRTUAL_CONTEXT, unref), ict::IN_D);
 }
 
-double CanvasItem::getY(ItemContext ic, bool unref) const {
+wxDouble CanvasItem::getY(ItemContext ic, bool unref) const {
     if (ic == VIRTUAL_CONTEXT) {
-        double ry = 0;
+        wxDouble ry = 0.0;
         if (reference && !unref) ry = reference->m_y;
         return geometry.m_y + ry;
     }
     else return scaler->scaleY(getY(VIRTUAL_CONTEXT, unref), ict::IN_D);
 }
 
-double CanvasItem::getWidth(ItemContext ic) const {
+wxDouble CanvasItem::getWidth(ItemContext ic) const {
     if (ic == VIRTUAL_CONTEXT) return geometry.m_width;
     else return scaler->scaleX(geometry.m_width, ict::IN_D);
 }
 
-double CanvasItem::getHeight(ItemContext ic) const {
+wxDouble CanvasItem::getHeight(ItemContext ic) const {
     if (ic == VIRTUAL_CONTEXT) return geometry.m_height;
     else return scaler->scaleY(geometry.m_height, ict::IN_D);
 }
 
-double CanvasItem:: getRight(ItemContext ic, bool unref) const {
+wxDouble CanvasItem:: getRight(ItemContext ic, bool unref) const {
     return getLeft(ic, unref) + getWidth(ic);
 }
 
-double CanvasItem::getBottom(ItemContext ic, bool unref) const {
+wxDouble CanvasItem::getBottom(ItemContext ic, bool unref) const {
     return getTop(ic, unref) + getHeight(ic);
 }
 
-double CanvasItem::getLeft(ItemContext ic, bool unref) const {
+wxDouble CanvasItem::getLeft(ItemContext ic, bool unref) const {
     return getX(ic, unref);
 }
 
-double CanvasItem::getTop(ItemContext ic, bool unref) const {
+wxDouble CanvasItem::getTop(ItemContext ic, bool unref) const {
     return getY(ic, unref);
 }
 
@@ -168,7 +168,6 @@ ict::ItemZone CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const 
 
 ict::ItemZone CanvasItem::press(const wxPoint &canvasPoint) {
     if(locked) return ict::NONE;
-    // convert p to coordinates relative to parent
     zonePressed = getLocation(canvasPoint);
     if (zonePressed == ict::NONE) {
         selected = false;
@@ -232,8 +231,8 @@ void CanvasItem::move(const wxPoint2DDouble &target) {
 }
 
 void CanvasItem::resize(const wxPoint2DDouble &target) {
-    int deltaX = - relativePress.m_x;
-    int deltaY = - relativePress.m_y;
+    wxDouble deltaX = - relativePress.m_x;
+    wxDouble deltaY = - relativePress.m_y;
     if(zonePressed == ict::SE) {
         deltaX += target.m_x - (geometry.m_x + geometry.m_width);
         deltaY += target.m_y - (geometry.m_y + geometry.m_height);
@@ -281,18 +280,37 @@ void CanvasItem::resize(const wxPoint2DDouble &target) {
     fitInRestriction(zonePressed);
 }
 
+void CanvasItem::modifyPosition(wxDouble x, wxDouble y) {
+    geometry.m_x = x;
+    geometry.m_y = y;
+}
+
 void CanvasItem::pushToRestriction() {
     if(!isRestricted() || restriction.Contains(geometry)) return;
     int cx1 = restriction.GetLeft(), cx2 = restriction.GetRight();
     int nx1 = geometry.GetLeft(), nx2 = geometry.GetRight();
-    /* if(nx2 > cx2)
-        geometry.SetPosition(wxPoint(cx2 - geometry.GetWidth(), geometry.GetY()));
-    if(nx1 < cx1) geometry.SetPosition(wxPoint(cx1, geometry.GetY()));
-    int cy1 = restriction.GetY(), cy2 = restriction.GetY() + restriction.GetHeight();
-    int ny1 = geometry.GetY(), ny2 = geometry.GetY() + geometry.GetHeight();
-    if(ny2 > cy2)
-        geometry.SetPosition(wxPoint(geometry.GetX(), cy2 - geometry.GetHeight()));
-    if(ny1 < cy1) geometry.SetPosition(wxPoint(geometry.GetX(), cy1)); */
+    if(nx2 > cx2) modifyPosition(cx2 - geometry.m_width, geometry.m_y);
+    if(nx1 < cx1) modifyPosition(cx1, geometry.m_y);
+    int cy1 = restriction.m_y, cy2 = restriction.GetBottom();
+    int ny1 = geometry.m_y, ny2 = geometry.GetBottom();
+    if(ny2 > cy2) modifyPosition(geometry.m_x, cy2 - geometry.m_height);
+    if(ny1 < cy1) modifyPosition(geometry.m_x, cy1);
+}
+
+bool CanvasItem::exceedsBottomRestriction() const {
+    return (geometry.m_y + geometry.m_height > restriction.m_y + restriction.m_height);
+}
+
+bool CanvasItem::exceedsTopRestriction() const {
+    return geometry.m_y < restriction.m_y;
+}
+
+bool CanvasItem::exceedsRightRestriction() const {
+    return (geometry.m_x + geometry.m_width > restriction.m_x + restriction.m_width);
+}
+
+bool CanvasItem::exceedsLeftRestriction() const {
+    return geometry.m_x < restriction.m_x;
 }
 
 void CanvasItem::fitInRestriction(ict::ItemZone simulation) {
@@ -301,82 +319,60 @@ void CanvasItem::fitInRestriction(ict::ItemZone simulation) {
         geometry.Intersect(restriction);
         return;
     }
-    /* bool exceedsTopY = geometry.GetY() < restriction.GetY();
-    bool exceedsBottomY =
-        (geometry.GetY() + geometry.GetHeight()) > (restriction.GetY() + restriction.GetHeight());
-    bool exceedsLeftX = geometry.GetX() < restriction.GetX();
-    bool exceedsRightX =
-        (geometry.GetX() + geometry.GetWidth()) > (restriction.GetX() + restriction.GetWidth());
-    wxRect aux(geometry);
+    wxRect2DDouble aux(geometry);
     aux.Intersect(restriction);
-    int newWidth, newHeight;
+    wxDouble newWidth, newHeight;
     if(simulation == ict::SE || simulation == ict::S) {
-        if(exceedsRightX) {
-            newWidth = aux.GetWidth();
-            accumulateY(newHeight, newWidth);
-            geometry.SetSize(wxSize(newWidth, newHeight));
-            exceedsBottomY =
-                (geometry.GetY() + geometry.GetHeight()) >
-                (restriction.GetY() + restriction.GetHeight());
+        if(exceedsRightRestriction()) {
+            newWidth = aux.m_width;
+            // accumulateY(newHeight, newWidth);
+            modifySize(newWidth, newHeight);
         }
-        if(exceedsBottomY) {
-            newHeight = aux.GetHeight();
-            accumulateX(newWidth, newHeight);
-            geometry.SetSize(wxSize(newWidth, newHeight));
+        if(exceedsBottomRestriction()) {
+            newHeight = aux.m_height;
+            // accumulateX(newWidth, newHeight);
+            modifySize(newWidth, newHeight);
         }
     } else if(simulation == ict::SW || simulation == ict::W) {
-        if(exceedsLeftX) {
-            newWidth = aux.GetWidth();
-            accumulateY(newHeight, newWidth);
-            geometry.SetSize(wxSize(newWidth, newHeight));
-            geometry.SetPosition(wxPoint(restriction.GetX(), geometry.GetY()));
-            exceedsBottomY =
-                (geometry.GetY() + geometry.GetHeight()) >
-                (restriction.GetY() + restriction.GetHeight());
+        if(exceedsLeftRestriction()) {
+            newWidth = aux.m_width;
+            // accumulateY(newHeight, newWidth);
+            modifyPosition(restriction.m_x, geometry.m_y);
+            modifySize(newWidth, newHeight);
         }
-        if(exceedsBottomY) {
-            newHeight = aux.GetHeight();
-            accumulateX(newWidth, newHeight);
-            wxPoint newPos(geometry.GetX() + geometry.GetWidth() - newWidth,
-                           geometry.GetY());
-            geometry.SetSize(wxSize(newWidth, newHeight));
-            geometry.SetPosition(newPos);
+        if(exceedsBottomRestriction()) {
+            newHeight = aux.m_height;
+            // accumulateX(newWidth, newHeight);
+            modifyPosition(geometry.m_x + geometry.m_width - newWidth, geometry.m_y);
+            modifySize(newWidth, newHeight);
         }
     } else if(simulation == ict::NE || simulation == ict::E) {
-        if(exceedsRightX) {
-            newWidth = aux.GetWidth();
-            accumulateY(newHeight, newWidth);
-            wxPoint newPos(geometry.GetX(),
-                           geometry.GetY() + geometry.GetHeight() - newHeight);
-            geometry.SetSize(wxSize(newWidth, newHeight));
-            geometry.SetPosition(newPos);
-            exceedsTopY = geometry.GetY() < restriction.GetY();
+        if(exceedsRightRestriction()) {
+            newWidth = aux.m_width;
+            // accumulateY(newHeight, newWidth);
+            modifyPosition(geometry.m_x, geometry.m_y + geometry.m_height - newHeight);
+            modifyPosition(newWidth, newHeight);
         }
-        if(exceedsTopY) {
-            newHeight = aux.GetHeight();
-            accumulateX(newWidth, newHeight);
-            geometry.SetSize(wxSize(newWidth, newHeight));
-            geometry.SetPosition(wxPoint(geometry.GetX(), restriction.GetY()));
+        if(exceedsTopRestriction()) {
+            newHeight = aux.m_height;
+            // accumulateX(newWidth, newHeight);
+            modifyPosition(geometry.m_x, restriction.m_y);
+            modifySize(newWidth, newHeight);
         }
     } else if(simulation == ict::NW || simulation == ict::N) {
-        if(exceedsLeftX) {
-            newWidth = aux.GetWidth();
-            accumulateY(newHeight, newWidth);
-            wxPoint newPos(restriction.GetX(),
-                           geometry.GetY() + geometry.GetHeight() - newHeight);
-            geometry.SetSize(wxSize(newWidth, newHeight));
-            geometry.SetPosition(newPos);
-            exceedsTopY = geometry.GetY() < restriction.GetY();
+        if(exceedsLeftRestriction()) {
+            newWidth = aux.m_width;
+            // accumulateY(newHeight, newWidth);
+            modifyPosition(restriction.m_x, geometry.m_y + geometry.m_height - newHeight);
+            modifySize(newWidth, newHeight);
         }
-        if(exceedsTopY) {
-            newHeight = aux.GetHeight();
-            accumulateX(newWidth, newHeight);
-            wxPoint newPos(geometry.GetX() + geometry.GetWidth() - newWidth,
-                           restriction.GetY());
-            geometry.SetSize(wxSize(newWidth, newHeight));
-            geometry.SetPosition(newPos);
+        if(exceedsTopRestriction()) {
+            newHeight = aux.m_height;
+            // accumulateX(newWidth, newHeight);
+            modifyPosition(geometry.m_x + geometry.m_width - newWidth, restriction.m_y);
+            modifySize(newWidth, newHeight);
         }
-    } */
+    }
 }
 
 void CanvasItem::setVirtualRestriction(const wxRect2DDouble &restriction) {
@@ -429,11 +425,11 @@ bool CanvasItem::setVirtualPosition(const wxPoint2DDouble &pos) {
     return setVirtualGeometry(wxRect2DDouble(pos.m_x, pos.m_y, d.m_x, d.m_y));
 }
 
-double CanvasItem::getUnmodAspectRatio() const {
+wxDouble CanvasItem::getUnmodAspectRatio() const {
     return unmodGeometry.m_width / unmodGeometry.m_height;
 }
 
-double CanvasItem::getAspectRatio() const {
+wxDouble CanvasItem::getAspectRatio() const {
     return geometry.m_width / geometry.m_height;
 }
 

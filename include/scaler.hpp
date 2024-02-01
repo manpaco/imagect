@@ -5,37 +5,37 @@
 #include "defs.hpp"
 #include <wx/geometry.h>
 
-const double minScaleFactor = 1.0 / 256;
-const double maxScaleFactor = 256;
+const wxDouble minScaleFactor = 1.0 / 256;
+const wxDouble maxScaleFactor = 256;
 
 class Scaler {
 public:
     Scaler();
-    Scaler(double xxf, double yyf);
+    Scaler(wxDouble xxf, wxDouble yyf);
 
-    void setNewFactor(double xf, double yf);
-    void getNewFactor(double *xf, double *yf) const;
-    void getOldFactor(double *xof, double *yof) const;
-    void getTransferFactor(double *xtf, double *ytf) const;
+    void setNewFactor(wxDouble xf, wxDouble yf);
+    void getNewFactor(wxDouble *xf, wxDouble *yf) const;
+    void getOldFactor(wxDouble *xof, wxDouble *yof) const;
+    void getTransferFactor(wxDouble *xtf, wxDouble *ytf) const;
     bool hasTransfer() const;
     void clearTransfer();
-    void plusFactor(double axf, double ayf);
+    void plusFactor(wxDouble axf, wxDouble ayf);
 
-    double scaleX(const double v, ict::Dot d) const;
-    double scaleY(const double v, ict::Dot d) const;
+    wxDouble scaleX(const wxDouble v, ict::Dot d) const;
+    wxDouble scaleY(const wxDouble v, ict::Dot d) const;
     wxPoint2DDouble scalePoint(const wxPoint2DDouble &p, ict::Dot d) const;
 
-    double transferX(const double v, ict::Dot d) const;
-    double transferY(const double v, ict::Dot d) const;
+    wxDouble transferX(const wxDouble v, ict::Dot d) const;
+    wxDouble transferY(const wxDouble v, ict::Dot d) const;
     wxPoint2DDouble transferPoint(const wxPoint2DDouble &p, ict::Dot d) const;
 
     ~Scaler();
 
 private:
-    double scale(const double v, const ict::Dot d, const double f) const;
+    wxDouble scale(const wxDouble v, const ict::Dot d, const wxDouble f) const;
 
-    double xxFactor = 1.0, yyFactor = 1.0;
-    double xxOldFactor = 1.0, yyOldFactor = 1.0;
+    wxDouble xxFactor = 1.0, yyFactor = 1.0;
+    wxDouble xxOldFactor = 1.0, yyOldFactor = 1.0;
 };
 
 #endif // !SCALER_H
