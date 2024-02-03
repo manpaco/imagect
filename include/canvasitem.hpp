@@ -23,6 +23,7 @@
 #include "defs.hpp"
 #include <wx/gdicmn.h>
 #include <wx/geometry.h>
+#include "smartrect.hpp"
 
 enum ItemContext {
     VIRTUAL_CONTEXT,
@@ -61,17 +62,19 @@ public:
     bool isSelected() const;
     bool restrict(const bool state);
     bool isRestricted() const;
-    void setVirtualRestriction(const wxRect2DDouble &restriction);
+    bool setVirtualRestriction(const wxRect2DDouble &restriction);
     wxDouble getAspectRatio() const;
     void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
     void setVirtualReference(wxPoint2DDouble *r);
     wxPoint2DDouble getReference(ItemContext c);
 
+    void expandFromCenter(bool op);
+
     /**
      * Enable or disable the fix aspect ratio.
      */
-    void fixAspectRatio(bool op);
+    void fixedAspectRatio(bool op);
 
     /**
      * Modify the the item geometry.
@@ -109,66 +112,32 @@ private:
     wxDouble getTop(ItemContext ic, bool unref = false) const;
     wxDouble getBottom(ItemContext ic, bool unref = false) const;
 
-    bool applyGeometry(const wxRect2DDouble &geo);
-
-    /**
-     * Move the crop rectangle such that it fits in the constraint.
-     */
-    void pushToRestriction();
-
-    /**
-     * Fit the crop rectangle in the constraint holding the position. That
-     * means the size is modified.
-     */
-    void fitInRestriction(ict::ItemZone simulation);
-
-    /**
-     * Move to target point. Relative pressure is considered.
-     */
-    void move(const wxPoint2DDouble &t);
-
     /**
      * Resize to target point. Relative pressure and edge zones are
      * considered.
      */
-    void resize(const wxPoint2DDouble &t);
+    bool resize();
 
     /**
      * Get offset from p to respective zone.
      */
-
     wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, ict::ItemZone z, ItemContext c);
 
-    void inflateRect(wxRect2DDouble &r) const;
-
-    void modifyPosition(wxDouble x, wxDouble y);
-    void modifySize(wxDouble w, wxDouble h);
-
     ict::ItemZone getLocation(const wxPoint2DDouble &vp) const;
-
-    wxDouble getUnmodAspectRatio() const;
-
-    bool exceedsBottomRestriction() const;
-    bool exceedsTopRestriction() const;
-    bool exceedsRightRestriction() const;
-    bool exceedsLeftRestriction() const;
 
     void drawEntries(wxMemoryDC *pv);
 
     int id;
-    wxRect2DDouble geometry;
-    wxRect2DDouble restriction;
-    wxRect2DDouble unmodGeometry;
     bool selected;
     bool locked;
-    bool fixed;
-    bool restricted;
     bool hidden;
     ict::ItemZone zonePressed;
+    wxPoint2DDouble *reference;
     wxPoint2DDouble relativePress;
     wxPoint2DDouble lastPoint;
     Scaler *scaler;
-    wxPoint2DDouble *reference;
+    SmartRect geometry;
+
 };
 
 #endif // !CANVASITEM_H
