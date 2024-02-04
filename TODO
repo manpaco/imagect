@@ -5,4 +5,5 @@ Canvas:
 - Improve canvas magnification
 - Canvas scrolling
 - Send notification on item change
-- Rename from ScrolledCanvas to ExtendedCanvas
++ Rename from ScrolledCanvas to ExtendedCanvas
+- Improve item selection
