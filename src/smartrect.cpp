@@ -195,12 +195,38 @@ bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
             else return pushBottomTo(inp.m_y);
             break;
         }
+        case ict::L_ZONE: {
+            wxDouble zoneLimit(GetRight());
+            if(isCentered()) zoneLimit = GetCentre().m_x;
+            if(inp.m_x > zoneLimit) {
+                lastReflection ^= ict::HORI_REFLEC;
+                if(!isCentered()) m_x = m_x + m_width;
+            }
+            reflection ^= lastReflection;
+            if(lastReflection == ict::HORI_REFLEC) return pushZoneTo(ict::R_ZONE, inp);
+            else return pushLeftTo(inp.m_x);
+            break;
+        }
+        case ict::R_ZONE: {
+            wxDouble zoneLimit(GetLeft());
+            if(isCentered()) zoneLimit = GetCentre().m_x;
+            if(inp.m_x < zoneLimit) {
+                lastReflection ^= ict::HORI_REFLEC;
+                if(!isCentered()) m_x = m_x - m_width;
+            }
+            reflection ^= lastReflection;
+            if(lastReflection == ict::HORI_REFLEC) return pushZoneTo(ict::L_ZONE, inp);
+            else return pushRightTo(inp.m_x);
+            break;
+        }
         case ict::IN_ZONE: {
             return pushTo(inp);
             break;
         }
-        default:
-            return true;
+        default: {
+            return false;
+            break;
+        }
     }
 }
 
@@ -361,6 +387,40 @@ bool SmartRect::pushBottomTo(const wxDouble &p) {
         m_width += deltaX;
         m_y -= deltaY;
         m_height += deltaY;
+    }
+    return instantChanged();
+}
+
+bool SmartRect::pushLeftTo(const wxDouble &p) {
+    saveInstant();
+    wxDouble deltaX = p - GetLeft();
+    wxDouble deltaY = 0;
+    if(isFixed()) deltaY = calcOrdi(deltaX);
+    m_x += deltaX;
+    m_y += deltaY / 2;
+    m_width -= deltaX;
+    m_height -= deltaY;
+    if(isCentered()) {
+        m_width -= deltaX;
+        m_y += deltaY / 2;
+        m_height -= deltaY;
+    }
+    return instantChanged();
+}
+
+bool SmartRect::pushRightTo(const wxDouble &p) {
+    saveInstant();
+    wxDouble deltaX = p - GetRight();
+    wxDouble deltaY = 0;
+    if(isFixed()) deltaY = calcOrdi(-deltaX);
+    m_y += deltaY / 2;
+    m_width += deltaX;
+    m_height -= deltaY;
+    if(isCentered()) {
+        m_x -= deltaX;
+        m_width += deltaX;
+        m_y += deltaY / 2;
+        m_height -= deltaY;
     }
     return instantChanged();
 }
