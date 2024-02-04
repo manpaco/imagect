@@ -175,6 +175,30 @@ bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
             else return pushLeftBottomTo(inp);
             break;
         }
+        case ict::T_ZONE: {
+            wxDouble zoneLimit(GetBottom());
+            if(isCentered()) zoneLimit = GetCentre().m_y;
+            if(inp.m_y > zoneLimit) {
+                lastReflection ^= ict::VERT_REFLEC;
+                if(!isCentered()) m_y = m_y + m_height;
+            }
+            reflection ^= lastReflection;
+            if(lastReflection == ict::VERT_REFLEC) return pushZoneTo(ict::B_ZONE, inp);
+            else return pushTopTo(inp.m_y);
+            break;
+        }
+        case ict::B_ZONE: {
+            wxDouble zoneLimit(GetTop());
+            if(isCentered()) zoneLimit = GetCentre().m_y;
+            if(inp.m_y < zoneLimit) {
+                lastReflection ^= ict::VERT_REFLEC;
+                if(!isCentered()) m_y = m_y - m_height;
+            }
+            reflection ^= lastReflection;
+            if(lastReflection == ict::VERT_REFLEC) return pushZoneTo(ict::T_ZONE, inp);
+            else return pushBottomTo(inp.m_y);
+            break;
+        }
         case ict::IN_ZONE: {
             return pushTo(inp);
             break;
@@ -198,15 +222,16 @@ bool SmartRect::pushRightBottomTo(const wxPoint2DDouble &p) {
     wxDouble deltaX = p.m_x - (GetRight());
     wxDouble deltaY = p.m_y - (GetBottom());
     if(isFixed()) {
-        wxDouble proy = abs(deltaX / deltaY);
         if(p.m_x >= GetRight() && p.m_y <= GetBottom()) {
             deltaX = calcAbsc(deltaY);
         } else if(p.m_x <= GetRight() && p.m_y >= GetBottom()) {
             deltaY = calcOrdi(deltaX);
-        } else if(p.m_x <= GetRight() && p.m_y <= GetBottom()) {
+        } else if(p.m_x < GetRight() && p.m_y < GetBottom()) {
+            wxDouble proy = abs(deltaX / deltaY);
             if(proy < aspectRatio) deltaX = calcAbsc(deltaY);
             else deltaY = calcOrdi(deltaX);
-        } else if(p.m_x >= GetRight() && p.m_y >= GetBottom()) {
+        } else if(p.m_x > GetRight() && p.m_y > GetBottom()) {
+            wxDouble proy = abs(deltaX / deltaY);
             if(proy > aspectRatio) deltaX = calcAbsc(deltaY);
             else deltaY = calcOrdi(deltaX);
         }
@@ -225,15 +250,16 @@ bool SmartRect::pushLeftTopTo(const wxPoint2DDouble &p) {
     wxDouble deltaX = p.m_x - GetLeft();
     wxDouble deltaY = p.m_y - GetTop();
     if(isFixed()) {
-        wxDouble proy = abs(deltaX / deltaY);
         if(p.m_x >= GetLeft() && p.m_y <= GetTop()) {
             deltaY = calcOrdi(deltaX);
         } else if(p.m_x <= GetLeft() && p.m_y >= GetTop()) {
             deltaX = calcAbsc(deltaY);
-        } else if(p.m_x <= GetLeft() && p.m_y <= GetTop()) {
+        } else if(p.m_x < GetLeft() && p.m_y < GetTop()) {
+            wxDouble proy = abs(deltaX / deltaY);
             if(proy > aspectRatio) deltaX = calcAbsc(deltaY);
             else deltaY = calcOrdi(deltaX);
-        } else if(p.m_x >= GetLeft() && p.m_y >= GetTop()) {
+        } else if(p.m_x > GetLeft() && p.m_y > GetTop()) {
+            wxDouble proy = abs(deltaX / deltaY);
             if(proy < aspectRatio) deltaX = calcAbsc(deltaY);
             else deltaY = calcOrdi(deltaX);
         }
@@ -254,17 +280,18 @@ bool SmartRect::pushRightTopTo(const wxPoint2DDouble &p) {
     wxDouble deltaX = p.m_x - GetRight();
     wxDouble deltaY = p.m_y - GetTop();
     if(isFixed()) {
-        wxDouble proy = abs(deltaX / deltaY);
-        if(p.m_x >= GetRight() && p.m_y <= GetTop()) {
-            if(proy > aspectRatio) deltaX = calcAbsc(deltaY);
-            else deltaY = calcOrdi(deltaX);
-        } else if(p.m_x <= GetRight() && p.m_y >= GetTop()) {
-            if(proy < aspectRatio) deltaX = calcAbsc(deltaY);
-            else deltaY = calcOrdi(deltaX);
-        } else if(p.m_x <= GetRight() && p.m_y <= GetTop()) {
-            deltaY = calcOrdi(deltaX);
+        if(p.m_x <= GetRight() && p.m_y <= GetTop()) {
+            deltaY = calcOrdi(-deltaX);
         } else if(p.m_x >= GetRight() && p.m_y >= GetTop()) {
-            deltaX = calcAbsc(deltaY);
+            deltaX = calcAbsc(-deltaY);
+        } else if(p.m_x > GetRight() && p.m_y < GetTop()) {
+            wxDouble proy = abs(deltaX / deltaY);
+            if(proy > aspectRatio) deltaX = calcAbsc(-deltaY);
+            else deltaY = calcOrdi(-deltaX);
+        } else if(p.m_x < GetRight() && p.m_y > GetTop()) {
+            wxDouble proy = abs(deltaX / deltaY);
+            if(proy < aspectRatio) deltaX = calcAbsc(-deltaY);
+            else deltaY = calcOrdi(-deltaX);
         }
     }
     m_y += deltaY;
@@ -283,17 +310,18 @@ bool SmartRect::pushLeftBottomTo(const wxPoint2DDouble &p) {
     wxDouble deltaX = p.m_x - GetLeft();
     wxDouble deltaY = p.m_y - GetBottom();
     if(isFixed()) {
-        wxDouble proy = abs(deltaX / deltaY);
-        if(p.m_x >= GetLeft() && p.m_y <= GetBottom()) {
-            if(proy < aspectRatio) deltaX = calcAbsc(deltaY);
-            else deltaY = calcOrdi(deltaX);
-        } else if(p.m_x <= GetLeft() && p.m_y >= GetBottom()) {
-            if(proy > aspectRatio) deltaX = calcAbsc(deltaY);
-            else deltaY = calcOrdi(deltaX);
-        } else if(p.m_x <= GetLeft() && p.m_y <= GetBottom()) {
-            deltaX = calcAbsc(deltaY);
+        if(p.m_x <= GetLeft() && p.m_y <= GetBottom()) {
+            deltaX = calcAbsc(-deltaY);
         } else if(p.m_x >= GetLeft() && p.m_y >= GetBottom()) {
-            deltaY = calcOrdi(deltaX);
+            deltaY = calcOrdi(-deltaX);
+        } else if(p.m_x > GetLeft() && p.m_y < GetBottom()) {
+            wxDouble proy = abs(deltaX / deltaY);
+            if(proy < aspectRatio) deltaX = calcAbsc(-deltaY);
+            else deltaY = calcOrdi(-deltaX);
+        } else if(p.m_x < GetLeft() && p.m_y > GetBottom()) {
+            wxDouble proy = abs(deltaX / deltaY);
+            if(proy > aspectRatio) deltaX = calcAbsc(-deltaY);
+            else deltaY = calcOrdi(-deltaX);
         }
     }
     m_x += deltaX;
@@ -301,6 +329,40 @@ bool SmartRect::pushLeftBottomTo(const wxPoint2DDouble &p) {
     m_height += deltaY;
     if(isCentered()) {
         m_width -= deltaX;
+        m_y -= deltaY;
+        m_height += deltaY;
+    }
+    return instantChanged();
+}
+
+bool SmartRect::pushTopTo(const wxDouble &p) {
+    saveInstant();
+    wxDouble deltaX = 0;
+    wxDouble deltaY = p - GetTop();
+    if(isFixed()) deltaX = calcAbsc(deltaY);
+    m_x += deltaX / 2;
+    m_width -= deltaX;
+    m_y += deltaY;
+    m_height -= deltaY;
+    if(isCentered()) {
+        m_x += deltaX / 2;
+        m_width -= deltaX;
+        m_height -= deltaY;
+    }
+    return instantChanged();
+}
+
+bool SmartRect::pushBottomTo(const wxDouble &p) {
+    saveInstant();
+    wxDouble deltaX = 0;
+    wxDouble deltaY = p - GetBottom();
+    if(isFixed()) deltaX = calcAbsc(deltaY);
+    m_x -= deltaX / 2;
+    m_width += deltaX;
+    m_height += deltaY;
+    if(isCentered()) {
+        m_x -= deltaX / 2;
+        m_width += deltaX;
         m_y -= deltaY;
         m_height += deltaY;
     }
