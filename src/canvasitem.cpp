@@ -20,7 +20,6 @@
 #include "canvasitem.hpp"
 #include "defs.hpp"
 #include "scaler.hpp"
-#include "scrolledcanvas.hpp"
 #include <wx/dcmemory.h>
 #include <wx/gdicmn.h>
 #include <iostream>

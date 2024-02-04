@@ -29,7 +29,7 @@ class wxSplitterWindow;
 class ScrolledView;
 class ZoomCtrl;
 class ZoomEvent;
-class ScrolledCanvas;
+class ExtendedCanvas;
 
 #include "wx/frame.h"
 
@@ -105,7 +105,7 @@ class MainFrame: public wxFrame {
         int showProceedMessage();
         int showCloseMessage();
 
-        ScrolledCanvas *sCanvas = nullptr;
+        ExtendedCanvas *sCanvas = nullptr;
         ToolsPanel *tools = nullptr;
         wxSplitterWindow *mainSplitter = nullptr;
         wxSplitterWindow *sideSplitter = nullptr;
