@@ -35,7 +35,7 @@ CanvasItem::CanvasItem(int id, wxRect2DDouble geometry) {
     this->scaler = nullptr;
     this->locked = true;
     this->selected = false;
-    this->zonePressed = ict::NONE;
+    this->zonePressed = ict::NONE_ZONE;
     this->reference = nullptr;
 }
 
@@ -91,46 +91,46 @@ wxDouble CanvasItem::getTop(ItemContext ic, bool unref) const {
     return getY(ic, unref);
 }
 
-wxRect2DDouble CanvasItem::getZone(ict::ItemZone z) const {
-    if(z == ict::NE) {
+wxRect2DDouble CanvasItem::getZone(ict::RectZone z) const {
+    if(z == ict::RT_ZONE) {
         return wxRect2DDouble(getRight(CANVAS_CONTEXT), getTop(CANVAS_CONTEXT) - ict::CORNER, ict::CORNER, ict::CORNER);
-    } else if(z == ict::NW) {
+    } else if(z == ict::LT_ZONE) {
         return wxRect2DDouble(getLeft(CANVAS_CONTEXT) - ict::CORNER, getTop(CANVAS_CONTEXT) - ict::CORNER, ict::CORNER, ict::CORNER);
-    } else if(z == ict::SE) {
+    } else if(z == ict::RB_ZONE) {
         return wxRect2DDouble(getRight(CANVAS_CONTEXT), getBottom(CANVAS_CONTEXT), ict::CORNER, ict::CORNER);
-    } else if(z == ict::SW) {
+    } else if(z == ict::LB_ZONE) {
         return wxRect2DDouble(getLeft(CANVAS_CONTEXT) - ict::CORNER, getBottom(CANVAS_CONTEXT), ict::CORNER, ict::CORNER);
-    } else if(z == ict::N) {
+    } else if(z == ict::T_ZONE) {
         return wxRect2DDouble(getLeft(CANVAS_CONTEXT), getTop(CANVAS_CONTEXT) - ict::CORNER, getWidth(CANVAS_CONTEXT), ict::CORNER);
-    } else if(z == ict::S) {
+    } else if(z == ict::B_ZONE) {
         return wxRect2DDouble(getLeft(CANVAS_CONTEXT), getBottom(CANVAS_CONTEXT), getWidth(CANVAS_CONTEXT), ict::CORNER);
-    } else if(z == ict::E) {
+    } else if(z == ict::R_ZONE) {
         return wxRect2DDouble(getRight(CANVAS_CONTEXT), getTop(CANVAS_CONTEXT), ict::CORNER, getHeight(CANVAS_CONTEXT));
-    } else if(z == ict::W) {
+    } else if(z == ict::L_ZONE) {
         return wxRect2DDouble(getLeft(CANVAS_CONTEXT) - ict::CORNER, getTop(CANVAS_CONTEXT), ict::CORNER, getHeight(CANVAS_CONTEXT));
-    } else if(z == ict::INNER)
+    } else if(z == ict::IN_ZONE)
         return getGeometry(CANVAS_CONTEXT);
     return wxRect2DDouble(0, 0, 0, 0);
 }
 
-wxPoint2DDouble CanvasItem::relativeToEdge(const wxPoint2DDouble &p, ict::ItemZone z, ItemContext c) {
-    if(z == ict::NE) {
+wxPoint2DDouble CanvasItem::relativeToEdge(const wxPoint2DDouble &p, ict::RectZone z, ItemContext c) {
+    if(z == ict::RT_ZONE) {
         return wxPoint2DDouble(p.m_x - getRight(c), p.m_y - getTop(c));
-    } else if(z == ict::NW) {
+    } else if(z == ict::LT_ZONE) {
         return wxPoint2DDouble(p.m_x - getLeft(c), p.m_y - getTop(c));
-    } else if(z == ict::SE) {
+    } else if(z == ict::RB_ZONE) {
         return wxPoint2DDouble(p.m_x - getRight(c), p.m_y - getBottom(c));
-    } else if(z == ict::SW) {
+    } else if(z == ict::LB_ZONE) {
         return wxPoint2DDouble(p.m_x - getLeft(c), p.m_y - getBottom(c));
-    } else if(z == ict::N) {
+    } else if(z == ict::T_ZONE) {
         return wxPoint2DDouble(0, p.m_y - getTop(c));
-    } else if(z == ict::S) {
+    } else if(z == ict::B_ZONE) {
         return wxPoint2DDouble(0, p.m_y - getBottom(c));
-    } else if(z == ict::E) {
+    } else if(z == ict::R_ZONE) {
         return wxPoint2DDouble(p.m_x - getRight(c), 0);
-    } else if(z == ict::W) {
+    } else if(z == ict::L_ZONE) {
         return wxPoint2DDouble(p.m_x - getLeft(c), 0);
-    } else if(z == ict::INNER) {
+    } else if(z == ict::IN_ZONE) {
         return p - getPosition(c);
     }
     return p - getReference(c);
@@ -144,43 +144,43 @@ wxPoint2DDouble CanvasItem::getReference(ItemContext c) {
     return wxPoint2DDouble(0, 0);
 }
 
-ict::ItemZone CanvasItem::getZonePressed() const {
+ict::RectZone CanvasItem::getZonePressed() const {
     return zonePressed;
 }
 
-ict::ItemZone CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const {
+ict::RectZone CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const {
     if (selected) {
-        if(getZone(ict::NE).Contains(canvasPoint)) return ict::NE;
-        if(getZone(ict::NW).Contains(canvasPoint)) return ict::NW;
-        if(getZone(ict::SE).Contains(canvasPoint)) return ict::SE;
-        if(getZone(ict::SW).Contains(canvasPoint)) return ict::SW;
-        if(getZone(ict::N).Contains(canvasPoint)) return ict::N;
-        if(getZone(ict::S).Contains(canvasPoint)) return ict::S;
-        if(getZone(ict::E).Contains(canvasPoint)) return ict::E;
-        if(getZone(ict::W).Contains(canvasPoint)) return ict::W;
+        if(getZone(ict::RT_ZONE).Contains(canvasPoint)) return ict::RT_ZONE;
+        if(getZone(ict::LT_ZONE).Contains(canvasPoint)) return ict::LT_ZONE;
+        if(getZone(ict::RB_ZONE).Contains(canvasPoint)) return ict::RB_ZONE;
+        if(getZone(ict::LB_ZONE).Contains(canvasPoint)) return ict::LB_ZONE;
+        if(getZone(ict::T_ZONE).Contains(canvasPoint)) return ict::T_ZONE;
+        if(getZone(ict::B_ZONE).Contains(canvasPoint)) return ict::B_ZONE;
+        if(getZone(ict::R_ZONE).Contains(canvasPoint)) return ict::R_ZONE;
+        if(getZone(ict::L_ZONE).Contains(canvasPoint)) return ict::L_ZONE;
     }
-    if(getZone(ict::INNER).Contains(canvasPoint)) return ict::INNER;
-    return ict::NONE;
+    if(getZone(ict::IN_ZONE).Contains(canvasPoint)) return ict::IN_ZONE;
+    return ict::NONE_ZONE;
 }
 
-ict::ItemZone CanvasItem::press(const wxPoint &canvasPoint) {
-    if(locked) return ict::NONE;
+ict::RectZone CanvasItem::press(const wxPoint &canvasPoint) {
+    if(locked) return ict::NONE_ZONE;
     zonePressed = getLocation(canvasPoint);
-    if (zonePressed == ict::NONE) {
+    if (!zonePressed) {
         selected = false;
         return zonePressed;
     }
     selected = true;
     relativePress = relativeToEdge(canvasPoint, zonePressed, CANVAS_CONTEXT);
     relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
-    lastPoint = relativeToEdge(canvasPoint, ict::NONE, CANVAS_CONTEXT);
+    lastPoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, CANVAS_CONTEXT);
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
     lastPoint -= relativePress;
     return zonePressed;
 }
 
 void CanvasItem::release() {
-    zonePressed = ict::NONE;
+    zonePressed = ict::NONE_ZONE;
     geometry.setMark();
 }
 
@@ -212,92 +212,61 @@ bool CanvasItem::isRestricted() const {
 }
 
 bool CanvasItem::modify(const wxPoint &canvasPoint) {
-    if (zonePressed == ict::NONE) return false;
-    lastPoint = relativeToEdge(canvasPoint, ict::NONE, CANVAS_CONTEXT);
+    if (!zonePressed) return false;
+    lastPoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, CANVAS_CONTEXT);
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
     lastPoint -= relativePress;
-    bool changed;
-    if (zonePressed == ict::INNER) {
-        changed = geometry.pushTo(lastPoint);
-    } else {
-        changed = resize();
-    }
+    bool changed = geometry.pushZoneTo(zonePressed, lastPoint);
+    zonePressed = geometry.getLastZone();
     if (changed) return true;
     else return false;
 }
 
-/* void CanvasItem::move(const wxPoint2DDouble &target) {
-    wxPoint2DDouble newPos(target - relativePress);
-    if(newPos == geometry.GetPosition()) return;
-    geometry.m_x = newPos.m_x;
-    geometry.m_y = newPos.m_y;
-    pushToRestriction();
-} */
-
-bool CanvasItem::resize() {
-    if(zonePressed == ict::SE) {
-        return geometry.pushRightBottomTo(lastPoint);
-    }
-    return false;
-    /* wxDouble deltaX = - relativePress.m_x;
-    wxDouble deltaY = - relativePress.m_y;
-    if(zonePressed == ict::SE) {
+/* bool CanvasItem::resize() {
+    if(zonePressed == ict::RB_ZONE) {
         deltaX += target.m_x - (geometry.m_x + geometry.m_width);
         deltaY += target.m_y - (geometry.m_y + geometry.m_height);
         geometry = wxRect2DDouble(geometry.m_x, geometry.m_y, geometry.m_width + deltaX,
                 geometry.m_height + deltaY);
-    } else if(zonePressed == ict::NW) {
+    } else if(zonePressed == ict::LT_ZONE) {
         deltaX += target.m_x - geometry.m_x;
         deltaY += target.m_y - geometry.m_y;
         geometry = wxRect2DDouble(geometry.m_x + deltaX, geometry.m_y + deltaY,
                 geometry.m_width - deltaX,
                 geometry.m_height - deltaY);
-    } else if(zonePressed == ict::NE) {
+    } else if(zonePressed == ict::RT_ZONE) {
         deltaX += target.m_x - (geometry.m_x + geometry.m_width);
         deltaY += target.m_y - geometry.m_y;
         geometry = wxRect2DDouble(geometry.m_x, geometry.m_y + deltaY,
                 geometry.m_width + deltaX,
                 geometry.m_height - deltaY);
-    } else if(zonePressed == ict::SW) {
+    } else if(zonePressed == ict::LB_ZONE) {
         deltaX += target.m_x - geometry.m_x;
         deltaY += target.m_y - (geometry.m_y + geometry.m_height);
         geometry = wxRect2DDouble(geometry.m_x + deltaX, geometry.m_y,
                 geometry.m_width - deltaX,
                 geometry.m_height + deltaY);
-    } else if(zonePressed == ict::N) {
+    } else if(zonePressed == ict::T_ZONE) {
         deltaY += target.m_y - geometry.m_y;
         geometry = wxRect2DDouble(geometry.m_x + deltaX, geometry.m_y + deltaY,
                 geometry.m_width - deltaX,
                 geometry.m_height - deltaY);
-    } else if(zonePressed == ict::S) {
+    } else if(zonePressed == ict::B_ZONE) {
         deltaY += target.m_y - (geometry.m_y + geometry.m_height);
         geometry = wxRect2DDouble(geometry.m_x, geometry.m_y,
                 geometry.m_width + deltaX,
                 geometry.m_height + deltaY);
-    } else if(zonePressed == ict::W) {
+    } else if(zonePressed == ict::L_ZONE) {
         deltaX += target.m_x - geometry.m_x;
         geometry = wxRect2DDouble(geometry.m_x + deltaX, geometry.m_y,
                 geometry.m_width - deltaX,
                 geometry.m_height + deltaY);
-    } else if(zonePressed == ict::E) {
+    } else if(zonePressed == ict::R_ZONE) {
         deltaX += target.m_x - (geometry.m_x + geometry.m_width);
         geometry = wxRect2DDouble(geometry.m_x, geometry.m_y + deltaY,
                 geometry.m_width + deltaX,
                 geometry.m_height - deltaY);
     }
-    fitInRestriction(zonePressed); */
-}
-
-/* void CanvasItem::pushToRestriction() {
-    if(!isRestricted() || restriction.Contains(geometry)) return;
-    int cx1 = restriction.GetLeft(), cx2 = restriction.GetRight();
-    int nx1 = geometry.GetLeft(), nx2 = geometry.GetRight();
-    if(nx2 > cx2) modifyPosition(cx2 - geometry.m_width, geometry.m_y);
-    if(nx1 < cx1) modifyPosition(cx1, geometry.m_y);
-    int cy1 = restriction.m_y, cy2 = restriction.GetBottom();
-    int ny1 = geometry.m_y, ny2 = geometry.GetBottom();
-    if(ny2 > cy2) modifyPosition(geometry.m_x, cy2 - geometry.m_height);
-    if(ny1 < cy1) modifyPosition(geometry.m_x, cy1);
 } */
 
 bool CanvasItem::setVirtualRestriction(const wxRect2DDouble &restriction) {
@@ -314,13 +283,16 @@ void CanvasItem::setAspectRatio(int xr, int yr) {
 
 void CanvasItem::expandFromCenter(bool op) {
     geometry.expandFromCenter(op);
+    if (!zonePressed || zonePressed == ict::IN_ZONE) return;
+    if (op) geometry.useMark();
+    geometry.pushZoneTo(zonePressed, lastPoint);
 }
 
 void CanvasItem::fixedAspectRatio(bool op) {
     geometry.fixedAspectRatio(op);
-    if (zonePressed == ict::NONE || zonePressed == ict::INNER) return;
+    if (!zonePressed || zonePressed == ict::IN_ZONE) return;
     if (op) geometry.useMark();
-    resize();
+    geometry.pushZoneTo(zonePressed, lastPoint);
 }
 
 bool CanvasItem::setVirtualDimensions(const wxPoint2DDouble &dim) {

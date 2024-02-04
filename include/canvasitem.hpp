@@ -53,7 +53,7 @@ public:
     wxPoint2DDouble getPosition(ItemContext ic, bool unref = false) const;
     wxPoint2DDouble getDimensions(ItemContext ic) const;
     wxRect2DDouble getArea() const;
-    wxRect2DDouble getZone(ict::ItemZone z) const;
+    wxRect2DDouble getZone(ict::RectZone z) const;
     bool setVirtualGeometry(const wxRect2DDouble &geo);
     bool setVirtualPosition(const wxPoint2DDouble &pos);
     bool setVirtualDimensions(const wxPoint2DDouble &dim);
@@ -89,7 +89,7 @@ public:
      *
      * @param p point, used to calculate zone and offset in pressure.
      */
-    ict::ItemZone press(const wxPoint &avp);
+    ict::RectZone press(const wxPoint &avp);
 
     /**
      * Release the simulated pressure.
@@ -99,7 +99,7 @@ public:
     /**
      * Get the zone pressed.
      */
-    ict::ItemZone getZonePressed() const;
+    ict::RectZone getZonePressed() const;
 
     bool operator==(const CanvasItem &);
     bool operator!=(const CanvasItem &);
@@ -121,9 +121,9 @@ private:
     /**
      * Get offset from p to respective zone.
      */
-    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, ict::ItemZone z, ItemContext c);
+    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, ict::RectZone z, ItemContext c);
 
-    ict::ItemZone getLocation(const wxPoint2DDouble &vp) const;
+    ict::RectZone getLocation(const wxPoint2DDouble &vp) const;
 
     void drawEntries(wxMemoryDC *pv);
 
@@ -131,7 +131,7 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    ict::ItemZone zonePressed;
+    ict::RectZone zonePressed;
     wxPoint2DDouble *reference;
     wxPoint2DDouble relativePress;
     wxPoint2DDouble lastPoint;

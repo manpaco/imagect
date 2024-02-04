@@ -85,7 +85,7 @@ void ScrolledCanvas::mouseMotion(wxMouseEvent &event) {
 
 CanvasItem * ScrolledCanvas::pressCanvas(const wxPoint p) {
     for (std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
-        if ((*it)->press(p) != ict::NONE) return *it;
+        if ((*it)->press(p) != ict::NONE_ZONE) return *it;
     }
     return nullptr;
 }

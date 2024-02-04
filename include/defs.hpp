@@ -98,20 +98,6 @@ enum ShapeChoice {
     SHAPE_CHOICE_SIZE
 };
 
-enum ItemZone {
-    NONE = -1,
-    INNER,
-    N,
-    NE,
-    NW,
-    S,
-    SE,
-    SW,
-    E,
-    W,
-    NUM_ZONES
-};
-
 enum Channel {
     RGB,
     ALPHA
