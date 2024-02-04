@@ -95,7 +95,7 @@ ict::RectZone SmartRect::getLastZone() const {
 
 bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
     wxPoint2DDouble inp(p);
-    if(isRestricted()) placeInPlayground(&inp);
+    if(isRestricted()) placeInPlayground(&inp, z == ict::IN_ZONE);
     int lastReflection = ict::NONE_REFLEC;
     lastZone = z;
     switch (z) {
