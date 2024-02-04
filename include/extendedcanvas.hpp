@@ -17,8 +17,8 @@
  *     with ImageCT. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SCROLLEDCANVAS_H
-#define SCROLLEDCANVAS_H
+#ifndef EXTENDEDCANVAS_H
+#define EXTENDEDCANVAS_H
 
 #include <vector>
 #include <wx/event.h>
@@ -31,14 +31,14 @@ class wxPanel;
 class CanvasItem;
 class Scaler;
 
-class ScrolledCanvas : public wxWindow {
+class ExtendedCanvas : public wxWindow {
 public:
-    ScrolledCanvas(wxWindow *parent, wxWindowID id);
+    ExtendedCanvas(wxWindow *parent, wxWindowID id);
 
     void addItem(CanvasItem *item);
     CanvasItem * getItem(int itemId);
 
-    ~ScrolledCanvas();
+    ~ExtendedCanvas();
 
 private:
     void paintCanvas(wxPaintEvent &event);
@@ -65,4 +65,4 @@ private:
     wxBitmap *canvasBuffer;
 };
 
-#endif // !SCROLLEDCANVAS_H
+#endif // !EXTENDEDCANVAS_H

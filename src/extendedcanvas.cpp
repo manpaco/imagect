@@ -20,7 +20,7 @@
 #include <cmath>
 #include <math.h>
 #include <iostream>
-#include "scrolledcanvas.hpp"
+#include "extendedcanvas.hpp"
 #include "canvasitem.hpp"
 #include "defs.hpp"
 #include "scaler.hpp"
@@ -34,7 +34,7 @@
 #include <wx/scrolbar.h>
 #include <wx/utils.h>
 
-ScrolledCanvas::ScrolledCanvas(wxWindow *parent, wxWindowID id) : wxWindow(parent, id) {
+ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(parent, id) {
     layout = new wxFlexGridSizer(2, 2, 0, 0);
     canvas = new wxWindow(this, wxID_ANY);
     canvas->SetBackgroundStyle(wxBG_STYLE_PAINT);
@@ -55,15 +55,15 @@ ScrolledCanvas::ScrolledCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     layout->Add(hBar, 1, wxEXPAND);
     layout->Add(zoom, 1, wxEXPAND);
     SetSizer(layout);
-    canvas->Bind(wxEVT_PAINT, &ScrolledCanvas::paintCanvas, this);
-    canvas->Bind(wxEVT_MOTION, &ScrolledCanvas::mouseMotion, this);
-    canvas->Bind(wxEVT_LEFT_DOWN, &ScrolledCanvas::mousePress, this);
-    canvas->Bind(wxEVT_LEFT_UP, &ScrolledCanvas::mouseRelease, this);
-    canvas->Bind(wxEVT_SIZE, &ScrolledCanvas::canvasResize, this);
-    canvas->Bind(wxEVT_MOUSEWHEEL, &ScrolledCanvas::magnification, this);
+    canvas->Bind(wxEVT_PAINT, &ExtendedCanvas::paintCanvas, this);
+    canvas->Bind(wxEVT_MOTION, &ExtendedCanvas::mouseMotion, this);
+    canvas->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::mousePress, this);
+    canvas->Bind(wxEVT_LEFT_UP, &ExtendedCanvas::mouseRelease, this);
+    canvas->Bind(wxEVT_SIZE, &ExtendedCanvas::canvasResize, this);
+    canvas->Bind(wxEVT_MOUSEWHEEL, &ExtendedCanvas::magnification, this);
 }
 
-void ScrolledCanvas::magnification(wxMouseEvent &event) {
+void ExtendedCanvas::magnification(wxMouseEvent &event) {
     int wheelRotation = event.GetWheelRotation();
     if (wheelRotation > 0) scaler->plusFactor(0.3, 0.3);
     else scaler->plusFactor(-0.3, -0.3);
@@ -72,25 +72,25 @@ void ScrolledCanvas::magnification(wxMouseEvent &event) {
     event.Skip();
 }
 
-void ScrolledCanvas::canvasResize(wxSizeEvent &event) {
+void ExtendedCanvas::canvasResize(wxSizeEvent &event) {
     if (canvasBuffer) delete canvasBuffer;
     canvasBuffer = new wxBitmap(event.GetSize().GetWidth(), event.GetSize().GetHeight());
     refreshCanvas();
 }
 
-void ScrolledCanvas::mouseMotion(wxMouseEvent &event) {
+void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
     if(pressItem) if(pressItem->modify(event.GetPosition())) refreshCanvas();
     event.Skip();
 }
 
-CanvasItem * ScrolledCanvas::pressCanvas(const wxPoint p) {
+CanvasItem * ExtendedCanvas::pressCanvas(const wxPoint p) {
     for (std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
         if ((*it)->press(p) != ict::NONE_ZONE) return *it;
     }
     return nullptr;
 }
 
-void ScrolledCanvas::mousePress(wxMouseEvent &event) {
+void ExtendedCanvas::mousePress(wxMouseEvent &event) {
     if(!canvas->HasCapture()) canvas->CaptureMouse();
     pressItem = pressCanvas(event.GetPosition());
     if (!oldSelectedItem) {
@@ -106,7 +106,7 @@ void ScrolledCanvas::mousePress(wxMouseEvent &event) {
     event.Skip();
 }
 
-void ScrolledCanvas::mouseRelease(wxMouseEvent &event) {
+void ExtendedCanvas::mouseRelease(wxMouseEvent &event) {
     if(canvas->HasCapture()) canvas->ReleaseMouse();
     if(pressItem) {
         pressItem->release();
@@ -115,7 +115,7 @@ void ScrolledCanvas::mouseRelease(wxMouseEvent &event) {
     event.Skip();
 }
 
-void ScrolledCanvas::paintCanvas(wxPaintEvent &event) {
+void ExtendedCanvas::paintCanvas(wxPaintEvent &event) {
     if (!canvasBuffer) return;
     wxPaintDC canvasPainter(canvas);
     wxRegion damaged = canvas->GetUpdateRegion();
@@ -131,14 +131,14 @@ void ScrolledCanvas::paintCanvas(wxPaintEvent &event) {
     canvasPainter.DrawBitmap(*canvasBuffer, 0, 0);
 }
 
-CanvasItem * ScrolledCanvas::getItem(int itemId) {
+CanvasItem * ExtendedCanvas::getItem(int itemId) {
     for (std::vector<CanvasItem *>::iterator it = zOrder.begin(); it != zOrder.end(); it++) {
         if ((*it)->getId() == itemId) return *it;
     }
     return nullptr;
 }
 
-void ScrolledCanvas::addItem(CanvasItem *item) {
+void ExtendedCanvas::addItem(CanvasItem *item) {
     if (!item) return;
     if (getItem(item->getId())) return;
     item->setScaler(scaler);
@@ -148,7 +148,7 @@ void ScrolledCanvas::addItem(CanvasItem *item) {
     refreshCanvasRect(wxRect(fresh.m_x, fresh.m_y, fresh.m_width, fresh.m_height));
 }
 
-void ScrolledCanvas::doMagnify(const wxPoint mousePosition) {
+void ExtendedCanvas::doMagnify(const wxPoint mousePosition) {
     if (scaler && !scaler->hasTransfer()) return;
     if (mousePosition.x < 0 || mousePosition.y < 0) return;
 
@@ -174,20 +174,20 @@ void ScrolledCanvas::doMagnify(const wxPoint mousePosition) {
     refreshCanvas();
 }
 
-void ScrolledCanvas::doScroll(const wxPoint motion) {
+void ExtendedCanvas::doScroll(const wxPoint motion) {
     if (motion.x == 0 && motion.y == 0) return;
 
     refreshCanvas();
 }
 
-void ScrolledCanvas::refreshCanvasRect(const wxRect &r) {
+void ExtendedCanvas::refreshCanvasRect(const wxRect &r) {
     canvas->RefreshRect(r);
 }
 
-void ScrolledCanvas::refreshCanvas() {
+void ExtendedCanvas::refreshCanvas() {
     canvas->Refresh();
 }
 
-ScrolledCanvas::~ScrolledCanvas() {
+ExtendedCanvas::~ExtendedCanvas() {
     if (canvasBuffer) delete canvasBuffer;
 }
