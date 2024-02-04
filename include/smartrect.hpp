@@ -26,7 +26,7 @@ class Scaler;
 namespace ict {
 
     enum RectZone {
-        NONE_ZONE = -1,
+        NONE_ZONE = 0,
         IN_ZONE,
         T_ZONE,
         RT_ZONE,
@@ -66,15 +66,7 @@ public:
     void modifyPosition(wxDouble x, wxDouble y);
     void modifySize(wxDouble w, wxDouble h);
 
-    bool pushTo(const wxPoint2DDouble &p);
-    bool pushTopTo(const wxDouble &p);
-    bool pushRightTopTo(const wxPoint2DDouble &p);
-    bool pushRightTo(const wxDouble &p);
-    bool pushRightBottomTo(const wxPoint2DDouble &p);
-    bool pushBottomTo(const wxDouble &p);
-    bool pushLeftBottomTo(const wxPoint2DDouble &p);
-    bool pushLeftTo(const wxDouble &p);
-    bool pushLeftTopTo(const wxPoint2DDouble &p);
+    bool pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p);
 
     bool restrict(const bool r);
     bool setRestriction(const wxRect2DDouble &r);
@@ -90,6 +82,8 @@ public:
     bool isFixed() const;
     bool isCentered() const;
     bool isRestricted() const;
+    int getReflection() const;
+    ict::RectZone getLastZone() const;
 
     /* SmartRect &operator=(SmartRect &&) = default;
     SmartRect &operator=(const SmartRect &) = default; */
@@ -97,13 +91,22 @@ public:
     ~SmartRect();
 
 private:
+    bool pushTo(const wxPoint2DDouble &p);
+    bool pushTopTo(const wxDouble &p);
+    bool pushRightTopTo(const wxPoint2DDouble &p);
+    bool pushRightTo(const wxDouble &p);
+    bool pushRightBottomTo(const wxPoint2DDouble &p);
+    bool pushBottomTo(const wxDouble &p);
+    bool pushLeftBottomTo(const wxPoint2DDouble &p);
+    bool pushLeftTo(const wxDouble &p);
+    bool pushLeftTopTo(const wxPoint2DDouble &p);
 
     void saveInstant();
     bool instantChanged() const;
 
     wxRect2DDouble getPlayground() const;
     wxRect2DDouble getInnerPlayground() const;
-    void pushPointToPlayground(wxPoint2DDouble *p, bool inner = false) const;
+    void placeInPlayground(wxPoint2DDouble *p, bool inner = false) const;
 
     wxDouble calcAbsc(const wxDouble &ordi) const;
     wxDouble calcOrdi(const wxDouble &absc) const;
@@ -116,7 +119,8 @@ private:
     bool centered;
     bool restricted;
 
-    int reflection, lastReflection;
+    int reflection = ict::NONE_REFLEC;
+    ict::RectZone lastZone;
 };
 
 #endif // !SMARTRECT
