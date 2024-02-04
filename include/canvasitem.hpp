@@ -113,12 +113,6 @@ private:
     wxDouble getBottom(ItemContext ic, bool unref = false) const;
 
     /**
-     * Resize to target point. Relative pressure and edge zones are
-     * considered.
-     */
-    bool resize();
-
-    /**
      * Get offset from p to respective zone.
      */
     wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, ict::RectZone z, ItemContext c);

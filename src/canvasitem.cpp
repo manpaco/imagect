@@ -222,53 +222,6 @@ bool CanvasItem::modify(const wxPoint &canvasPoint) {
     else return false;
 }
 
-/* bool CanvasItem::resize() {
-    if(zonePressed == ict::RB_ZONE) {
-        deltaX += target.m_x - (geometry.m_x + geometry.m_width);
-        deltaY += target.m_y - (geometry.m_y + geometry.m_height);
-        geometry = wxRect2DDouble(geometry.m_x, geometry.m_y, geometry.m_width + deltaX,
-                geometry.m_height + deltaY);
-    } else if(zonePressed == ict::LT_ZONE) {
-        deltaX += target.m_x - geometry.m_x;
-        deltaY += target.m_y - geometry.m_y;
-        geometry = wxRect2DDouble(geometry.m_x + deltaX, geometry.m_y + deltaY,
-                geometry.m_width - deltaX,
-                geometry.m_height - deltaY);
-    } else if(zonePressed == ict::RT_ZONE) {
-        deltaX += target.m_x - (geometry.m_x + geometry.m_width);
-        deltaY += target.m_y - geometry.m_y;
-        geometry = wxRect2DDouble(geometry.m_x, geometry.m_y + deltaY,
-                geometry.m_width + deltaX,
-                geometry.m_height - deltaY);
-    } else if(zonePressed == ict::LB_ZONE) {
-        deltaX += target.m_x - geometry.m_x;
-        deltaY += target.m_y - (geometry.m_y + geometry.m_height);
-        geometry = wxRect2DDouble(geometry.m_x + deltaX, geometry.m_y,
-                geometry.m_width - deltaX,
-                geometry.m_height + deltaY);
-    } else if(zonePressed == ict::T_ZONE) {
-        deltaY += target.m_y - geometry.m_y;
-        geometry = wxRect2DDouble(geometry.m_x + deltaX, geometry.m_y + deltaY,
-                geometry.m_width - deltaX,
-                geometry.m_height - deltaY);
-    } else if(zonePressed == ict::B_ZONE) {
-        deltaY += target.m_y - (geometry.m_y + geometry.m_height);
-        geometry = wxRect2DDouble(geometry.m_x, geometry.m_y,
-                geometry.m_width + deltaX,
-                geometry.m_height + deltaY);
-    } else if(zonePressed == ict::L_ZONE) {
-        deltaX += target.m_x - geometry.m_x;
-        geometry = wxRect2DDouble(geometry.m_x + deltaX, geometry.m_y,
-                geometry.m_width - deltaX,
-                geometry.m_height + deltaY);
-    } else if(zonePressed == ict::R_ZONE) {
-        deltaX += target.m_x - (geometry.m_x + geometry.m_width);
-        geometry = wxRect2DDouble(geometry.m_x, geometry.m_y + deltaY,
-                geometry.m_width + deltaX,
-                geometry.m_height - deltaY);
-    }
-} */
-
 bool CanvasItem::setVirtualRestriction(const wxRect2DDouble &restriction) {
     return geometry.setRestriction(restriction);
 }
