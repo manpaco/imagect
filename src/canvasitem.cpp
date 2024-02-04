@@ -170,6 +170,7 @@ ict::RectZone CanvasItem::press(const wxPoint &canvasPoint) {
         selected = false;
         return zonePressed;
     }
+    geometry.setMark();
     selected = true;
     relativePress = relativeToEdge(canvasPoint, zonePressed, CANVAS_CONTEXT);
     relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
@@ -181,7 +182,6 @@ ict::RectZone CanvasItem::press(const wxPoint &canvasPoint) {
 
 void CanvasItem::release() {
     zonePressed = ict::NONE_ZONE;
-    geometry.setMark();
 }
 
 wxPoint2DDouble CanvasItem::getDimensions(ItemContext ic) const {
