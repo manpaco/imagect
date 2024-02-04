@@ -110,11 +110,10 @@ bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
                 lastReflection ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
             }
-            if(lastReflection == ict::HORI_REFLEC) lastZone = ict::LB_ZONE;
-            else if(lastReflection == ict::VERT_REFLEC) lastZone = ict::RT_ZONE;
-            else if(lastReflection == ict::HOVE_REFLEC) lastZone = ict::LT_ZONE;
             reflection ^= lastReflection;
-            if(lastReflection) return pushZoneTo(lastZone, inp);
+            if(lastReflection == ict::HORI_REFLEC) return pushZoneTo(ict::LB_ZONE, inp);
+            else if(lastReflection == ict::VERT_REFLEC) return pushZoneTo(ict::RT_ZONE, inp);
+            else if(lastReflection == ict::HOVE_REFLEC) return pushZoneTo(ict::LT_ZONE, inp);
             else return pushRightBottomTo(inp);
             break;
         }
@@ -129,11 +128,10 @@ bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
                 lastReflection ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
             }
-            if(lastReflection == ict::HORI_REFLEC) lastZone = ict::RT_ZONE;
-            else if(lastReflection == ict::VERT_REFLEC) lastZone = ict::LB_ZONE;
-            else if(lastReflection == ict::HOVE_REFLEC) lastZone = ict::RB_ZONE;
             reflection ^= lastReflection;
-            if(lastReflection) return pushZoneTo(lastZone, inp);
+            if(lastReflection == ict::HORI_REFLEC) return pushZoneTo(ict::RT_ZONE, inp);
+            else if(lastReflection == ict::VERT_REFLEC) return pushZoneTo(ict::LB_ZONE, inp);
+            else if(lastReflection == ict::HOVE_REFLEC) return pushZoneTo(ict::RB_ZONE, inp);
             else return pushLeftTopTo(inp);
             break;
         }
@@ -148,11 +146,10 @@ bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
                 lastReflection ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
             }
-            if(lastReflection == ict::HORI_REFLEC) lastZone = ict::LT_ZONE;
-            else if(lastReflection == ict::VERT_REFLEC) lastZone = ict::RB_ZONE;
-            else if(lastReflection == ict::HOVE_REFLEC) lastZone = ict::LB_ZONE;
             reflection ^= lastReflection;
-            if(lastReflection) return pushZoneTo(lastZone, inp);
+            if(lastReflection == ict::HORI_REFLEC) return pushZoneTo(ict::LT_ZONE, inp);
+            else if(lastReflection == ict::VERT_REFLEC) return pushZoneTo(ict::RB_ZONE, inp);
+            else if(lastReflection == ict::HOVE_REFLEC) return pushZoneTo(ict::LB_ZONE, inp);
             else return pushRightTopTo(inp);
             break;
         }
@@ -167,11 +164,10 @@ bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
                 lastReflection ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
             }
-            if(lastReflection == ict::HORI_REFLEC) lastZone = ict::RB_ZONE;
-            else if(lastReflection == ict::VERT_REFLEC) lastZone = ict::LT_ZONE;
-            else if(lastReflection == ict::HOVE_REFLEC) lastZone = ict::RT_ZONE;
             reflection ^= lastReflection;
-            if(lastReflection) return pushZoneTo(lastZone, inp);
+            if(lastReflection == ict::HORI_REFLEC) return pushZoneTo(ict::RB_ZONE, inp);
+            else if(lastReflection == ict::VERT_REFLEC) return pushZoneTo(ict::LT_ZONE, inp);
+            else if(lastReflection == ict::HOVE_REFLEC) return pushZoneTo(ict::RT_ZONE, inp);
             else return pushLeftBottomTo(inp);
             break;
         }
