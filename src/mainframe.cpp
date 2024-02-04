@@ -92,7 +92,7 @@ void MainFrame::allocateMem() {
     it2->lock(false);
     it2->setVirtualRestriction(res);
     it2->restrict(true);
-    it2->fixedAspectRatio(true);
+    // it2->fixedAspectRatio(true);
     // it2->expandFromCenter(true);
     sCanvas->addItem(it2);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
