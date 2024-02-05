@@ -119,6 +119,7 @@ private:
     bool fixed;
     bool centered;
     bool restricted;
+    bool reflecting;
 
     int reflection = ict::NONE_REFLEC;
     ict::RectZone lastZone;
