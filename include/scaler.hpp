@@ -5,9 +5,6 @@
 #include "defs.hpp"
 #include <wx/geometry.h>
 
-const wxDouble minScaleFactor = 1.0 / 256;
-const wxDouble maxScaleFactor = 256;
-
 class Scaler {
 public:
     Scaler();
