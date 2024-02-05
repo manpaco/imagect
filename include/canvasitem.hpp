@@ -24,15 +24,12 @@
 #include <wx/gdicmn.h>
 #include <wx/geometry.h>
 #include "smartrect.hpp"
-
-enum ItemContext {
-    VIRTUAL_CONTEXT,
-    CANVAS_CONTEXT
-};
+#include "defs.hpp"
 
 class PixelView;
 class Scaler;
 class wxMemoryDC;
+class ExtendedCanvas;
 
 class CanvasItem {
 public:
@@ -45,13 +42,13 @@ public:
     bool isLocked();
     void hide(bool opt);
     bool isHidden() const;
-    wxDouble getX(ItemContext ic, bool unref = false) const;
-    wxDouble getY(ItemContext ic, bool unref = false) const;
-    wxDouble getWidth(ItemContext ic) const;
-    wxDouble getHeight(ItemContext ic) const;
-    wxRect2DDouble getGeometry(ItemContext ic, bool unref = false) const;
-    wxPoint2DDouble getPosition(ItemContext ic, bool unref = false) const;
-    wxPoint2DDouble getDimensions(ItemContext ic) const;
+    wxDouble getX(ict::ECContext ic, bool unref = false) const;
+    wxDouble getY(ict::ECContext ic, bool unref = false) const;
+    wxDouble getWidth(ict::ECContext ic) const;
+    wxDouble getHeight(ict::ECContext ic) const;
+    wxRect2DDouble getGeometry(ict::ECContext ic, bool unref = false) const;
+    wxPoint2DDouble getPosition(ict::ECContext ic, bool unref = false) const;
+    wxPoint2DDouble getDimensions(ict::ECContext ic) const;
     wxRect2DDouble getArea() const;
     wxRect2DDouble getZone(ict::RectZone z) const;
     bool setVirtualGeometry(const wxRect2DDouble &geo);
@@ -66,8 +63,8 @@ public:
     wxDouble getAspectRatio() const;
     void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
-    void setVirtualReference(wxPoint2DDouble *r);
-    wxPoint2DDouble getReference(ItemContext c);
+    void setContainer(ExtendedCanvas *c);
+    wxRect2DDouble getUpdateArea() const;
 
     void expandFromCenter(bool op);
 
@@ -107,30 +104,32 @@ public:
     ~CanvasItem();
 
 private:
-    wxDouble getRight(ItemContext ic, bool unref = false) const;
-    wxDouble getLeft(ItemContext ic, bool unref = false) const;
-    wxDouble getTop(ItemContext ic, bool unref = false) const;
-    wxDouble getBottom(ItemContext ic, bool unref = false) const;
+    wxDouble getRight(ict::ECContext ic, bool unref = false) const;
+    wxDouble getLeft(ict::ECContext ic, bool unref = false) const;
+    wxDouble getTop(ict::ECContext ic, bool unref = false) const;
+    wxDouble getBottom(ict::ECContext ic, bool unref = false) const;
 
     /**
      * Get offset from p to respective zone.
      */
-    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, ict::RectZone z, ItemContext c);
+    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, ict::RectZone z, ict::ECContext c);
 
     ict::RectZone getLocation(const wxPoint2DDouble &vp) const;
 
     void drawEntries(wxMemoryDC *pv);
+
+    wxPoint2DDouble getContainerReference(ict::ECContext c) const;
 
     int id;
     bool selected;
     bool locked;
     bool hidden;
     ict::RectZone zonePressed;
-    wxPoint2DDouble *reference;
     wxPoint2DDouble relativePress;
     wxPoint2DDouble lastPoint;
     Scaler *scaler;
     SmartRect geometry;
+    ExtendedCanvas *container;
 
 };
 
