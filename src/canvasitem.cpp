@@ -242,7 +242,6 @@ void CanvasItem::fixedAspectRatio(bool op) {
 wxRect2DDouble CanvasItem::getUpdateArea() const {
     wxRect2DDouble updArea(geometry.getChangeUnion());
     if(container) {
-        if(container->useGrid()) truncRect(&updArea);
         updArea.m_x += container->getReference(ict::VIRTUAL_CONTEXT).m_x;
         updArea.m_y += container->getReference(ict::VIRTUAL_CONTEXT).m_y;
     }
