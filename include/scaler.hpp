@@ -21,12 +21,13 @@ public:
     void clearTransfer();
     void plusFactor(wxDouble axf, wxDouble ayf);
 
-    wxDouble scaleX(const wxDouble v, ict::Dot d) const;
-    wxDouble scaleY(const wxDouble v, ict::Dot d) const;
+    wxDouble scaleX(const wxDouble &v, ict::Dot d) const;
+    wxDouble scaleY(const wxDouble &v, ict::Dot d) const;
     wxPoint2DDouble scalePoint(const wxPoint2DDouble &p, ict::Dot d) const;
+    void scaleRect(wxRect2DDouble *p, ict::Dot d) const;
 
-    wxDouble transferX(const wxDouble v, ict::Dot d) const;
-    wxDouble transferY(const wxDouble v, ict::Dot d) const;
+    wxDouble transferX(const wxDouble &v, ict::Dot d) const;
+    wxDouble transferY(const wxDouble &v, ict::Dot d) const;
     wxPoint2DDouble transferPoint(const wxPoint2DDouble &p, ict::Dot d) const;
 
     ~Scaler();
