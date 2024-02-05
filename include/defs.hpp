@@ -121,10 +121,15 @@ enum Dot {
     OUT_D
 };
 
-enum ScaleType {
+enum TruncType {
     FLOOR_ST,
     ROUND_ST,
     CEILL_ST
+};
+
+enum ECContext {
+    VIRTUAL_CONTEXT,
+    CANVAS_CONTEXT
 };
 
 }
