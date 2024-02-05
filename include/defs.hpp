@@ -25,6 +25,9 @@
 
 namespace ict {
 
+const double MAXUPP = 256;
+const double MINUPP = 1 / MAXUPP;
+
 const int IMG_MULTIPLIER = 3;
 const int SHADOW_OFFSET = 2;
 const int CORNER = 10;

@@ -19,7 +19,7 @@ public:
     void getTransferFactor(wxDouble *xtf, wxDouble *ytf) const;
     bool hasTransfer() const;
     void clearTransfer();
-    void plusFactor(wxDouble axf, wxDouble ayf);
+    void plusFactor(wxDouble pxf, wxDouble pyf);
 
     wxDouble scaleX(const wxDouble &v, ict::Dot d) const;
     wxDouble scaleY(const wxDouble &v, ict::Dot d) const;

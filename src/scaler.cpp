@@ -32,11 +32,11 @@ Scaler::Scaler(wxDouble xf, wxDouble yf) {
 }
 
 void Scaler::setNewFactor(wxDouble xf, wxDouble yf) {
-    if (xf > 0.0) {
+    if (xf >= ict::MINUPP) {
         this->xxOldFactor = this->xxFactor;
         this->xxFactor = xf;
     }
-    if (yf > 0.0) {
+    if (yf >= ict::MINUPP) {
         this->yyOldFactor = this->yyFactor;
         this->yyFactor = yf;
     }
@@ -52,9 +52,8 @@ void Scaler::clearTransfer() {
     setNewFactor(xxFactor, yyFactor);
 }
 
-void Scaler::plusFactor(wxDouble axf, wxDouble ayf) {
-    xxFactor += axf;
-    yyFactor += ayf;
+void Scaler::plusFactor(wxDouble pxf, wxDouble pyf) {
+    setNewFactor(xxFactor + pxf, yyFactor + pyf);
 }
 
 void Scaler::getNewFactor(wxDouble *xf, wxDouble *yf) const {
