@@ -207,7 +207,7 @@ bool CanvasItem::modify(const wxPoint &canvasPoint) {
     bool changed = geometry.pushZoneTo(zonePressed, lastPoint);
     zonePressed = geometry.getLastZone();
     if (changed) {
-        // if(container) container->notifyChange(this);
+        if(container) container->notifyChange(this);
         return true;
     }
     else return false;

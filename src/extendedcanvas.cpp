@@ -80,7 +80,7 @@ void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
 }
 
 void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
-    if(pressItem) if(pressItem->modify(event.GetPosition())) refreshCanvas();
+    if(pressItem) pressItem->modify(event.GetPosition());
     event.Skip();
 }
 
