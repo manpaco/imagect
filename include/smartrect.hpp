@@ -84,6 +84,7 @@ public:
     bool isRestricted() const;
     int getReflection() const;
     ict::RectZone getLastZone() const;
+    wxRect2DDouble getChangeUnion() const;
 
     /* SmartRect &operator=(SmartRect &&) = default;
     SmartRect &operator=(const SmartRect &) = default; */
@@ -102,7 +103,7 @@ private:
     bool pushLeftTopTo(const wxPoint2DDouble &p);
 
     void saveInstant();
-    bool instantChanged() const;
+    bool instantChanged(bool = true);
 
     wxRect2DDouble getPlayground() const;
     wxRect2DDouble getInnerPlayground() const;

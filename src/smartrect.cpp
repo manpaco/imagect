@@ -10,10 +10,11 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
     this->fixed = false;
     this->restricted = false;
     this->centered = false;
+    saveInstant();
+    setMark();
 }
 
 bool SmartRect::setGeometry(const wxRect2DDouble &r) {
-    saveInstant();
     *this = r;
     setMark();
     if(isRestricted()) {
@@ -91,6 +92,10 @@ int SmartRect::getReflection() const {
 
 ict::RectZone SmartRect::getLastZone() const {
     return lastZone;
+}
+
+wxRect2DDouble SmartRect::getChangeUnion() const {
+    return instant.CreateUnion(*this);
 }
 
 bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
@@ -233,14 +238,12 @@ bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
 bool SmartRect::pushTo(const wxPoint2DDouble &p) {
     if(p == GetPosition()) return false;
     wxPoint2DDouble inp(p);
-    saveInstant();
     if(isRestricted()) placeInPlayground(&inp, true);
     modifyPosition(inp.m_x, inp.m_y);
     return instantChanged();
 }
 
 bool SmartRect::pushRightBottomTo(const wxPoint2DDouble &p) {
-    saveInstant();
     wxDouble deltaX = p.m_x - (GetRight());
     wxDouble deltaY = p.m_y - (GetBottom());
     if(isFixed()) {
@@ -268,7 +271,6 @@ bool SmartRect::pushRightBottomTo(const wxPoint2DDouble &p) {
 }
 
 bool SmartRect::pushLeftTopTo(const wxPoint2DDouble &p) {
-    saveInstant();
     wxDouble deltaX = p.m_x - GetLeft();
     wxDouble deltaY = p.m_y - GetTop();
     if(isFixed()) {
@@ -298,7 +300,6 @@ bool SmartRect::pushLeftTopTo(const wxPoint2DDouble &p) {
 }
 
 bool SmartRect::pushRightTopTo(const wxPoint2DDouble &p) {
-    saveInstant();
     wxDouble deltaX = p.m_x - GetRight();
     wxDouble deltaY = p.m_y - GetTop();
     if(isFixed()) {
@@ -328,7 +329,6 @@ bool SmartRect::pushRightTopTo(const wxPoint2DDouble &p) {
 }
 
 bool SmartRect::pushLeftBottomTo(const wxPoint2DDouble &p) {
-    saveInstant();
     wxDouble deltaX = p.m_x - GetLeft();
     wxDouble deltaY = p.m_y - GetBottom();
     if(isFixed()) {
@@ -358,7 +358,6 @@ bool SmartRect::pushLeftBottomTo(const wxPoint2DDouble &p) {
 }
 
 bool SmartRect::pushTopTo(const wxDouble &p) {
-    saveInstant();
     wxDouble deltaX = 0;
     wxDouble deltaY = p - GetTop();
     if(isFixed()) deltaX = calcAbsc(deltaY);
@@ -375,7 +374,6 @@ bool SmartRect::pushTopTo(const wxDouble &p) {
 }
 
 bool SmartRect::pushBottomTo(const wxDouble &p) {
-    saveInstant();
     wxDouble deltaX = 0;
     wxDouble deltaY = p - GetBottom();
     if(isFixed()) deltaX = calcAbsc(deltaY);
@@ -392,7 +390,6 @@ bool SmartRect::pushBottomTo(const wxDouble &p) {
 }
 
 bool SmartRect::pushLeftTo(const wxDouble &p) {
-    saveInstant();
     wxDouble deltaX = p - GetLeft();
     wxDouble deltaY = 0;
     if(isFixed()) deltaY = calcOrdi(deltaX);
@@ -409,7 +406,6 @@ bool SmartRect::pushLeftTo(const wxDouble &p) {
 }
 
 bool SmartRect::pushRightTo(const wxDouble &p) {
-    saveInstant();
     wxDouble deltaX = p - GetRight();
     wxDouble deltaY = 0;
     if(isFixed()) deltaY = calcOrdi(-deltaX);
@@ -489,8 +485,11 @@ void SmartRect::saveInstant() {
     instant = *this;
 }
 
-bool SmartRect::instantChanged() const {
-    if (instant != *this) return true;
+bool SmartRect::instantChanged(bool saveNew) {
+    if (instant != *this) {
+        if(saveNew) saveInstant();
+        return true;
+    }
     else return false;
 }
 
