@@ -38,6 +38,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     layout = new wxFlexGridSizer(2, 2, 0, 0);
     canvas = new wxWindow(this, wxID_ANY);
     canvas->SetBackgroundStyle(wxBG_STYLE_PAINT);
+    canvasReference = wxPoint2DDouble(0, 0);
     vBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
     scaler = new Scaler(1.0, 1.0);
@@ -59,7 +60,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvas->Bind(wxEVT_MOTION, &ExtendedCanvas::mouseMotion, this);
     canvas->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::mousePress, this);
     canvas->Bind(wxEVT_LEFT_UP, &ExtendedCanvas::mouseRelease, this);
-    canvas->Bind(wxEVT_SIZE, &ExtendedCanvas::canvasResize, this);
+    canvas->Bind(wxEVT_SIZE, &ExtendedCanvas::resizeCanvas, this);
     canvas->Bind(wxEVT_MOUSEWHEEL, &ExtendedCanvas::magnification, this);
 }
 
@@ -72,7 +73,7 @@ void ExtendedCanvas::magnification(wxMouseEvent &event) {
     event.Skip();
 }
 
-void ExtendedCanvas::canvasResize(wxSizeEvent &event) {
+void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
     if (canvasBuffer) delete canvasBuffer;
     canvasBuffer = new wxBitmap(event.GetSize().GetWidth(), event.GetSize().GetHeight());
     refreshCanvas();
@@ -85,7 +86,7 @@ void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
 
 CanvasItem * ExtendedCanvas::pressCanvas(const wxPoint p) {
     for (std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
-        if ((*it)->press(p) != ict::NONE_ZONE) return *it;
+        if ((*it)->press(p)) return *it;
     }
     return nullptr;
 }
@@ -142,7 +143,7 @@ void ExtendedCanvas::addItem(CanvasItem *item) {
     if (!item) return;
     if (getItem(item->getId())) return;
     item->setScaler(scaler);
-    item->setVirtualReference(&canvasReference);
+    item->setContainer(this);
     zOrder.push_back(item);
     wxRect2DDouble fresh(item->getArea());
     refreshCanvasRect(wxRect(fresh.m_x, fresh.m_y, fresh.m_width, fresh.m_height));
@@ -186,6 +187,17 @@ void ExtendedCanvas::refreshCanvasRect(const wxRect &r) {
 
 void ExtendedCanvas::refreshCanvas() {
     canvas->Refresh();
+}
+
+void ExtendedCanvas::notifyChange(CanvasItem *changed) {
+    wxRect2DDouble ch(changed->getUpdateArea());
+    wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
+    refreshCanvasRect(refresh);
+}
+
+wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {
+    if(c == ict::VIRTUAL_CONTEXT) return canvasReference;
+    else return scaler->scalePoint(canvasReference, ict::IN_D);
 }
 
 ExtendedCanvas::~ExtendedCanvas() {

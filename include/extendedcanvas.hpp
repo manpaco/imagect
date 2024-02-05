@@ -24,6 +24,7 @@
 #include <wx/event.h>
 #include <wx/window.h>
 #include <wx/geometry.h>
+#include "defs.hpp"
 
 class wxScrollBar;
 class wxFlexGridSizer;
@@ -37,6 +38,7 @@ public:
 
     void addItem(CanvasItem *item);
     CanvasItem * getItem(int itemId);
+    wxPoint2DDouble getReference(ict::ECContext c) const;
 
     ~ExtendedCanvas();
 
@@ -45,13 +47,14 @@ private:
     void mouseMotion(wxMouseEvent &event);
     void mousePress(wxMouseEvent &event);
     void mouseRelease(wxMouseEvent &event);
-    void canvasResize(wxSizeEvent &event);
+    void resizeCanvas(wxSizeEvent &event);
     void magnification(wxMouseEvent &event);
     void doMagnify(const wxPoint magCenter);
     void doScroll(const wxPoint motion);
     CanvasItem * pressCanvas(const wxPoint p);
     void refreshCanvas();
     void refreshCanvasRect(const wxRect &r);
+    void notifyChange(CanvasItem *changed);
 
     wxScrollBar *vBar, *hBar;
     wxFlexGridSizer *layout;
@@ -63,6 +66,8 @@ private:
     wxPoint2DDouble canvasReference;
 
     wxBitmap *canvasBuffer;
+
+    friend CanvasItem;
 };
 
 #endif // !EXTENDEDCANVAS_H
