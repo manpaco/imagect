@@ -36,7 +36,7 @@ CanvasItem::CanvasItem(int id, wxRect2DDouble geometry) {
     this->scaler = nullptr;
     this->locked = true;
     this->selected = false;
-    this->zonePressed = ict::NONE_ZONE;
+    this->pressedZone = ict::NONE_ZONE;
     this->container = nullptr;
 }
 
@@ -135,8 +135,8 @@ wxPoint2DDouble CanvasItem::getContainerReference(ict::ECContext c) const {
     return wxPoint2DDouble(0, 0);
 }
 
-ict::RectZone CanvasItem::getZonePressed() const {
-    return zonePressed;
+ict::RectZone CanvasItem::getPressedZone() const {
+    return pressedZone;
 }
 
 bool CanvasItem::collides(const wxPoint2DDouble &p) const {
@@ -163,20 +163,20 @@ ict::RectZone CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const 
 
 ict::RectZone CanvasItem::press(const wxPoint &canvasPoint) {
     if(locked) return ict::NONE_ZONE;
-    zonePressed = getLocation(canvasPoint);
-    if(!zonePressed) return zonePressed;
+    pressedZone = getLocation(canvasPoint);
+    if(!pressedZone) return pressedZone;
     geometry.setMark();
-    relativePress = relativeToEdge(canvasPoint, zonePressed, ict::CANVAS_CONTEXT);
+    relativePress = relativeToEdge(canvasPoint, pressedZone, ict::CANVAS_CONTEXT);
     relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
     lastPoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, ict::CANVAS_CONTEXT);
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
     lastPoint -= relativePress;
     if(container) container->notifyPressure(this);
-    return zonePressed;
+    return pressedZone;
 }
 
 void CanvasItem::release() {
-    zonePressed = ict::NONE_ZONE;
+    pressedZone = ict::NONE_ZONE;
 }
 
 wxPoint2DDouble CanvasItem::getDimensions(ict::ECContext ic) const {
@@ -204,12 +204,12 @@ bool CanvasItem::isRestricted() const {
 }
 
 bool CanvasItem::modify(const wxPoint &canvasPoint) {
-    if (!zonePressed) return false;
+    if (!pressedZone) return false;
     lastPoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, ict::CANVAS_CONTEXT);
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
     lastPoint -= relativePress;
-    bool changed = geometry.pushZoneTo(zonePressed, lastPoint);
-    zonePressed = geometry.getLastZone();
+    bool changed = geometry.pushZoneTo(pressedZone, lastPoint);
+    pressedZone = geometry.getLastZone();
     if (changed) {
         if(container) container->notifyGeometry(this);
         return true;
@@ -231,16 +231,16 @@ void CanvasItem::setAspectRatio(int xr, int yr) {
 
 void CanvasItem::expandFromCenter(bool op) {
     geometry.expandFromCenter(op);
-    if (!zonePressed || zonePressed == ict::IN_ZONE) return;
+    if (!pressedZone || pressedZone == ict::IN_ZONE) return;
     if (op) geometry.useMark();
-    geometry.pushZoneTo(zonePressed, lastPoint);
+    geometry.pushZoneTo(pressedZone, lastPoint);
 }
 
 void CanvasItem::fixedAspectRatio(bool op) {
     geometry.fixedAspectRatio(op);
-    if (!zonePressed || zonePressed == ict::IN_ZONE) return;
+    if (!pressedZone || pressedZone == ict::IN_ZONE) return;
     if (op) geometry.useMark();
-    geometry.pushZoneTo(zonePressed, lastPoint);
+    geometry.pushZoneTo(pressedZone, lastPoint);
 }
 
 wxRect2DDouble CanvasItem::getUpdateArea() const {

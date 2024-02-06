@@ -76,7 +76,7 @@ public:
     /**
      * Get the zone pressed.
      */
-    ict::RectZone getZonePressed() const;
+    ict::RectZone getPressedZone() const;
 
     bool operator==(const CanvasItem &);
     bool operator!=(const CanvasItem &);
@@ -104,6 +104,8 @@ private:
      */
     ict::RectZone press(const wxPoint &avp);
 
+    ict::RectZone hover(const wxPoint &p);
+
     /**
      * Release the simulated pressure.
      */
@@ -124,7 +126,7 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    ict::RectZone zonePressed;
+    ict::RectZone pressedZone, hoverZone;
     wxPoint2DDouble relativePress;
     wxPoint2DDouble lastPoint;
     Scaler *scaler;
