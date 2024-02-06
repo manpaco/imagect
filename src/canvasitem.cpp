@@ -34,10 +34,12 @@ CanvasItem::CanvasItem(int id, wxRect2DDouble geometry) {
     this->id = id;
     this->geometry = geometry;
     this->scaler = nullptr;
+    this->hidden = false;
     this->locked = true;
     this->selected = false;
     this->pressedZone = ict::NONE_ZONE;
     this->container = nullptr;
+    this->hoverZone = ict::NONE_ZONE;
 }
 
 CanvasItem::~CanvasItem() {
@@ -179,6 +181,24 @@ void CanvasItem::release() {
     pressedZone = ict::NONE_ZONE;
 }
 
+void CanvasItem::hover(ict::RectZone z) {
+    if(hoverZone != z) {
+        prevHover = hoverZone;
+        hoverZone = z;
+        if(container) container->notifyHover(this);
+    }
+}
+
+void CanvasItem::tryHover(const wxPoint &p, ict::RectZone *t) {
+    if(locked || hidden) {
+        *t = ict::NONE_ZONE;
+        return;
+    }
+    *t = getLocation(p);
+    if(!*t) return;
+    if(container) container->notifyTryHover(this);
+}
+
 wxPoint2DDouble CanvasItem::getDimensions(ict::ECContext ic) const {
     return wxPoint2DDouble(getWidth(ic), getHeight(ic));
 }
@@ -210,6 +230,7 @@ bool CanvasItem::modify(const wxPoint &canvasPoint) {
     lastPoint -= relativePress;
     bool changed = geometry.pushZoneTo(pressedZone, lastPoint);
     pressedZone = geometry.getLastZone();
+    hoverZone = pressedZone;
     if (changed) {
         if(container) container->notifyGeometry(this);
         return true;
@@ -254,6 +275,9 @@ wxRect2DDouble CanvasItem::getUpdateArea() const {
     return updArea;
 }
 
+wxRect2DDouble CanvasItem::getHoverUpdate() const {
+    return getZone(hoverZone).CreateUnion(getZone(prevHover));
+}
 bool CanvasItem::setVirtualDimensions(const wxPoint2DDouble &dim) {
     return geometry.setSize(dim);
 }
@@ -280,6 +304,12 @@ void CanvasItem::drawOn(wxMemoryDC *pv) {
     wxRect2DDouble ddr(getGeometry(ict::CANVAS_CONTEXT));
     wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
     pv->DrawRectangle(dr);
+    if(hoverZone) {
+        pv->SetBrush(*wxYELLOW_BRUSH);
+        wxRect2DDouble ddr(getZone(hoverZone));
+        wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
+        pv->DrawRectangle(dr);
+    }
 }
 
 void CanvasItem::drawEntries(wxMemoryDC *pv) {

@@ -64,7 +64,6 @@ public:
     void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
     void setContainer(ExtendedCanvas *c);
-    wxRect2DDouble getUpdateArea() const;
     bool collides(const wxPoint2DDouble &) const;
     void expandFromCenter(bool op);
 
@@ -104,7 +103,11 @@ private:
      */
     ict::RectZone press(const wxPoint &avp);
 
-    ict::RectZone hover(const wxPoint &p);
+    void tryHover(const wxPoint &p, ict::RectZone *t);
+    void hover(ict::RectZone z);
+
+    wxRect2DDouble getUpdateArea() const;
+    wxRect2DDouble getHoverUpdate() const;
 
     /**
      * Release the simulated pressure.
@@ -126,7 +129,7 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    ict::RectZone pressedZone, hoverZone;
+    ict::RectZone pressedZone, hoverZone, prevHover;
     wxPoint2DDouble relativePress;
     wxPoint2DDouble lastPoint;
     Scaler *scaler;

@@ -45,6 +45,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvasBuffer = nullptr;
     pressedItem = nullptr;
     selectedItem = nullptr;
+    hoveredItem = nullptr;
     zoom = new wxWindow(this, wxID_ANY);
     zoom->SetBackgroundColour(wxColour(*wxYELLOW));
     layout->AddGrowableCol(0);
@@ -81,7 +82,17 @@ void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
 
 void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
     if(pressedItem) pressedItem->modify(event.GetPosition());
+    else if(!hoverCanvas(event.GetPosition()))
+        if(hoveredItem) hoveredItem->hover(ict::NONE_ZONE);
     event.Skip();
+}
+
+bool ExtendedCanvas::hoverCanvas(const wxPoint p) {
+    for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
+        (*it)->tryHover(p, &triedHover);
+        if(triedHover) return true;
+    }
+    return false;
 }
 
 bool ExtendedCanvas::pressCanvas(const wxPoint p) {
@@ -94,8 +105,7 @@ bool ExtendedCanvas::pressCanvas(const wxPoint p) {
 void ExtendedCanvas::mousePress(wxMouseEvent &event) {
     if(!canvas->HasCapture()) canvas->CaptureMouse();
     if(!pressCanvas(event.GetPosition()))
-        if(selectedItem)
-            selectedItem->select(false);
+        if(selectedItem) selectedItem->select(false);
     event.Skip();
 }
 
@@ -206,6 +216,25 @@ void ExtendedCanvas::notifySelection(CanvasItem *changed) {
 void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
     pressedItem = pressed;
     pressedItem->select(true);
+}
+
+void ExtendedCanvas::notifyHover(CanvasItem *hovered) {
+    if(hoveredItem) {
+        if(*hoveredItem != *hovered) {
+            if(hovered->hoverZone) {
+                hoveredItem->hover(ict::NONE_ZONE);
+                hoveredItem = hovered;
+            }
+        } else if(!hovered->hoverZone) hoveredItem = nullptr;
+    } else if(hovered->hoverZone) hoveredItem = hovered;
+    wxRect2DDouble ch(hovered->getHoverUpdate());
+    wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
+    refreshCanvasRect(refresh);
+    // send selection event
+}
+
+void ExtendedCanvas::notifyTryHover(CanvasItem *tried) {
+    tried->hover(triedHover);
 }
 
 wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {
