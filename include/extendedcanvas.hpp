@@ -59,7 +59,7 @@ private:
     void notifySelection(CanvasItem *changed);
     void notifyPressure(CanvasItem *pressed);
     void notifyHover(CanvasItem *hovered);
-    void notifyTryHover(CanvasItem *tried);
+    void notifyCollision(CanvasItem *tried);
 
     wxScrollBar *vBar, *hBar;
     wxFlexGridSizer *layout;

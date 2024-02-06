@@ -64,7 +64,6 @@ public:
     void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
     void setContainer(ExtendedCanvas *c);
-    bool collides(const wxPoint2DDouble &) const;
     void expandFromCenter(bool op);
 
     /**
@@ -103,8 +102,9 @@ private:
      */
     ict::RectZone press(const wxPoint &avp);
 
-    void tryHover(const wxPoint &p, ict::RectZone *t);
+    void hoverCollision();
     void hover(ict::RectZone z);
+    bool collides(const wxPoint2DDouble &);
 
     wxRect2DDouble getUpdateArea() const;
     wxRect2DDouble getHoverUpdate() const;
@@ -129,7 +129,7 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    ict::RectZone pressedZone, hoverZone, prevHover;
+    ict::RectZone pressedZone, hoverZone, prevHover, collisionZone;
     wxPoint2DDouble relativePress;
     wxPoint2DDouble lastPoint;
     Scaler *scaler;

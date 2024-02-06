@@ -89,8 +89,7 @@ void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
 
 bool ExtendedCanvas::hoverCanvas(const wxPoint p) {
     for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
-        (*it)->tryHover(p, &triedHover);
-        if(triedHover) return true;
+        if((*it)->collides(p)) return true;
     }
     return false;
 }
@@ -233,8 +232,8 @@ void ExtendedCanvas::notifyHover(CanvasItem *hovered) {
     // send selection event
 }
 
-void ExtendedCanvas::notifyTryHover(CanvasItem *tried) {
-    tried->hover(triedHover);
+void ExtendedCanvas::notifyCollision(CanvasItem *tried) {
+    tried->hoverCollision();
 }
 
 wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {

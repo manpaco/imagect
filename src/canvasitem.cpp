@@ -141,11 +141,15 @@ ict::RectZone CanvasItem::getPressedZone() const {
     return pressedZone;
 }
 
-bool CanvasItem::collides(const wxPoint2DDouble &p) const {
-    if(locked || hidden) return false;
-    wxRect2DDouble wall(getZone(ict::IN_ZONE));
-    if(selected) inflateRect(&wall, ict::CORNER);
-    return wall.Contains(p);
+bool CanvasItem::collides(const wxPoint2DDouble &p) {
+    if(locked || hidden) {
+        collisionZone = ict::NONE_ZONE;
+        return false;
+    }
+    collisionZone = getLocation(p);
+    if(!collisionZone) return false;
+    if(container) container->notifyCollision(this);
+    return true;
 }
 
 ict::RectZone CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const {
@@ -181,22 +185,16 @@ void CanvasItem::release() {
     pressedZone = ict::NONE_ZONE;
 }
 
+void CanvasItem::hoverCollision() {
+    hover(collisionZone);
+}
+
 void CanvasItem::hover(ict::RectZone z) {
     if(hoverZone != z) {
         prevHover = hoverZone;
         hoverZone = z;
         if(container) container->notifyHover(this);
     }
-}
-
-void CanvasItem::tryHover(const wxPoint &p, ict::RectZone *t) {
-    if(locked || hidden) {
-        *t = ict::NONE_ZONE;
-        return;
-    }
-    *t = getLocation(p);
-    if(!*t) return;
-    if(container) container->notifyTryHover(this);
 }
 
 wxPoint2DDouble CanvasItem::getDimensions(ict::ECContext ic) const {
