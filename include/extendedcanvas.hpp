@@ -51,10 +51,12 @@ private:
     void magnification(wxMouseEvent &event);
     void doMagnify(const wxPoint magCenter);
     void doScroll(const wxPoint motion);
-    CanvasItem * pressCanvas(const wxPoint p);
+    bool pressCanvas(const wxPoint p);
     void refreshCanvas();
     void refreshCanvasRect(const wxRect &r);
-    void notifyChange(CanvasItem *changed);
+    void notifyGeometry(CanvasItem *changed);
+    void notifySelection(CanvasItem *changed);
+    void notifyPressure(CanvasItem *pressed);
 
     wxScrollBar *vBar, *hBar;
     wxFlexGridSizer *layout;
@@ -62,7 +64,7 @@ private:
     wxWindow *zoom;
     Scaler *scaler;
     std::vector<CanvasItem *> zOrder;
-    CanvasItem *pressItem, *oldSelectedItem;
+    CanvasItem *pressedItem, *selectedItem;
     wxPoint2DDouble canvasReference;
 
     wxBitmap *canvasBuffer;

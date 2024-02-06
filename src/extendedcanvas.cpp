@@ -43,8 +43,8 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
     scaler = new Scaler(1.0, 1.0);
     canvasBuffer = nullptr;
-    pressItem = nullptr;
-    oldSelectedItem = nullptr;
+    pressedItem = nullptr;
+    selectedItem = nullptr;
     zoom = new wxWindow(this, wxID_ANY);
     zoom->SetBackgroundColour(wxColour(*wxYELLOW));
     layout->AddGrowableCol(0);
@@ -80,38 +80,30 @@ void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
 }
 
 void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
-    if(pressItem) pressItem->modify(event.GetPosition());
+    if(pressedItem) pressedItem->modify(event.GetPosition());
     event.Skip();
 }
 
-CanvasItem * ExtendedCanvas::pressCanvas(const wxPoint p) {
-    for (std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
-        if ((*it)->press(p)) return *it;
+bool ExtendedCanvas::pressCanvas(const wxPoint p) {
+    for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
+        if((*it)->press(p)) return true;
     }
-    return nullptr;
+    return false;
 }
 
 void ExtendedCanvas::mousePress(wxMouseEvent &event) {
     if(!canvas->HasCapture()) canvas->CaptureMouse();
-    pressItem = pressCanvas(event.GetPosition());
-    if (!oldSelectedItem) {
-        if (pressItem) refreshCanvas();
-    } else if (!pressItem) {
-        oldSelectedItem->select(false);
-        refreshCanvas();
-    } else if (*pressItem != *oldSelectedItem) {
-        oldSelectedItem->select(false);
-        refreshCanvas();
-    }
-    oldSelectedItem = pressItem;
+    if(!pressCanvas(event.GetPosition()))
+        if(selectedItem)
+            selectedItem->select(false);
     event.Skip();
 }
 
 void ExtendedCanvas::mouseRelease(wxMouseEvent &event) {
     if(canvas->HasCapture()) canvas->ReleaseMouse();
-    if(pressItem) {
-        pressItem->release();
-        pressItem = nullptr;
+    if(pressedItem) {
+        pressedItem->release();
+        pressedItem = nullptr;
     }
     event.Skip();
 }
@@ -189,10 +181,31 @@ void ExtendedCanvas::refreshCanvas() {
     canvas->Refresh();
 }
 
-void ExtendedCanvas::notifyChange(CanvasItem *changed) {
+void ExtendedCanvas::notifyGeometry(CanvasItem *changed) {
     wxRect2DDouble ch(changed->getUpdateArea());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
+    refreshCanvasRect(refresh.Inflate(1, 1));
+    // send geometry event
+}
+
+void ExtendedCanvas::notifySelection(CanvasItem *changed) {
+    if(selectedItem) {
+        if(*selectedItem != *changed) {
+            if(changed->isSelected()) {
+                selectedItem->select(false);
+                selectedItem = changed;
+            }
+        } else if(!changed->isSelected()) selectedItem = nullptr;
+    } else if(changed->isSelected()) selectedItem = changed;
+    wxRect2DDouble ch(changed->getArea());
+    wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh);
+    // send selection event
+}
+
+void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
+    pressedItem = pressed;
+    pressedItem->select(true);
 }
 
 wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {

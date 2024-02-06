@@ -65,13 +65,29 @@ public:
     void setScaler(Scaler *s);
     void setContainer(ExtendedCanvas *c);
     wxRect2DDouble getUpdateArea() const;
-
+    bool collides(const wxPoint2DDouble &) const;
     void expandFromCenter(bool op);
 
     /**
      * Enable or disable the fix aspect ratio.
      */
     void fixedAspectRatio(bool op);
+
+    /**
+     * Get the zone pressed.
+     */
+    ict::RectZone getZonePressed() const;
+
+    bool operator==(const CanvasItem &);
+    bool operator!=(const CanvasItem &);
+
+    ~CanvasItem();
+
+private:
+    wxDouble getRight(ict::ECContext ic, bool unref = false) const;
+    wxDouble getLeft(ict::ECContext ic, bool unref = false) const;
+    wxDouble getTop(ict::ECContext ic, bool unref = false) const;
+    wxDouble getBottom(ict::ECContext ic, bool unref = false) const;
 
     /**
      * Modify the the item geometry.
@@ -94,22 +110,6 @@ public:
     void release();
 
     /**
-     * Get the zone pressed.
-     */
-    ict::RectZone getZonePressed() const;
-
-    bool operator==(const CanvasItem &);
-    bool operator!=(const CanvasItem &);
-
-    ~CanvasItem();
-
-private:
-    wxDouble getRight(ict::ECContext ic, bool unref = false) const;
-    wxDouble getLeft(ict::ECContext ic, bool unref = false) const;
-    wxDouble getTop(ict::ECContext ic, bool unref = false) const;
-    wxDouble getBottom(ict::ECContext ic, bool unref = false) const;
-
-    /**
      * Get offset from p to respective zone.
      */
     wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, ict::RectZone z, ict::ECContext c);
@@ -130,6 +130,8 @@ private:
     Scaler *scaler;
     SmartRect geometry;
     ExtendedCanvas *container;
+
+    friend ExtendedCanvas;
 
 };
 

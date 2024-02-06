@@ -139,6 +139,13 @@ ict::RectZone CanvasItem::getZonePressed() const {
     return zonePressed;
 }
 
+bool CanvasItem::collides(const wxPoint2DDouble &p) const {
+    if(locked || hidden) return false;
+    wxRect2DDouble wall(getZone(ict::IN_ZONE));
+    if(selected) inflateRect(&wall, ict::CORNER);
+    return wall.Contains(p);
+}
+
 ict::RectZone CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const {
     if (selected) {
         if(getZone(ict::RT_ZONE).Contains(canvasPoint)) return ict::RT_ZONE;
@@ -157,17 +164,14 @@ ict::RectZone CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const 
 ict::RectZone CanvasItem::press(const wxPoint &canvasPoint) {
     if(locked) return ict::NONE_ZONE;
     zonePressed = getLocation(canvasPoint);
-    if (!zonePressed) {
-        selected = false;
-        return zonePressed;
-    }
+    if(!zonePressed) return zonePressed;
     geometry.setMark();
-    selected = true;
     relativePress = relativeToEdge(canvasPoint, zonePressed, ict::CANVAS_CONTEXT);
     relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
     lastPoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, ict::CANVAS_CONTEXT);
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
     lastPoint -= relativePress;
+    if(container) container->notifyPressure(this);
     return zonePressed;
 }
 
@@ -207,7 +211,7 @@ bool CanvasItem::modify(const wxPoint &canvasPoint) {
     bool changed = geometry.pushZoneTo(zonePressed, lastPoint);
     zonePressed = geometry.getLastZone();
     if (changed) {
-        if(container) container->notifyChange(this);
+        if(container) container->notifyGeometry(this);
         return true;
     }
     else return false;
@@ -303,7 +307,14 @@ void CanvasItem::setScaler(Scaler *s) {
 }
 
 void CanvasItem::select(const bool opt) {
-    selected = opt;
+    if(selected != opt) {
+        selected = opt;
+        if(container) container->notifySelection(this);
+    }
+}
+
+bool CanvasItem::isSelected() const {
+    return selected;
 }
 
 void CanvasItem::lock(const bool opt) {
