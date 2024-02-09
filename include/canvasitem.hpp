@@ -65,6 +65,8 @@ public:
     void setScaler(Scaler *s);
     void setContainer(ExtendedCanvas *c);
     void expandFromCenter(bool op);
+    void useGrid(bool);
+    bool useGrid() const;
 
     /**
      * Enable or disable the fix aspect ratio.
