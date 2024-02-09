@@ -25,12 +25,12 @@
 #include <wx/window.h>
 #include <wx/geometry.h>
 #include "defs.hpp"
-#include "canvasitem.hpp"
 
 class wxScrollBar;
 class wxFlexGridSizer;
 class wxPanel;
 class Scaler;
+class CanvasItem;
 
 class ExtendedCanvas : public wxWindow {
 public:
@@ -39,6 +39,8 @@ public:
     void addItem(CanvasItem *item);
     CanvasItem * getItem(int itemId);
     wxPoint2DDouble getReference(ict::ECContext c) const;
+    void useGrid(bool);
+    bool useGrid() const;
 
     ~ExtendedCanvas();
 
@@ -60,7 +62,9 @@ private:
     void notifyPressure(CanvasItem *pressed);
     void notifyHover(CanvasItem *hovered);
     void notifyCollision(CanvasItem *tried);
+    void gridToggle(wxMouseEvent &event);
 
+    bool grid;
     wxScrollBar *vBar, *hBar;
     wxFlexGridSizer *layout;
     wxWindow *canvas;
@@ -69,7 +73,6 @@ private:
     std::vector<CanvasItem *> zOrder;
     CanvasItem *pressedItem, *selectedItem, *hoveredItem;
     wxPoint2DDouble canvasReference;
-    ict::RectZone triedHover;
 
     wxBitmap *canvasBuffer;
 

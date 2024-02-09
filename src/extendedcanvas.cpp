@@ -46,6 +46,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     pressedItem = nullptr;
     selectedItem = nullptr;
     hoveredItem = nullptr;
+    grid = false;
     zoom = new wxWindow(this, wxID_ANY);
     zoom->SetBackgroundColour(wxColour(*wxYELLOW));
     layout->AddGrowableCol(0);
@@ -63,6 +64,12 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvas->Bind(wxEVT_LEFT_UP, &ExtendedCanvas::mouseRelease, this);
     canvas->Bind(wxEVT_SIZE, &ExtendedCanvas::resizeCanvas, this);
     canvas->Bind(wxEVT_MOUSEWHEEL, &ExtendedCanvas::magnification, this);
+    zoom->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::gridToggle, this);
+}
+
+void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
+    useGrid(!grid);
+    event.Skip();
 }
 
 void ExtendedCanvas::magnification(wxMouseEvent &event) {
@@ -81,8 +88,9 @@ void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
 }
 
 void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
-    if(pressedItem) pressedItem->modify(event.GetPosition());
-    else if(!hoverCanvas(event.GetPosition()))
+    if(pressedItem) {
+        if(pressedItem->modify(event.GetPosition())) refreshCanvas();
+    } else if(!hoverCanvas(event.GetPosition()))
         if(hoveredItem) hoveredItem->hover(ict::NONE_ZONE);
     event.Skip();
 }
@@ -145,6 +153,7 @@ void ExtendedCanvas::addItem(CanvasItem *item) {
     if (getItem(item->getId())) return;
     item->setScaler(scaler);
     item->setContainer(this);
+    item->useGrid(grid);
     zOrder.push_back(item);
     wxRect2DDouble fresh(item->getArea());
     refreshCanvasRect(wxRect(fresh.m_x, fresh.m_y, fresh.m_width, fresh.m_height));
@@ -239,6 +248,19 @@ void ExtendedCanvas::notifyCollision(CanvasItem *tried) {
 wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {
     if(c == ict::VIRTUAL_CONTEXT) return canvasReference;
     else return scaler->scalePoint(canvasReference, ict::IN_D);
+}
+
+void ExtendedCanvas::useGrid(bool op) {
+    if(grid == op) return;
+    grid = op;
+    for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
+        (*it)->useGrid(grid);
+    }
+    refreshCanvas();
+}
+
+bool ExtendedCanvas::useGrid() const {
+    return grid;
 }
 
 ExtendedCanvas::~ExtendedCanvas() {
