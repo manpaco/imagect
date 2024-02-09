@@ -66,6 +66,11 @@ public:
     void modifyPosition(wxDouble x, wxDouble y);
     void modifySize(wxDouble w, wxDouble h);
 
+    wxDouble getLeft() const;
+    wxDouble getTop() const;
+    wxDouble getRight() const;
+    wxDouble getBottom() const;
+
     bool pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p);
 
     bool restrict(const bool r);
@@ -78,11 +83,14 @@ public:
     void expandFromCenter(const bool ec);
     wxDouble getAspectRatio() const;
     wxRect2DDouble inflatedRect(const wxDouble &x, const wxDouble &y) const;
+    void useGrid(bool);
+    void avoidGrid(bool);
 
     bool isFixed() const;
     bool isCentered() const;
     bool isRestricted() const;
     int getReflection() const;
+    bool useGrid() const;
     ict::RectZone getLastZone() const;
     wxRect2DDouble getChangeUnion() const;
 
@@ -120,6 +128,7 @@ private:
     bool centered;
     bool restricted;
     bool reflecting;
+    bool grid, avoid;
 
     int reflection = ict::NONE_REFLEC;
     ict::RectZone lastZone;
