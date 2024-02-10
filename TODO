@@ -12,3 +12,5 @@ Canvas:
 - Improve playground (SmartRect)
 - Fix some getters in SmartRect (consistency between getters when using grid)
 - Implement zoom control
+- Add .editorconfig to project
+- Move buildvalues.hpp.in to config dir
