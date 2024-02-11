@@ -2,15 +2,13 @@ Canvas:
 + Change from integer to float/double (best precision)
 + Due to the above, implement canvas grid (1x1 px)
 + Improve item resize (limits, fixed ratio, etc)
-- Improve canvas magnification
-    + Using wxDouble
-    - Use steps accumulator for the mouse wheel (stable zoom)
-- Canvas scrolling
 + Send notification on item change
 + Rename from ScrolledCanvas to ExtendedCanvas
 + Improve item selection
 - Improve playground (SmartRect)
 - Fix some getters in SmartRect (consistency between getters when using grid)
-- Implement zoom control
-- Add .editorconfig to project
-- Move buildvalues.hpp.in to config dir
+- Canvas scrolling
+- Improve canvas magnification
+    + Using wxDouble
+    - Use steps accumulator for the mouse wheel (stable zoom)
+    - Implement zoom control
