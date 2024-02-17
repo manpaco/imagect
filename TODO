@@ -5,6 +5,7 @@ Canvas:
 + Send notification on item change
 + Rename from ScrolledCanvas to ExtendedCanvas
 + Improve item selection
+- Implement accumulators (just a test)
 - Improve playground (SmartRect)
 - Fix some getters in SmartRect (consistency between getters when using grid)
 - Canvas scrolling
