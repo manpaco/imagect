@@ -2,6 +2,7 @@
 #include "recthelper.hpp"
 #include "defs.hpp"
 #include <iostream>
+#include <iomanip>
 
 SmartRect::SmartRect() : SmartRect(wxRect2DDouble(0, 0, 1, 1)) {
 
@@ -13,7 +14,10 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
     this->restricted = false;
     this->centered = false;
     this->grid = false;
-    this->avoid = false;
+    this->accLeft = 0;
+    this->accTop = 0;
+    this->accWidth = 0;
+    this->accHeight = 0;
     saveInstant();
     setMark();
 }
@@ -51,24 +55,20 @@ void SmartRect::modifySize(wxDouble w, wxDouble h) {
     m_width = w; m_height = h;
 }
 
-wxDouble SmartRect::getLeft() const {
-    if(useGrid()) return round(GetLeft());
-    else return GetLeft();
+wxDouble SmartRect::internalGetLeft() const {
+    return GetLeft() + accLeft;
 }
 
-wxDouble SmartRect::getTop() const {
-    if(useGrid()) return round(GetTop());
-    return GetTop();
+wxDouble SmartRect::internalGetTop() const {
+    return GetTop() + accTop;
 }
 
-wxDouble SmartRect::getRight() const {
-    if(useGrid()) return round(GetRight());
-    else return GetRight();
+wxDouble SmartRect::internalGetRight() const {
+    return GetRight() + accWidth;
 }
 
-wxDouble SmartRect::getBottom() const {
-    if(useGrid()) return round(GetBottom());
-    else return GetBottom();
+wxDouble SmartRect::internalGetBottom() const {
+    return GetBottom() + accHeight;
 }
 
 void SmartRect::placeInPlayground(wxPoint2DDouble *p, bool inner) const {
@@ -85,19 +85,38 @@ void SmartRect::placeInPlayground(wxPoint2DDouble *p, bool inner) const {
 void SmartRect::useGrid(bool op) {
     if(grid != op) {
         grid = op;
-        if(useGrid()) {
-            m_x = round(m_x);
-            m_y = round(m_y);
-        }
+        if(useGrid()) assembleGrid();
+        else disassembleGrid();
+    }
+}
+
+void SmartRect::clearAccums() {
+    accLeft = accTop = accWidth = accHeight = 0;
+}
+
+void SmartRect::disassembleGrid() {
+    m_width = internalGetRight() - internalGetLeft();
+    m_height = internalGetBottom() - internalGetTop();
+    m_x += accLeft;
+    m_y += accTop;
+}
+
+void SmartRect::assembleGrid() {
+    clearAccums();
+    wxDouble re(GetRight());
+    wxDouble be(GetBottom());
+    m_x = accumulateLeft(m_x);
+    m_y = accumulateTop(m_y);
+    m_width = accumulateWidth(re) - m_x;
+    m_height = accumulateHeight(be) - m_y;
+    if(isCentered()) {
+        balanceAbscAccums();
+        balanceOrdiAccums();
     }
 }
 
 bool SmartRect::useGrid() const {
-    return grid && !avoid;
-}
-
-void SmartRect::avoidGrid(bool op) {
-    avoid = op;
+    return grid;
 }
 
 wxRect2DDouble SmartRect::getInnerPlayground() const {
@@ -305,10 +324,6 @@ bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
             break;
         }
         case ict::IN_ZONE: {
-            if(useGrid()) {
-                inp.m_x = round(inp.m_x);
-                inp.m_y = round(inp.m_y);
-            }
             changed = pushTo(inp);
             break;
         }
@@ -324,34 +339,52 @@ bool SmartRect::pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p) {
 bool SmartRect::pushTo(const wxPoint2DDouble &p) {
     if(p == GetPosition()) return false;
     wxPoint2DDouble inp(p);
-    if(isRestricted()) placeInPlayground(&inp, true);
+    if(useGrid()) {
+        inp.m_x = round(inp.m_x);
+        inp.m_y = round(inp.m_y);
+    }
     modifyPosition(inp.m_x, inp.m_y);
     return instantChanged();
 }
 
 bool SmartRect::pushRightBottomTo(const wxPoint2DDouble &p) {
-    wxDouble deltaX = p.m_x - (GetRight());
-    wxDouble deltaY = p.m_y - (GetBottom());
+    wxDouble dx = p.m_x - (internalGetRight());
+    wxDouble dy = p.m_y - (internalGetBottom());
     if(isFixed()) {
-        if(p.m_x >= GetRight() && p.m_y <= GetBottom()) {
-            deltaX = calcAbsc(deltaY);
-        } else if(p.m_x <= GetRight() && p.m_y >= GetBottom()) {
-            deltaY = calcOrdi(deltaX);
-        } else if(p.m_x < GetRight() && p.m_y < GetBottom()) {
-            wxDouble proy = deltaX / deltaY;
-            if(proy < aspectRatio) deltaX = calcAbsc(deltaY);
-            else deltaY = calcOrdi(deltaX);
-        } else if(p.m_x > GetRight() && p.m_y > GetBottom()) {
-            wxDouble proy = deltaX / deltaY;
-            if(proy > aspectRatio) deltaX = calcAbsc(deltaY);
-            else deltaY = calcOrdi(deltaX);
+        if(p.m_x >= internalGetRight() && p.m_y <= internalGetBottom()) {
+            dx = calcAbsc(dy);
+        } else if(p.m_x <= internalGetRight() && p.m_y >= internalGetBottom()) {
+            dy = calcOrdi(dx);
+        } else if(p.m_x < internalGetRight() && p.m_y < internalGetBottom()) {
+            wxDouble proy = dx / dy;
+            if(proy < aspectRatio) dx = calcAbsc(dy);
+            else dy = calcOrdi(dx);
+        } else if(p.m_x > internalGetRight() && p.m_y > internalGetBottom()) {
+            wxDouble proy = dx / dy;
+            if(proy > aspectRatio) dx = calcAbsc(dy);
+            else dy = calcOrdi(dx);
         }
     }
-    m_width += deltaX;
-    m_height += deltaY;
-    if(isCentered()) {
-        m_x -= deltaX; m_width += deltaX;
-        m_y -= deltaY; m_height += deltaY;
+    if(useGrid()) {
+        wxDouble rdx, bdy;
+        rdx = accumulateWidth(dx);
+        bdy = accumulateHeight(dy);
+        m_width += rdx;
+        m_height += bdy;
+        if(isCentered()) {
+            wxDouble ldx, tdy;
+            ldx = accumulateLeft(-dx);
+            tdy = accumulateTop(-dy);
+            m_x -= ldx; m_width += ldx + rdx;
+            m_y -= tdy; m_height += tdy + bdy;
+        }
+    } else {
+        m_width += dx;
+        m_height += dy;
+        if(isCentered()) {
+            m_x -= dx; m_width += dx;
+            m_y -= dy; m_height += dy;
+        }
     }
     return instantChanged();
 }
@@ -492,19 +525,90 @@ bool SmartRect::pushLeftTo(const wxDouble &p) {
 }
 
 bool SmartRect::pushRightTo(const wxDouble &p) {
-    wxDouble deltaX = p - GetRight();
-    wxDouble deltaY = 0;
-    if(isFixed()) deltaY = calcOrdi(-deltaX);
-    m_y += deltaY / 2;
-    m_width += deltaX;
-    m_height -= deltaY;
-    if(isCentered()) {
-        m_x -= deltaX;
-        m_width += deltaX;
-        m_y += deltaY / 2;
-        m_height -= deltaY;
+    wxDouble dx = p - internalGetRight();
+    wxDouble dy = 0;
+    if(isFixed()) {
+        dy = calcOrdi(dx) / 2;
+        if(useGrid() && !isCentered()) balanceOrdiAccums();
     }
+    if(useGrid()) {
+        wxDouble rdx, tdy, bdy;
+        rdx = accumulateWidth(dx);
+        m_width += rdx;
+        bdy = accumulateHeight(dy);
+        tdy = accumulateTop(-dy);
+        m_y += tdy;
+        m_height += bdy - tdy;
+        if(isCentered()) {
+            wxDouble ldx;
+            ldx = accumulateLeft(-dx);
+            m_x += ldx;
+            m_width -= ldx;
+            bdy = accumulateHeight(dy);
+            tdy = accumulateTop(-dy);
+            m_y += tdy;
+            m_height += bdy - tdy;
+        }
+    } else {
+        m_width += dx;
+        m_y -= dy;
+        m_height += dy * 2;
+        if(isCentered()) {
+            m_x -= dx;
+            m_width += dx;
+            m_y -= dy;
+            m_height += dy * 2;
+        }
+    }
+    wxDouble iw, ih;
     return instantChanged();
+}
+
+wxDouble SmartRect::accumulateLeft(const wxDouble &dl) {
+    wxDouble ret;
+    accLeft += dl;
+    ret = floor(accLeft);
+    accLeft -= ret;
+    return ret;
+}
+
+wxDouble SmartRect::accumulateTop(const wxDouble &dt) {
+    wxDouble ret;
+    accTop += dt;
+    ret = floor(accTop);
+    accTop -= ret;
+    return ret;
+}
+
+wxDouble SmartRect::accumulateWidth(const wxDouble &dr) {
+    wxDouble ret;
+    accWidth += dr;
+    ret = ceil(accWidth);
+    accWidth -= ret;
+    return ret;
+}
+
+wxDouble SmartRect::accumulateHeight(const wxDouble &db) {
+    wxDouble ret;
+    accHeight += db;
+    ret = ceil(accHeight);
+    accHeight -= ret;
+    return ret;
+}
+
+void SmartRect::balanceOrdiAccums() {
+    wxDouble avg(accTop + accHeight);
+    if(avg == 0) return;
+    avg /= 2;
+    accTop -= avg;
+    accHeight -= avg;
+}
+
+void SmartRect::balanceAbscAccums() {
+    wxDouble avg(accLeft + accWidth);
+    avg /= 2;
+    accLeft -= avg;
+    accWidth -= avg;
 }
 
 wxRect2DDouble SmartRect::inflatedRect(const wxDouble &x, const wxDouble &y) const {
@@ -553,6 +657,10 @@ void SmartRect::setAspectRatio(const int x, const int y) {
 
 void SmartRect::expandFromCenter(const bool ec) {
     centered = ec;
+    if(centered) {
+        balanceAbscAccums();
+        balanceOrdiAccums();
+    }
 }
 
 bool SmartRect::isFixed() const {

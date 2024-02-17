@@ -62,14 +62,6 @@ public:
     bool setGeometry(const wxRect2DDouble &r);
     bool setPosition(const wxPoint2DDouble &r);
     bool setSize(const wxPoint2DDouble &r);
-    void modifyGeometry(wxDouble x, wxDouble y, wxDouble w, wxDouble h);
-    void modifyPosition(wxDouble x, wxDouble y);
-    void modifySize(wxDouble w, wxDouble h);
-
-    wxDouble getLeft() const;
-    wxDouble getTop() const;
-    wxDouble getRight() const;
-    wxDouble getBottom() const;
 
     bool pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p);
 
@@ -84,7 +76,6 @@ public:
     wxDouble getAspectRatio() const;
     wxRect2DDouble inflatedRect(const wxDouble &x, const wxDouble &y) const;
     void useGrid(bool);
-    void avoidGrid(bool);
 
     bool isFixed() const;
     bool isCentered() const;
@@ -110,8 +101,17 @@ private:
     bool pushLeftTo(const wxDouble &p);
     bool pushLeftTopTo(const wxPoint2DDouble &p);
 
+    wxDouble internalGetLeft() const;
+    wxDouble internalGetTop() const;
+    wxDouble internalGetRight() const;
+    wxDouble internalGetBottom() const;
+
     void saveInstant();
     bool instantChanged(bool = true);
+
+    void modifyGeometry(wxDouble x, wxDouble y, wxDouble w, wxDouble h);
+    void modifyPosition(wxDouble x, wxDouble y);
+    void modifySize(wxDouble w, wxDouble h);
 
     wxRect2DDouble getPlayground() const;
     wxRect2DDouble getInnerPlayground() const;
@@ -120,15 +120,45 @@ private:
     wxDouble calcAbsc(const wxDouble &ordi) const;
     wxDouble calcOrdi(const wxDouble &absc) const;
 
+    wxDouble accumulateLeft(const wxDouble &dl);
+    wxDouble accumulateTop(const wxDouble &dt);
+    wxDouble accumulateWidth(const wxDouble &dr);
+    wxDouble accumulateHeight(const wxDouble &db);
+    void balanceOrdiAccums();
+    void balanceAbscAccums();
+    void clearAccums();
+
+    void assembleGrid();
+    void disassembleGrid();
+
+    /* ----------------------- SmartRect main structure -----------------------
+     * External getters are inherited from wxRect2DDouble.
+     * Internal getters are identified by "internal" prefix.
+     * Getters that don't have "internal" prefix will be external.
+     *
+     * When grid is enabled: external =/= internal, most of the time.
+     * When grid is disabled: external == internal, always. */
+
     wxRect2DDouble restriction;
     wxRect2DDouble mark;
     wxRect2DDouble instant;
     wxDouble aspectRatio;
+
+    /* Geometry accumulators used when resizing and grid is active.
+     * These accumulators save decimals of the respective border.
+     * i. e. if "internalGetLeft" is 15.34, then Left is 15 and accLeft is 0.34
+     * They are not affected by the "move" function (when IN_ZONE is used)
+     * since it only affects the POSITION (external).
+     * POSITION =/= "internalGetLeftTop"; when grilled
+     * i. e. "internalGetLeftTop" == (GetLeft + accLeft, GetTop + accTop)
+     * then, POSITION == (GetLeft, GetTop) */
+    wxDouble accLeft, accTop, accWidth, accHeight;
+
     bool fixed;
     bool centered;
     bool restricted;
     bool reflecting;
-    bool grid, avoid;
+    bool grid;
 
     int reflection = ict::NONE_REFLEC;
     ict::RectZone lastZone;
