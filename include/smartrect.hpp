@@ -116,6 +116,7 @@ private:
     wxDouble internalGetTop() const;
     wxDouble internalGetRight() const;
     wxDouble internalGetBottom() const;
+    wxPoint2DDouble internalGetCentre() const;
 
     void saveInstant();
     bool instantChanged(bool = true);
@@ -135,8 +136,6 @@ private:
     wxDouble accumulateTop(const wxDouble &dt);
     wxDouble accumulateWidth(const wxDouble &dr);
     wxDouble accumulateHeight(const wxDouble &db);
-    void balanceOrdiAccums();
-    void balanceAbscAccums();
     void clearAccums();
 
     void assembleGrid();
