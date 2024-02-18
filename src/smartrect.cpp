@@ -230,9 +230,7 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             break;
         }
         case ict::T_ZONE: {
-            if(!isCentered()) {
-                limity = internalGetBottom();
-            }
+            if(!isCentered()) limity = internalGetBottom();
             if(inp.m_y > limity) {
                 reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
@@ -240,9 +238,7 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             break;
         }
         case ict::B_ZONE: {
-            if(!isCentered()) {
-                limity = internalGetTop();
-            }
+            if(!isCentered()) limity = internalGetTop();
             if(inp.m_y < limity) {
                 reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
@@ -250,9 +246,7 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             break;
         }
         case ict::L_ZONE: {
-            if(!isCentered()) {
-                limitx = internalGetRight();
-            }
+            if(!isCentered()) limitx = internalGetRight();
             if(inp.m_x > limitx) {
                 reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
@@ -260,9 +254,7 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             break;
         }
         case ict::R_ZONE: {
-            if(!isCentered()) {
-                limitx = internalGetLeft();
-            }
+            if(!isCentered()) limitx = internalGetLeft();
             if(inp.m_x < limitx) {
                 reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
