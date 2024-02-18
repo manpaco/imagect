@@ -724,7 +724,7 @@ void SmartRect::saveInstant() {
     instant = *this;
 }
 
-bool SmartRect::instantChanged(bool saveNew) {
+bool SmartRect::instantChanged() {
     if (instant != *this) return true;
     else return false;
 }

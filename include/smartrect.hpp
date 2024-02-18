@@ -119,7 +119,7 @@ private:
     wxPoint2DDouble internalGetCentre() const;
 
     void saveInstant();
-    bool instantChanged(bool = true);
+    bool instantChanged();
 
     void modifyGeometry(wxDouble x, wxDouble y, wxDouble w, wxDouble h);
     void modifyPosition(wxDouble x, wxDouble y);
