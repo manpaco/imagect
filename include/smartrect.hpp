@@ -25,7 +25,7 @@ class Scaler;
 
 namespace ict {
 
-    enum RectZone {
+    /* enum RectZone {
         NONE_ZONE = 0,
         IN_ZONE,
         T_ZONE,
@@ -36,7 +36,7 @@ namespace ict {
         LB_ZONE,
         R_ZONE,
         L_ZONE,
-    };
+    }; */
 
     /* enum Reflection {
         NONE_REFLEC = 0,
@@ -49,6 +49,17 @@ namespace ict {
     const int HORI_REFLEC = 1;
     const int VERT_REFLEC = 2;
     const int HOVE_REFLEC = 3;
+
+    const int NONE_ZONE = 0;
+    const int IN_ZONE = 1;
+    const int RB_ZONE = 4;
+    const int LB_ZONE = 5;
+    const int RT_ZONE = 6;
+    const int LT_ZONE = 7;
+    const int R_ZONE = 8;
+    const int L_ZONE = 9;
+    const int T_ZONE = 12;
+    const int B_ZONE = 14;
 
 }
 
@@ -63,7 +74,7 @@ public:
     bool setPosition(const wxPoint2DDouble &r);
     bool setSize(const wxPoint2DDouble &r);
 
-    bool pushZoneTo(ict::RectZone z, const wxPoint2DDouble &p);
+    bool pushZoneTo(const int z, const wxPoint2DDouble &p);
 
     bool restrict(const bool r);
     bool setRestriction(const wxRect2DDouble &r);
@@ -82,7 +93,7 @@ public:
     bool isRestricted() const;
     int getReflection() const;
     bool useGrid() const;
-    ict::RectZone getLastZone() const;
+    int getLastZone() const;
     wxRect2DDouble getChangeUnion() const;
 
     /* SmartRect &operator=(SmartRect &&) = default;
@@ -157,11 +168,10 @@ private:
     bool fixed;
     bool centered;
     bool restricted;
-    bool reflecting;
     bool grid;
 
     int reflection = ict::NONE_REFLEC;
-    ict::RectZone lastZone;
+    int lastZone;
 };
 
 #endif // !SMARTRECT
