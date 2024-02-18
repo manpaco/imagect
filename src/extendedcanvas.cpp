@@ -74,7 +74,6 @@ void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
 
 void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
     int wheelRotation = event.GetWheelRotation();
-    std::cout << wheelRotation << std::endl;
     if (wheelRotation > 0) scaler->plusFactor(0.3, 0.3);
     else scaler->plusFactor(-0.3, -0.3);
     doMagnify(event.GetPosition());
