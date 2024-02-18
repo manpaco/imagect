@@ -161,165 +161,115 @@ wxRect2DDouble SmartRect::getChangeUnion() const {
 bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
     saveInstant();
     lastZone = z;
-    int lastReflection = ict::NONE_REFLEC;
     wxPoint2DDouble inp(p);
-    wxDouble lrx, lry, lmx, lmy;
+    wxDouble limitx, limity;
     if(isCentered()) {
         wxPoint2DDouble icen(internalGetCentre());
-        lrx = lmx = icen.m_x;
-        lry = lmy = icen.m_y;
+        limitx = icen.m_x;
+        limity = icen.m_y;
     }
     switch (lastZone) {
         case ict::RB_ZONE: {
             if(!isCentered()) {
-                lrx = GetLeft() + accWidth;
-                lry = GetTop() + accHeight;
-                lmx = GetLeft();
-                if(accLeft > 0) lmx += accLeft;
-                lmy = GetTop();
-                if(accTop > 0) lmy += accTop;
+                limitx = internalGetLeft();
+                limity = internalGetTop();
             }
-            if(inp.m_x < lrx) {
-                lastReflection ^= ict::HORI_REFLEC;
+            if(inp.m_x < limitx) {
+                reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
-            } else if(inp.m_x < lmx) {
-                inp.m_x = lmx;
             }
-            if(inp.m_y < lry) {
-                lastReflection ^= ict::VERT_REFLEC;
+            if(inp.m_y < limity) {
+                reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
-            } else if(inp.m_y < lmy) {
-                inp.m_y = lmy;
             }
             break;
         }
         case ict::LT_ZONE: {
             if(!isCentered()) {
-                lrx = GetRight() + accLeft;
-                lry = GetBottom() + accTop;
-                lmx = GetRight();
-                if(accWidth > 0) lmx += accWidth;
-                lmy = GetBottom();
-                if(accHeight > 0) lmy += accHeight;
+                limitx = internalGetRight();
+                limity = internalGetBottom();
             }
-            if(inp.m_x > lrx) {
-                lastReflection ^= ict::HORI_REFLEC;
+            if(inp.m_x > limitx) {
+                reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
-            } else if(inp.m_x > lmx) {
-                inp.m_x = lmx;
             }
-            if(inp.m_y > lry) {
-                lastReflection ^= ict::VERT_REFLEC;
+            if(inp.m_y > limity) {
+                reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
-            } else if(inp.m_y > lmy) {
-                inp.m_y = lmy;
             }
             break;
         }
         case ict::RT_ZONE: {
             if(!isCentered()) {
-                lrx = GetLeft() + accWidth;
-                lry = GetBottom() + accTop;
-                lmx = GetLeft();
-                if(accLeft > 0) lmx += accLeft;
-                lmy = GetBottom();
-                if(accHeight > 0) lmy += accHeight;
+                limitx = internalGetLeft();
+                limity = internalGetBottom();
             }
-            if(inp.m_x < lrx) {
-                lastReflection ^= ict::HORI_REFLEC;
+            if(inp.m_x < limitx) {
+                reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
-            } else if(inp.m_x < lmx) {
-                inp.m_x = lmx;
             }
-            if(inp.m_y > lry) {
-                lastReflection ^= ict::VERT_REFLEC;
+            if(inp.m_y > limity) {
+                reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
-            } else if(inp.m_y > lmy) {
-                inp.m_y = lmy;
             }
             break;
         }
         case ict::LB_ZONE: {
             if(!isCentered()) {
-                lrx = GetRight() + accLeft;
-                lry = GetTop() + accHeight;
-                lmx = GetRight();
-                if(accWidth > 0) lmx += accWidth;
-                lmy = GetTop();
-                if(accTop > 0) lmy += accTop;
+                limitx = internalGetRight();
+                limity = internalGetTop();
             }
-            if(inp.m_x > lrx) {
-                lastReflection ^= ict::HORI_REFLEC;
+            if(inp.m_x > limitx) {
+                reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
-            } else if(inp.m_x > lmx) {
-                inp.m_x = lmx;
             }
-            if(inp.m_y < lry) {
-                lastReflection ^= ict::VERT_REFLEC;
+            if(inp.m_y < limity) {
+                reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
-            } else if(inp.m_y < lmy) {
-                inp.m_y = lmy;
             }
             break;
         }
         case ict::T_ZONE: {
             if(!isCentered()) {
-                lry = GetBottom() + accTop;
-                lmy = GetBottom();
-                if(accHeight > 0) lmy += accHeight;
+                limity = internalGetBottom();
             }
-            if(inp.m_y > lry) {
-                lastReflection ^= ict::VERT_REFLEC;
+            if(inp.m_y > limity) {
+                reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
-            } else if(inp.m_y > lmy) {
-                inp.m_y = lmy;
             }
             break;
         }
         case ict::B_ZONE: {
             if(!isCentered()) {
-                lry = GetTop() + accHeight;
-                lmy = GetTop();
-                if(accTop > 0) lmy += accTop;
+                limity = internalGetTop();
             }
-            if(inp.m_y < lry) {
-                lastReflection ^= ict::VERT_REFLEC;
+            if(inp.m_y < limity) {
+                reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
-            } else if(inp.m_y < lmy) {
-                inp.m_y = lmy;
             }
             break;
         }
         case ict::L_ZONE: {
             if(!isCentered()) {
-                lrx = GetRight() + accLeft;
-                lmx = GetRight();
-                if(accWidth > 0) lmx += accWidth;
+                limitx = internalGetRight();
             }
-            if(inp.m_x > lrx) {
-                lastReflection ^= ict::HORI_REFLEC;
+            if(inp.m_x > limitx) {
+                reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
-            } else if(inp.m_x > lmx) {
-                inp.m_x = lmx;
             }
             break;
         }
         case ict::R_ZONE: {
             if(!isCentered()) {
-                lrx = GetLeft() + accWidth;
-                lmx = GetLeft();
-                if(accLeft > 0) lmx += accLeft;
+                limitx = internalGetLeft();
             }
-            if(inp.m_x < lrx) {
-                lastReflection ^= ict::HORI_REFLEC;
+            if(inp.m_x < limitx) {
+                reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
-            } else if(inp.m_x < lmx) {
-                inp.m_x = lmx;
             }
             break;
         }
     }
-    reflection ^= lastZone ^= lastReflection;
     // if(isRestricted()) placeInPlayground(&inp, lastZone == ict::IN_ZONE);
     switch (lastZone) {
         case ict::IN_ZONE:
