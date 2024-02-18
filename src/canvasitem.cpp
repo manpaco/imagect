@@ -95,7 +95,7 @@ wxDouble CanvasItem::getTop(ict::ECContext ic, bool unref) const {
     else return scaler->scaleY(getTop(ict::VIRTUAL_CONTEXT, unref), ict::IN_D);
 }
 
-wxRect2DDouble CanvasItem::getZone(ict::RectZone z) const {
+wxRect2DDouble CanvasItem::getZone(int z) const {
     if(z == ict::RT_ZONE) {
         return wxRect2DDouble(getRight(ict::CANVAS_CONTEXT), getTop(ict::CANVAS_CONTEXT) - ict::CORNER, ict::CORNER, ict::CORNER);
     } else if(z == ict::LT_ZONE) {
@@ -117,7 +117,7 @@ wxRect2DDouble CanvasItem::getZone(ict::RectZone z) const {
     } else return wxRect2DDouble(0, 0, 0, 0);
 }
 
-wxPoint2DDouble CanvasItem::relativeToEdge(const wxPoint2DDouble &p, ict::RectZone z, ict::ECContext c) {
+wxPoint2DDouble CanvasItem::relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c) {
     if(z == ict::RT_ZONE) {
         return wxPoint2DDouble(p.m_x - getRight(c), p.m_y - getTop(c));
     } else if(z == ict::LT_ZONE) {
@@ -144,7 +144,7 @@ wxPoint2DDouble CanvasItem::getContainerReference(ict::ECContext c) const {
     return wxPoint2DDouble(0, 0);
 }
 
-ict::RectZone CanvasItem::getPressedZone() const {
+int CanvasItem::getPressedZone() const {
     return pressedZone;
 }
 
@@ -159,7 +159,7 @@ bool CanvasItem::collides(const wxPoint2DDouble &p) {
     return true;
 }
 
-ict::RectZone CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const {
+int CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const {
     if (selected) {
         if(getZone(ict::RT_ZONE).Contains(canvasPoint)) return ict::RT_ZONE;
         if(getZone(ict::LT_ZONE).Contains(canvasPoint)) return ict::LT_ZONE;
@@ -174,7 +174,7 @@ ict::RectZone CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const 
     return ict::NONE_ZONE;
 }
 
-ict::RectZone CanvasItem::press(const wxPoint &canvasPoint) {
+int CanvasItem::press(const wxPoint &canvasPoint) {
     if(locked) return ict::NONE_ZONE;
     pressedZone = getLocation(canvasPoint);
     if(!pressedZone) return pressedZone;
@@ -196,7 +196,7 @@ void CanvasItem::hoverCollision() {
     hover(collisionZone);
 }
 
-void CanvasItem::hover(ict::RectZone z) {
+void CanvasItem::hover(int z) {
     if(hoverZone != z) {
         prevHover = hoverZone;
         hoverZone = z;

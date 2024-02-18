@@ -50,7 +50,7 @@ public:
     wxPoint2DDouble getPosition(ict::ECContext ic, bool unref = false) const;
     wxPoint2DDouble getDimensions(ict::ECContext ic) const;
     wxRect2DDouble getArea() const;
-    wxRect2DDouble getZone(ict::RectZone z) const;
+    wxRect2DDouble getZone(int z) const;
     bool setVirtualGeometry(const wxRect2DDouble &geo);
     bool setVirtualPosition(const wxPoint2DDouble &pos);
     bool setVirtualDimensions(const wxPoint2DDouble &dim);
@@ -76,7 +76,7 @@ public:
     /**
      * Get the zone pressed.
      */
-    ict::RectZone getPressedZone() const;
+    int getPressedZone() const;
 
     bool operator==(const CanvasItem &);
     bool operator!=(const CanvasItem &);
@@ -102,10 +102,10 @@ private:
      *
      * @param p point, used to calculate zone and offset in pressure.
      */
-    ict::RectZone press(const wxPoint &avp);
+    int press(const wxPoint &avp);
 
     void hoverCollision();
-    void hover(ict::RectZone z);
+    void hover(int z);
     bool collides(const wxPoint2DDouble &);
 
     wxRect2DDouble getUpdateArea() const;
@@ -119,9 +119,9 @@ private:
     /**
      * Get offset from p to respective zone.
      */
-    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, ict::RectZone z, ict::ECContext c);
+    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c);
 
-    ict::RectZone getLocation(const wxPoint2DDouble &vp) const;
+    int getLocation(const wxPoint2DDouble &vp) const;
 
     void drawEntries(wxMemoryDC *pv);
 
@@ -131,7 +131,7 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    ict::RectZone pressedZone, hoverZone, prevHover, collisionZone;
+    int pressedZone, hoverZone, prevHover, collisionZone;
     wxPoint2DDouble relativePress;
     wxPoint2DDouble lastPoint;
     Scaler *scaler;
