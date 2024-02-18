@@ -50,7 +50,7 @@ private:
     void mousePress(wxMouseEvent &event);
     void mouseRelease(wxMouseEvent &event);
     void resizeCanvas(wxSizeEvent &event);
-    void magnification(wxMouseEvent &event);
+    void mouseWheel(wxMouseEvent &event);
     void doMagnify(const wxPoint magCenter);
     void doScroll(const wxPoint motion);
     bool pressCanvas(const wxPoint p);

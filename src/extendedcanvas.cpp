@@ -63,7 +63,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvas->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::mousePress, this);
     canvas->Bind(wxEVT_LEFT_UP, &ExtendedCanvas::mouseRelease, this);
     canvas->Bind(wxEVT_SIZE, &ExtendedCanvas::resizeCanvas, this);
-    canvas->Bind(wxEVT_MOUSEWHEEL, &ExtendedCanvas::magnification, this);
+    canvas->Bind(wxEVT_MOUSEWHEEL, &ExtendedCanvas::mouseWheel, this);
     zoom->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::gridToggle, this);
 }
 
@@ -72,8 +72,9 @@ void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
     event.Skip();
 }
 
-void ExtendedCanvas::magnification(wxMouseEvent &event) {
+void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
     int wheelRotation = event.GetWheelRotation();
+    std::cout << wheelRotation << std::endl;
     if (wheelRotation > 0) scaler->plusFactor(0.3, 0.3);
     else scaler->plusFactor(-0.3, -0.3);
     doMagnify(event.GetPosition());
