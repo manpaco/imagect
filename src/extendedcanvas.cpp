@@ -88,9 +88,8 @@ void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
 }
 
 void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
-    if(pressedItem) {
-        if(pressedItem->modify(event.GetPosition())) refreshCanvas();
-    } else if(!hoverCanvas(event.GetPosition()))
+    if(pressedItem) pressedItem->modify(event.GetPosition());
+    else if(!hoverCanvas(event.GetPosition()))
         if(hoveredItem) hoveredItem->hover(ict::NONE_ZONE);
     event.Skip();
 }
@@ -224,6 +223,7 @@ void ExtendedCanvas::notifySelection(CanvasItem *changed) {
 void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
     pressedItem = pressed;
     pressedItem->select(true);
+    // send pressure event
 }
 
 void ExtendedCanvas::notifyHover(CanvasItem *hovered) {
@@ -238,7 +238,7 @@ void ExtendedCanvas::notifyHover(CanvasItem *hovered) {
     wxRect2DDouble ch(hovered->getHoverUpdate());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh);
-    // send selection event
+    // send hover event
 }
 
 void ExtendedCanvas::notifyCollision(CanvasItem *tried) {
