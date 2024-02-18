@@ -134,8 +134,8 @@ private:
 
     wxDouble accumulateLeft(const wxDouble &dl);
     wxDouble accumulateTop(const wxDouble &dt);
-    wxDouble accumulateWidth(const wxDouble &dr);
-    wxDouble accumulateHeight(const wxDouble &db);
+    wxDouble accumulateRight(const wxDouble &dr);
+    wxDouble accumulateBottom(const wxDouble &db);
     void clearAccums();
 
     void assembleGrid();
@@ -162,7 +162,7 @@ private:
      * POSITION =/= "internalGetLeftTop"; when grilled
      * i. e. "internalGetLeftTop" == (GetLeft + accLeft, GetTop + accTop)
      * then, POSITION == (GetLeft, GetTop) */
-    wxDouble accLeft, accTop, accWidth, accHeight;
+    wxDouble accLeft, accTop, accRight, accBottom;
 
     bool fixed;
     bool centered;

@@ -16,8 +16,8 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
     this->grid = false;
     this->accLeft = 0;
     this->accTop = 0;
-    this->accWidth = 0;
-    this->accHeight = 0;
+    this->accRight = 0;
+    this->accBottom = 0;
     saveInstant();
     setMark();
 }
@@ -64,11 +64,11 @@ wxDouble SmartRect::internalGetTop() const {
 }
 
 wxDouble SmartRect::internalGetRight() const {
-    return GetRight() + accWidth;
+    return GetRight() + accRight;
 }
 
 wxDouble SmartRect::internalGetBottom() const {
-    return GetBottom() + accHeight;
+    return GetBottom() + accBottom;
 }
 
 wxPoint2DDouble SmartRect::internalGetCentre() const {
@@ -96,7 +96,7 @@ void SmartRect::useGrid(bool op) {
 }
 
 void SmartRect::clearAccums() {
-    accLeft = accTop = accWidth = accHeight = 0;
+    accLeft = accTop = accRight = accBottom = 0;
 }
 
 void SmartRect::disassembleGrid() {
@@ -112,8 +112,8 @@ void SmartRect::assembleGrid() {
     wxDouble be(GetBottom());
     m_x = accumulateLeft(m_x);
     m_y = accumulateTop(m_y);
-    m_width = accumulateWidth(re) - m_x;
-    m_height = accumulateHeight(be) - m_y;
+    m_width = accumulateRight(re) - m_x;
+    m_height = accumulateBottom(be) - m_y;
 }
 
 bool SmartRect::useGrid() const {
@@ -326,8 +326,8 @@ bool SmartRect::pushRightBottomTo(const wxPoint2DDouble &p) {
     }
     if(useGrid()) {
         wxDouble rdx, bdy;
-        rdx = accumulateWidth(dx);
-        bdy = accumulateHeight(dy);
+        rdx = accumulateRight(dx);
+        bdy = accumulateBottom(dy);
         m_width += rdx;
         m_height += bdy;
         if(isCentered()) {
@@ -376,8 +376,8 @@ bool SmartRect::pushLeftTopTo(const wxPoint2DDouble &p) {
         m_height -= tdy;
         if(isCentered()) {
             wxDouble rdx, bdy;
-            rdx = accumulateWidth(-dx);
-            bdy = accumulateHeight(-dy);
+            rdx = accumulateRight(-dx);
+            bdy = accumulateBottom(-dy);
             m_width += rdx;
             m_height += bdy;
         }
@@ -414,7 +414,7 @@ bool SmartRect::pushRightTopTo(const wxPoint2DDouble &p) {
     }
     if(useGrid()) {
         wxDouble rdx, tdy;
-        rdx = accumulateWidth(dx);
+        rdx = accumulateRight(dx);
         tdy = accumulateTop(dy);
         m_y += tdy;
         m_width += rdx;
@@ -422,7 +422,7 @@ bool SmartRect::pushRightTopTo(const wxPoint2DDouble &p) {
         if(isCentered()) {
             wxDouble ldx, bdy;
             ldx = accumulateLeft(-dx);
-            bdy = accumulateHeight(-dy);
+            bdy = accumulateBottom(-dy);
             m_x += ldx;
             m_width -= ldx;
             m_height += bdy;
@@ -461,13 +461,13 @@ bool SmartRect::pushLeftBottomTo(const wxPoint2DDouble &p) {
     if(useGrid()) {
         wxDouble ldx, bdy;
         ldx = accumulateLeft(dx);
-        bdy = accumulateHeight(dy);
+        bdy = accumulateBottom(dy);
         m_x += ldx;
         m_width -= ldx;
         m_height += bdy;
         if(isCentered()) {
             wxDouble rdx, tdy;
-            rdx = accumulateWidth(-dx);
+            rdx = accumulateRight(-dx);
             tdy = accumulateTop(-dy);
             m_width += rdx;
             m_y += tdy;
@@ -493,7 +493,7 @@ bool SmartRect::pushTopTo(const wxDouble &p) {
     if(useGrid()) {
         wxDouble tdy, ldx, rdx;
         ldx = accumulateLeft(dx);
-        rdx = accumulateWidth(-dx);
+        rdx = accumulateRight(-dx);
         m_x += ldx;
         m_width += rdx - ldx;
         tdy = accumulateTop(dy);
@@ -501,10 +501,10 @@ bool SmartRect::pushTopTo(const wxDouble &p) {
         m_height -= tdy;
         if(isCentered()) {
             ldx = accumulateLeft(dx);
-            rdx = accumulateWidth(-dx);
+            rdx = accumulateRight(-dx);
             m_x += ldx;
             m_width += rdx - ldx;
-            tdy = accumulateHeight(-dy);
+            tdy = accumulateBottom(-dy);
             m_height += tdy;
         }
     } else {
@@ -528,14 +528,14 @@ bool SmartRect::pushBottomTo(const wxDouble &p) {
     if(useGrid()) {
         wxDouble bdy, ldx, rdx;
         ldx = accumulateLeft(-dx);
-        rdx = accumulateWidth(dx);
+        rdx = accumulateRight(dx);
         m_x += ldx;
         m_width += rdx - ldx;
-        bdy = accumulateHeight(dy);
+        bdy = accumulateBottom(dy);
         m_height += bdy;
         if(isCentered()) {
             ldx = accumulateLeft(-dx);
-            rdx = accumulateWidth(dx);
+            rdx = accumulateRight(dx);
             m_x += ldx;
             m_width += rdx - ldx;
             bdy = accumulateTop(-dy);
@@ -565,15 +565,15 @@ bool SmartRect::pushLeftTo(const wxDouble &p) {
         ldx = accumulateLeft(dx);
         m_x += ldx;
         m_width -= ldx;
-        bdy = accumulateHeight(-dy);
+        bdy = accumulateBottom(-dy);
         tdy = accumulateTop(dy);
         m_y += tdy;
         m_height += bdy - tdy;
         if(isCentered()) {
             wxDouble rdx;
-            rdx = accumulateWidth(-dx);
+            rdx = accumulateRight(-dx);
             m_width += rdx;
-            bdy = accumulateHeight(-dy);
+            bdy = accumulateBottom(-dy);
             tdy = accumulateTop(dy);
             m_y += tdy;
             m_height += bdy - tdy;
@@ -598,9 +598,9 @@ bool SmartRect::pushRightTo(const wxDouble &p) {
     if(isFixed()) dy = calcOrdi(dx) / 2;
     if(useGrid()) {
         wxDouble rdx, tdy, bdy;
-        rdx = accumulateWidth(dx);
+        rdx = accumulateRight(dx);
         m_width += rdx;
-        bdy = accumulateHeight(dy);
+        bdy = accumulateBottom(dy);
         tdy = accumulateTop(-dy);
         m_y += tdy;
         m_height += bdy - tdy;
@@ -609,7 +609,7 @@ bool SmartRect::pushRightTo(const wxDouble &p) {
             ldx = accumulateLeft(-dx);
             m_x += ldx;
             m_width -= ldx;
-            bdy = accumulateHeight(dy);
+            bdy = accumulateBottom(dy);
             tdy = accumulateTop(-dy);
             m_y += tdy;
             m_height += bdy - tdy;
@@ -644,19 +644,19 @@ wxDouble SmartRect::accumulateTop(const wxDouble &dt) {
     return ret;
 }
 
-wxDouble SmartRect::accumulateWidth(const wxDouble &dr) {
+wxDouble SmartRect::accumulateRight(const wxDouble &dr) {
     wxDouble ret;
-    accWidth += dr;
-    ret = round(accWidth);
-    accWidth -= ret;
+    accRight += dr;
+    ret = round(accRight);
+    accRight -= ret;
     return ret;
 }
 
-wxDouble SmartRect::accumulateHeight(const wxDouble &db) {
+wxDouble SmartRect::accumulateBottom(const wxDouble &db) {
     wxDouble ret;
-    accHeight += db;
-    ret = round(accHeight);
-    accHeight -= ret;
+    accBottom += db;
+    ret = round(accBottom);
+    accBottom -= ret;
     return ret;
 }
 
