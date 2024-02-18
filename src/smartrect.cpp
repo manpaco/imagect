@@ -302,16 +302,16 @@ void SmartRect::pushRightBottomTo(const wxPoint2DDouble &p) {
     wxDouble dy = p.m_y - internalGetBottom();
     if(isFixed()) {
         if(p.m_x >= internalGetRight() && p.m_y <= internalGetBottom()) {
-            dx = calcAbsc(dy);
-        } else if(p.m_x <= internalGetRight() && p.m_y >= internalGetBottom()) {
             dy = calcOrdi(dx);
+        } else if(p.m_x <= internalGetRight() && p.m_y >= internalGetBottom()) {
+            dx = calcAbsc(dy);
         } else if(p.m_x < internalGetRight() && p.m_y < internalGetBottom()) {
             wxDouble proy = dx / dy;
-            if(proy < aspectRatio) dx = calcAbsc(dy);
+            if(proy > aspectRatio) dx = calcAbsc(dy);
             else dy = calcOrdi(dx);
         } else if(p.m_x > internalGetRight() && p.m_y > internalGetBottom()) {
             wxDouble proy = dx / dy;
-            if(proy > aspectRatio) dx = calcAbsc(dy);
+            if(proy < aspectRatio) dx = calcAbsc(dy);
             else dy = calcOrdi(dx);
         }
     }
@@ -343,16 +343,16 @@ void SmartRect::pushLeftTopTo(const wxPoint2DDouble &p) {
     wxDouble dy = p.m_y - internalGetTop();
     if(isFixed()) {
         if(p.m_x >= internalGetLeft() && p.m_y <= internalGetTop()) {
-            dy = calcOrdi(dx);
-        } else if(p.m_x <= internalGetLeft() && p.m_y >= internalGetTop()) {
             dx = calcAbsc(dy);
+        } else if(p.m_x <= internalGetLeft() && p.m_y >= internalGetTop()) {
+            dy = calcOrdi(dx);
         } else if(p.m_x < internalGetLeft() && p.m_y < internalGetTop()) {
             wxDouble proy = dx / dy;
-            if(proy > aspectRatio) dx = calcAbsc(dy);
+            if(proy < aspectRatio) dx = calcAbsc(dy);
             else dy = calcOrdi(dx);
         } else if(p.m_x > internalGetLeft() && p.m_y > internalGetTop()) {
             wxDouble proy = dx / dy;
-            if(proy < aspectRatio) dx = calcAbsc(dy);
+            if(proy > aspectRatio) dx = calcAbsc(dy);
             else dy = calcOrdi(dx);
         }
     }
@@ -388,16 +388,16 @@ void SmartRect::pushRightTopTo(const wxPoint2DDouble &p) {
     wxDouble dy = p.m_y - internalGetTop();
     if(isFixed()) {
         if(p.m_x <= internalGetRight() && p.m_y <= internalGetTop()) {
-            dy = calcOrdi(-dx);
-        } else if(p.m_x >= internalGetRight() && p.m_y >= internalGetTop()) {
             dx = calcAbsc(-dy);
+        } else if(p.m_x >= internalGetRight() && p.m_y >= internalGetTop()) {
+            dy = calcOrdi(-dx);
         } else if(p.m_x > internalGetRight() && p.m_y < internalGetTop()) {
             wxDouble proy = dx / -dy;
-            if(proy > aspectRatio) dx = calcAbsc(-dy);
+            if(proy < aspectRatio) dx = calcAbsc(-dy);
             else dy = calcOrdi(-dx);
         } else if(p.m_x < internalGetRight() && p.m_y > internalGetTop()) {
             wxDouble proy = dx / -dy;
-            if(proy < aspectRatio) dx = calcAbsc(-dy);
+            if(proy > aspectRatio) dx = calcAbsc(-dy);
             else dy = calcOrdi(-dx);
         }
     }
@@ -433,16 +433,16 @@ void SmartRect::pushLeftBottomTo(const wxPoint2DDouble &p) {
     wxDouble dy = p.m_y - internalGetBottom();
     if(isFixed()) {
         if(p.m_x <= internalGetLeft() && p.m_y <= internalGetBottom()) {
-            dx = calcAbsc(-dy);
-        } else if(p.m_x >= internalGetLeft() && p.m_y >= internalGetBottom()) {
             dy = calcOrdi(-dx);
+        } else if(p.m_x >= internalGetLeft() && p.m_y >= internalGetBottom()) {
+            dx = calcAbsc(-dy);
         } else if(p.m_x > internalGetLeft() && p.m_y < internalGetBottom()) {
             wxDouble proy = dx / -dy;
-            if(proy < aspectRatio) dx = calcAbsc(-dy);
+            if(proy > aspectRatio) dx = calcAbsc(-dy);
             else dy = calcOrdi(-dx);
         } else if(p.m_x < internalGetLeft() && p.m_y > internalGetBottom()) {
             wxDouble proy = dx / -dy;
-            if(proy > aspectRatio) dx = calcAbsc(-dy);
+            if(proy < aspectRatio) dx = calcAbsc(-dy);
             else dy = calcOrdi(-dx);
         }
     }
