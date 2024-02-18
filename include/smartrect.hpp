@@ -102,15 +102,15 @@ public:
     ~SmartRect();
 
 private:
-    bool pushTo(const wxPoint2DDouble &p);
-    bool pushTopTo(const wxDouble &p);
-    bool pushRightTopTo(const wxPoint2DDouble &p);
-    bool pushRightTo(const wxDouble &p);
-    bool pushRightBottomTo(const wxPoint2DDouble &p);
-    bool pushBottomTo(const wxDouble &p);
-    bool pushLeftBottomTo(const wxPoint2DDouble &p);
-    bool pushLeftTo(const wxDouble &p);
-    bool pushLeftTopTo(const wxPoint2DDouble &p);
+    void pushTo(const wxPoint2DDouble &p);
+    void pushTopTo(const wxDouble &p);
+    void pushRightTopTo(const wxPoint2DDouble &p);
+    void pushRightTo(const wxDouble &p);
+    void pushRightBottomTo(const wxPoint2DDouble &p);
+    void pushBottomTo(const wxDouble &p);
+    void pushLeftBottomTo(const wxPoint2DDouble &p);
+    void pushLeftTo(const wxDouble &p);
+    void pushLeftTopTo(const wxPoint2DDouble &p);
 
     wxDouble internalGetLeft() const;
     wxDouble internalGetTop() const;
