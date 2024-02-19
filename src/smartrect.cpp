@@ -68,22 +68,34 @@ bool SmartRect::setSize(const wxPoint2DDouble &s) {
 }
 
 wxDouble SmartRect::extGetLeft() const {
-    if(useGrid()) return round(m_x);
+    if(useGrid()) {
+        if(m_x < 0) return round_htz(m_x);
+        else return round_haz(m_x);
+    }
     else return m_x;
 }
 
 wxDouble SmartRect::extGetTop() const {
-    if(useGrid()) return round(m_y);
+    if(useGrid()) {
+        if(m_y < 0) return round_htz(m_y);
+        else return round_haz(m_y);
+    }
     else return m_y;
 }
 
 wxDouble SmartRect::extGetRight() const {
-    if(useGrid()) return round(m_x + m_width);
+    if(useGrid()) {
+        if(m_x + m_width < 0) return round_haz(m_x + m_width);
+        else return round_htz(m_x + m_width);
+    }
     else return m_x + m_width;
 }
 
 wxDouble SmartRect::extGetBottom() const {
-    if(useGrid()) return round(m_y + m_height);
+    if(useGrid()) {
+        if(m_y + m_height < 0) return round_haz(m_y + m_height);
+        else return round_htz(m_y + m_height);
+    }
     else return m_y + m_height;
 }
 
