@@ -24,7 +24,6 @@
 #include <wx/gdicmn.h>
 #include <wx/geometry.h>
 #include "smartrect.hpp"
-#include "defs.hpp"
 
 class PixelView;
 class Scaler;
