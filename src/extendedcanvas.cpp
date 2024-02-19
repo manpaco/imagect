@@ -73,11 +73,13 @@ void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
 }
 
 void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
-    int wheelRotation = event.GetWheelRotation();
-    if (wheelRotation > 0) scaler->plusFactor(0.3, 0.3);
-    else scaler->plusFactor(-0.3, -0.3);
+    wxDouble plus = event.GetWheelRotation();
+    plus /= 2000;
+    wxDouble sx;
+    scaler->getNewFactor(&sx, nullptr);
+    plus *= sx;
+    scaler->plusFactor(plus, plus);
     doMagnify(event.GetPosition());
-    //doMagnify(wxPoint(0, 0));
     event.Skip();
 }
 
