@@ -42,12 +42,8 @@ public:
     bool isLocked();
     void hide(bool opt);
     bool isHidden() const;
-    wxDouble getX(ict::ECContext ic, bool unref = false) const;
-    wxDouble getY(ict::ECContext ic, bool unref = false) const;
-    wxDouble getWidth(ict::ECContext ic) const;
-    wxDouble getHeight(ict::ECContext ic) const;
-    wxRect2DDouble getGeometry(ict::ECContext ic, bool unref = false) const;
-    wxPoint2DDouble getPosition(ict::ECContext ic, bool unref = false) const;
+    wxRect2DDouble getGeometry(ict::ECContext ic) const;
+    wxPoint2DDouble getPosition(ict::ECContext ic) const;
     wxPoint2DDouble getDimensions(ict::ECContext ic) const;
     wxRect2DDouble getArea() const;
     wxRect2DDouble getZone(int z) const;
@@ -84,10 +80,14 @@ public:
     ~CanvasItem();
 
 private:
-    wxDouble getRight(ict::ECContext ic, bool unref = false) const;
-    wxDouble getLeft(ict::ECContext ic, bool unref = false) const;
-    wxDouble getTop(ict::ECContext ic, bool unref = false) const;
-    wxDouble getBottom(ict::ECContext ic, bool unref = false) const;
+    wxDouble getWidth(ict::ECContext ic, bool ext = true) const;
+    wxDouble getHeight(ict::ECContext ic, bool ext = true) const;
+    wxDouble getRight(ict::ECContext ic, bool ext = true) const;
+    wxDouble getLeft(ict::ECContext ic, bool ext = true) const;
+    wxDouble getTop(ict::ECContext ic, bool ext = true) const;
+    wxDouble getBottom(ict::ECContext ic, bool ext = true) const;
+
+    void useSavedMark();
 
     /**
      * Modify the the item geometry.
@@ -133,7 +133,8 @@ private:
     bool hidden;
     int pressedZone, hoverZone, prevHover, collisionZone;
     wxPoint2DDouble relativePress;
-    wxPoint2DDouble lastPoint;
+    wxPoint2DDouble relativePoint;
+    wxPoint cPoint;
     Scaler *scaler;
     SmartRect geometry;
     ExtendedCanvas *container;
