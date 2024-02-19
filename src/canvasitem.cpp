@@ -232,6 +232,7 @@ bool CanvasItem::isRestricted() const {
 
 bool CanvasItem::modify(const wxPoint &canvasPoint) {
     if(!handler) return false;
+    if(canvasPoint == cPoint) return false;
     cPoint = canvasPoint;
     relativePoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, ict::CANVAS_CONTEXT);
     relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
