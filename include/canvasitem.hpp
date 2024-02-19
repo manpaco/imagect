@@ -46,7 +46,7 @@ public:
     wxPoint2DDouble getPosition(ict::ECContext ic) const;
     wxPoint2DDouble getDimensions(ict::ECContext ic) const;
     wxRect2DDouble getArea() const;
-    wxRect2DDouble getZone(int z) const;
+    wxRect2DDouble getHandleZone(int z) const;
     bool setVirtualGeometry(const wxRect2DDouble &geo);
     bool setVirtualPosition(const wxPoint2DDouble &pos);
     bool setVirtualDimensions(const wxPoint2DDouble &dim);

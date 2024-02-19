@@ -96,7 +96,7 @@ wxDouble CanvasItem::getTop(ict::ECContext ic, bool ext) const {
     else return scaler->scaleY(getTop(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
 }
 
-wxRect2DDouble CanvasItem::getZone(int z) const {
+wxRect2DDouble CanvasItem::getHandleZone(int z) const {
     if(z == ict::RT_ZONE) {
         return wxRect2DDouble(getRight(ict::CANVAS_CONTEXT), getTop(ict::CANVAS_CONTEXT) - hdim, hdim, hdim);
     } else if(z == ict::LT_ZONE) {
@@ -162,16 +162,16 @@ bool CanvasItem::collides(const wxPoint2DDouble &p) {
 
 int CanvasItem::inHandle(const wxPoint2DDouble &canvasPoint) const {
     if (selected) {
-        if(getZone(ict::RT_ZONE).Contains(canvasPoint)) return ict::RT_ZONE;
-        if(getZone(ict::LT_ZONE).Contains(canvasPoint)) return ict::LT_ZONE;
-        if(getZone(ict::RB_ZONE).Contains(canvasPoint)) return ict::RB_ZONE;
-        if(getZone(ict::LB_ZONE).Contains(canvasPoint)) return ict::LB_ZONE;
-        if(getZone(ict::T_ZONE).Contains(canvasPoint)) return ict::T_ZONE;
-        if(getZone(ict::B_ZONE).Contains(canvasPoint)) return ict::B_ZONE;
-        if(getZone(ict::R_ZONE).Contains(canvasPoint)) return ict::R_ZONE;
-        if(getZone(ict::L_ZONE).Contains(canvasPoint)) return ict::L_ZONE;
+        if(getHandleZone(ict::RT_ZONE).Contains(canvasPoint)) return ict::RT_ZONE;
+        if(getHandleZone(ict::LT_ZONE).Contains(canvasPoint)) return ict::LT_ZONE;
+        if(getHandleZone(ict::RB_ZONE).Contains(canvasPoint)) return ict::RB_ZONE;
+        if(getHandleZone(ict::LB_ZONE).Contains(canvasPoint)) return ict::LB_ZONE;
+        if(getHandleZone(ict::T_ZONE).Contains(canvasPoint)) return ict::T_ZONE;
+        if(getHandleZone(ict::B_ZONE).Contains(canvasPoint)) return ict::B_ZONE;
+        if(getHandleZone(ict::R_ZONE).Contains(canvasPoint)) return ict::R_ZONE;
+        if(getHandleZone(ict::L_ZONE).Contains(canvasPoint)) return ict::L_ZONE;
     }
-    if(getZone(ict::IN_ZONE).Contains(canvasPoint)) return ict::IN_ZONE;
+    if(getHandleZone(ict::IN_ZONE).Contains(canvasPoint)) return ict::IN_ZONE;
     return ict::NONE_ZONE;
 }
 
@@ -288,7 +288,7 @@ wxRect2DDouble CanvasItem::getUpdateArea() const {
 }
 
 wxRect2DDouble CanvasItem::getHoverUpdate() const {
-    return getZone(handleHover).CreateUnion(getZone(prevHover));
+    return getHandleZone(handleHover).CreateUnion(getHandleZone(prevHover));
 }
 bool CanvasItem::setVirtualDimensions(const wxPoint2DDouble &dim) {
     return geometry.setSize(dim);
@@ -318,7 +318,7 @@ void CanvasItem::drawOn(wxMemoryDC *pv) {
     pv->DrawRectangle(dr);
     if(handleHover) {
         pv->SetBrush(*wxYELLOW_BRUSH);
-        wxRect2DDouble ddr(getZone(handleHover));
+        wxRect2DDouble ddr(getHandleZone(handleHover));
         wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
         pv->DrawRectangle(dr);
     }
