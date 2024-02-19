@@ -237,7 +237,13 @@ bool CanvasItem::modify(const wxPoint &canvasPoint) {
     relativePoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, ict::CANVAS_CONTEXT);
     relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
     relativePoint -= relativePress;
+    int ref = geometry.getReflection();
+    geometry.setDummySpace(relativePress.m_x, relativePress.m_y);
     bool changed = geometry.pushZoneTo(handler, relativePoint);
+    geometry.clearDummySpace();
+    ref = reflectionChange(ref, geometry.getReflection());
+    if(ref & ict::HORI_REFLEC) relativePress.m_x = 0;
+    if(ref & ict::VERT_REFLEC) relativePress.m_y = 0;
     handler = geometry.getLastZone();
     handleHover = handler;
     if(changed) {
