@@ -23,6 +23,13 @@
 #include <wx/geometry.h>
 class Scaler;
 
+inline double round_htz(const double &n) {
+    return std::copysign(ceil((fabs(n) - 0.5)), n);
+}
+inline double round_haz(const double &n) {
+    return std::copysign(floor((fabs(n) + 0.5)), n);
+}
+
 namespace ict {
 
     /* enum RectZone {
