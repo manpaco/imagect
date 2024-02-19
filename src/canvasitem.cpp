@@ -38,9 +38,9 @@ CanvasItem::CanvasItem(int id, wxRect2DDouble geometry) {
     this->hidden = false;
     this->locked = true;
     this->selected = false;
-    this->pressedZone = ict::NONE_ZONE;
+    this->handler = ict::NONE_ZONE;
     this->container = nullptr;
-    this->hoverZone = ict::NONE_ZONE;
+    this->handleHover = ict::NONE_ZONE;
     hdim = 15;
 }
 
@@ -145,22 +145,22 @@ wxPoint2DDouble CanvasItem::getContainerReference(ict::ECContext c) const {
     return wxPoint2DDouble(0, 0);
 }
 
-int CanvasItem::getPressedZone() const {
-    return pressedZone;
+int CanvasItem::getHandler() const {
+    return handler;
 }
 
 bool CanvasItem::collides(const wxPoint2DDouble &p) {
     if(locked || hidden) {
-        collisionZone = ict::NONE_ZONE;
+        handleCollision = ict::NONE_ZONE;
         return false;
     }
-    collisionZone = getLocation(p);
-    if(!collisionZone) return false;
+    handleCollision = inHandle(p);
+    if(!handleCollision) return false;
     if(container) container->notifyCollision(this);
     return true;
 }
 
-int CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const {
+int CanvasItem::inHandle(const wxPoint2DDouble &canvasPoint) const {
     if (selected) {
         if(getZone(ict::RT_ZONE).Contains(canvasPoint)) return ict::RT_ZONE;
         if(getZone(ict::LT_ZONE).Contains(canvasPoint)) return ict::LT_ZONE;
@@ -178,30 +178,30 @@ int CanvasItem::getLocation(const wxPoint2DDouble &canvasPoint) const {
 int CanvasItem::press(const wxPoint &canvasPoint) {
     if(locked) return ict::NONE_ZONE;
     cPoint = canvasPoint;
-    pressedZone = getLocation(canvasPoint);
-    if(!pressedZone) return pressedZone;
+    handler = inHandle(canvasPoint);
+    if(!handler) return handler;
     geometry.setMark();
-    relativePress = relativeToEdge(canvasPoint, pressedZone, ict::CANVAS_CONTEXT);
+    relativePress = relativeToEdge(canvasPoint, handler, ict::CANVAS_CONTEXT);
     relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
     relativePoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, ict::CANVAS_CONTEXT);
     relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
     relativePoint -= relativePress;
     if(container) container->notifyPressure(this);
-    return pressedZone;
+    return handler;
 }
 
 void CanvasItem::release() {
-    pressedZone = ict::NONE_ZONE;
+    handler = ict::NONE_ZONE;
 }
 
 void CanvasItem::hoverCollision() {
-    hover(collisionZone);
+    hover(handleCollision);
 }
 
 void CanvasItem::hover(int z) {
-    if(hoverZone != z) {
-        prevHover = hoverZone;
-        hoverZone = z;
+    if(handleHover != z) {
+        prevHover = handleHover;
+        handleHover = z;
         if(container) container->notifyHover(this);
     }
 }
@@ -231,14 +231,14 @@ bool CanvasItem::isRestricted() const {
 }
 
 bool CanvasItem::modify(const wxPoint &canvasPoint) {
-    if(!pressedZone) return false;
+    if(!handler) return false;
     cPoint = canvasPoint;
     relativePoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, ict::CANVAS_CONTEXT);
     relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
     relativePoint -= relativePress;
-    bool changed = geometry.pushZoneTo(pressedZone, relativePoint);
-    pressedZone = geometry.getLastZone();
-    hoverZone = pressedZone;
+    bool changed = geometry.pushZoneTo(handler, relativePoint);
+    handler = geometry.getLastZone();
+    handleHover = handler;
     if(changed) {
         if(container) container->notifyGeometry(this);
         return true;
@@ -259,7 +259,7 @@ void CanvasItem::setAspectRatio(int xr, int yr) {
 }
 
 void CanvasItem::useSavedMark() {
-    if(!pressedZone || pressedZone == ict::IN_ZONE) return;
+    if(!handler || handler == ict::IN_ZONE) return;
     geometry.useMark();
     geometry.saveBefore(false);
     modify(cPoint);
@@ -288,7 +288,7 @@ wxRect2DDouble CanvasItem::getUpdateArea() const {
 }
 
 wxRect2DDouble CanvasItem::getHoverUpdate() const {
-    return getZone(hoverZone).CreateUnion(getZone(prevHover));
+    return getZone(handleHover).CreateUnion(getZone(prevHover));
 }
 bool CanvasItem::setVirtualDimensions(const wxPoint2DDouble &dim) {
     return geometry.setSize(dim);
@@ -311,20 +311,20 @@ void CanvasItem::setContainer(ExtendedCanvas *c) {
 }
 
 void CanvasItem::drawOn(wxMemoryDC *pv) {
-    drawEntries(pv);
+    drawHandles(pv);
     pv->SetBrush(*wxRED_BRUSH);
     wxRect2DDouble ddr(getGeometry(ict::CANVAS_CONTEXT));
     wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
     pv->DrawRectangle(dr);
-    if(hoverZone) {
+    if(handleHover) {
         pv->SetBrush(*wxYELLOW_BRUSH);
-        wxRect2DDouble ddr(getZone(hoverZone));
+        wxRect2DDouble ddr(getZone(handleHover));
         wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
         pv->DrawRectangle(dr);
     }
 }
 
-void CanvasItem::drawEntries(wxMemoryDC *pv) {
+void CanvasItem::drawHandles(wxMemoryDC *pv) {
     if (!selected) return;
     pv->SetBrush(*wxBLUE_BRUSH);
     wxRect2DDouble ddr(getArea());

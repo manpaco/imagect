@@ -72,7 +72,7 @@ public:
     /**
      * Get the zone pressed.
      */
-    int getPressedZone() const;
+    int getHandler() const;
 
     bool operator==(const CanvasItem &);
     bool operator!=(const CanvasItem &);
@@ -121,9 +121,9 @@ private:
      */
     wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c);
 
-    int getLocation(const wxPoint2DDouble &vp) const;
+    int inHandle(const wxPoint2DDouble &vp) const;
 
-    void drawEntries(wxMemoryDC *pv);
+    void drawHandles(wxMemoryDC *pv);
 
     wxPoint2DDouble getContainerReference(ict::ECContext c) const;
 
@@ -131,7 +131,7 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    int pressedZone, hoverZone, prevHover, collisionZone;
+    int handler, handleHover, prevHover, handleCollision;
     wxPoint2DDouble relativePress;
     wxPoint2DDouble relativePoint;
     wxPoint cPoint;

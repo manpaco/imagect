@@ -231,12 +231,12 @@ void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
 void ExtendedCanvas::notifyHover(CanvasItem *hovered) {
     if(hoveredItem) {
         if(*hoveredItem != *hovered) {
-            if(hovered->hoverZone) {
+            if(hovered->handleHover) {
                 hoveredItem->hover(ict::NONE_ZONE);
                 hoveredItem = hovered;
             }
-        } else if(!hovered->hoverZone) hoveredItem = nullptr;
-    } else if(hovered->hoverZone) hoveredItem = hovered;
+        } else if(!hovered->handleHover) hoveredItem = nullptr;
+    } else if(hovered->handleHover) hoveredItem = hovered;
     wxRect2DDouble ch(hovered->getHoverUpdate());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh);
