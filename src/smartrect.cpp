@@ -27,9 +27,70 @@ void SmartRect::saveBefore(bool c) {
 }
 
 bool SmartRect::restrictionContains(const wxPoint2DDouble &p) const {
-    return p.m_x >= rx && p.m_x < rx + rw &
+    return p.m_x >= rx && p.m_x < rx + rw &&
            p.m_y >= ry && p.m_y < ry + rh;
 }
+
+wxDouble SmartRect::restrictionLeft() const {
+    if(useGrid()) {
+        if(rx < 0) return round_htz(rx);
+        else return round_haz(rx);
+    }
+    else return rx;
+}
+
+wxDouble SmartRect::restrictionTop() const {
+    if(useGrid()) {
+        if(ry < 0) return round_htz(ry);
+        else return round_haz(ry);
+    }
+    else return ry;
+}
+
+wxDouble SmartRect::restrictionRight() const {
+    if(useGrid()) {
+        if(rx + rw < 0) return round_haz(rx + rw);
+        else return round_htz(rx + rw);
+    }
+    else return rx + rw;
+}
+
+wxDouble SmartRect::restrictionBottom() const {
+    if(useGrid()) {
+        if(ry + rh < 0) return round_haz(ry + rh);
+        else return round_htz(ry + rh);
+    }
+    else return ry + rh;
+}
+
+wxDouble SmartRect::restrictionLeftLimit() const {
+    if(useGrid()) return restrictionLeft() - 0.5;
+    else return restrictionLeft();
+}
+
+wxDouble SmartRect::restrictionTopLimit() const {
+    if(useGrid()) return restrictionTop() - 0.5;
+    else return restrictionTop();
+}
+
+wxDouble SmartRect::restrictionRightLimit() const {
+    if(useGrid()) return restrictionRight() + 0.5;
+    else return restrictionRight();
+}
+
+wxDouble SmartRect::restrictionBottomLimit() const {
+    if(useGrid()) return restrictionBottom() + 0.5;
+    else return restrictionBottom();
+}
+
+wxRect2DDouble SmartRect::restrictionGeometryLimit() const {
+    wxDouble rll(restrictionLeftLimit());
+    wxDouble rtl(restrictionTopLimit());
+    wxDouble rrl(restrictionRightLimit());
+    wxDouble rbl(restrictionBottomLimit());
+    return wxRect2DDouble(rll, rtl, rrl - rll, rbl - rtl);
+}
+
 bool SmartRect::setGeometry(const wxRect2DDouble &r) {
     wxRect2DDouble newg(r);
     saveInstant();
@@ -109,30 +170,42 @@ wxDouble SmartRect::extGetHeight() const {
     else return m_height;
 }
 
-void SmartRect::placeInPlayground(wxPoint2DDouble *p, bool inner) const {
+void SmartRect::placeInsidePlayground(wxPoint2DDouble *p, int z) const {
     wxRect2DDouble playground;
-    if(inner) playground = getInnerPlayground();
-    else playground = getPlayground();
+    if(z == ict::IN_ZONE) playground = getMovePlayground();
+    else {
+        /* if(isCentered()) playground = getCenteredPlayground();
+        else playground = getResizePlayground(z); */
+        playground = restrictionGeometryLimit();
+    }
     if(playground.Contains(*p)) return;
     if(p->m_x < playground.GetLeft()) p->m_x = playground.GetLeft();
-    if(p->m_x > playground.GetRight()) p->m_x = playground.GetRight();
+    else if(p->m_x > playground.GetRight()) p->m_x = playground.GetRight();
     if(p->m_y < playground.GetTop()) p->m_y = playground.GetTop();
-    if(p->m_y > playground.GetBottom()) p->m_y = playground.GetBottom();
+    else if(p->m_y > playground.GetBottom()) p->m_y = playground.GetBottom();
 }
 
 void SmartRect::useGrid(bool op) {
     grid = op;
+    restrict(restricted);
 }
 
 bool SmartRect::useGrid() const {
     return grid;
 }
 
-wxRect2DDouble SmartRect::getInnerPlayground() const {
-/*     return wxRect2DDouble(restriction.m_x, restriction.m_y, restriction.m_width - m_width, restriction.m_height - m_height); */
+wxRect2DDouble SmartRect::getResizePlayground(int z) const {
+
 }
 
-wxRect2DDouble SmartRect::getPlayground() const {
+wxRect2DDouble SmartRect::getMovePlayground() const {
+    wxRect2DDouble ret(restrictionGeometryLimit());
+    ret.m_width -= m_width;
+    ret.m_height -= m_height;
+    return ret;
+}
+
+wxRect2DDouble SmartRect::getCenteredPlayground() const {
     /* if(isCentered()) {
         wxRect2DDouble playground;
         wxPoint2DDouble cen(GetCentre());
@@ -195,14 +268,16 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             }
             if(inp.m_x < limitx - ict::MINUPP - dummyX) {
                 inp.m_x += dummyX;
-                reflection ^= lastZone ^= ict::HORI_REFLEC;
+                reflection ^= ict::HORI_REFLEC;
+                lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
             } else if(inp.m_x < limitx + ict::MINUPP) {
                 inp.m_x = limitx + ict::MINUPP;
             }
             if(inp.m_y < limity - ict::MINUPP - dummyY) {
                 inp.m_y += dummyY;
-                reflection ^= lastZone ^= ict::VERT_REFLEC;
+                reflection ^= ict::VERT_REFLEC;
+                lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
             } else if(inp.m_y < limity + ict::MINUPP) {
                 inp.m_y = limity + ict::MINUPP;
@@ -215,14 +290,16 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             }
             if(inp.m_x > limitx + ict::MINUPP + dummyX) {
                 inp.m_x -= dummyX;
-                reflection ^= lastZone ^= ict::HORI_REFLEC;
+                reflection ^= ict::HORI_REFLEC;
+                lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
             } else if(inp.m_x > limitx - ict::MINUPP) {
                 inp.m_x = limitx - ict::MINUPP;
             }
             if(inp.m_y > limity + ict::MINUPP + dummyY) {
                 inp.m_y -= dummyY;
-                reflection ^= lastZone ^= ict::VERT_REFLEC;
+                reflection ^= ict::VERT_REFLEC;
+                lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
             } else if(inp.m_y > limity - ict::MINUPP) {
                 inp.m_y = limity - ict::MINUPP;
@@ -235,14 +312,16 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             }
             if(inp.m_x < limitx - ict::MINUPP - dummyX) {
                 inp.m_x += dummyX;
-                reflection ^= lastZone ^= ict::HORI_REFLEC;
+                reflection ^= ict::HORI_REFLEC;
+                lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
             } else if(inp.m_x < limitx + ict::MINUPP) {
                 inp.m_x = limitx + ict::MINUPP;
             }
             if(inp.m_y > limity + ict::MINUPP + dummyY) {
                 inp.m_y -= dummyY;
-                reflection ^= lastZone ^= ict::VERT_REFLEC;
+                reflection ^= ict::VERT_REFLEC;
+                lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
             } else if(inp.m_y > limity - ict::MINUPP) {
                 inp.m_y = limity - ict::MINUPP;
@@ -255,14 +334,16 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             }
             if(inp.m_x > limitx + ict::MINUPP + dummyX) {
                 inp.m_x -= dummyX;
-                reflection ^= lastZone ^= ict::HORI_REFLEC;
+                reflection ^= ict::HORI_REFLEC;
+                lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
             } else if(inp.m_x > limitx - ict::MINUPP) {
                 inp.m_x = limitx - ict::MINUPP;
             }
             if(inp.m_y < limity - ict::MINUPP - dummyY) {
                 inp.m_y += dummyY;
-                reflection ^= lastZone ^= ict::VERT_REFLEC;
+                reflection ^= ict::VERT_REFLEC;
+                lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
             } else if(inp.m_y < limity + ict::MINUPP) {
                 inp.m_y = limity + ict::MINUPP;
@@ -272,7 +353,8 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             if(!isCentered()) limity = GetBottom();
             if(inp.m_y > limity + ict::MINUPP + dummyY) {
                 inp.m_y -= dummyY;
-                reflection ^= lastZone ^= ict::VERT_REFLEC;
+                reflection ^= ict::VERT_REFLEC;
+                lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
             } else if(inp.m_y > limity - ict::MINUPP) {
                 inp.m_y = limity - ict::MINUPP;
@@ -282,7 +364,8 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             if(!isCentered()) limity = GetTop();
             if(inp.m_y < limity - ict::MINUPP - dummyY) {
                 inp.m_y += dummyY;
-                reflection ^= lastZone ^= ict::VERT_REFLEC;
+                reflection ^= ict::VERT_REFLEC;
+                lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
             } else if(inp.m_y < limity + ict::MINUPP) {
                 inp.m_y = limity + ict::MINUPP;
@@ -292,7 +375,8 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             if(!isCentered()) limitx = GetRight();
             if(inp.m_x > limitx + ict::MINUPP + dummyX) {
                 inp.m_x -= dummyX;
-                reflection ^= lastZone ^= ict::HORI_REFLEC;
+                reflection ^= ict::HORI_REFLEC;
+                lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
             } else if(inp.m_x > limitx - ict::MINUPP) {
                 inp.m_x = limitx - ict::MINUPP;
@@ -302,14 +386,15 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
             if(!isCentered()) limitx = GetLeft();
             if(inp.m_x < limitx - ict::MINUPP - dummyX) {
                 inp.m_x += dummyX;
-                reflection ^= lastZone ^= ict::HORI_REFLEC;
+                reflection ^= ict::HORI_REFLEC;
+                lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
             } else if(inp.m_x < limitx + ict::MINUPP) {
                 inp.m_x = limitx + ict::MINUPP;
             }
             break;
     }
-    // if(isRestricted()) placeInPlayground(&inp, lastZone == ict::IN_ZONE);
+    if(isRestricted()) placeInsidePlayground(&inp, lastZone);
     switch (lastZone) {
         case ict::IN_ZONE:
             pushTo(inp);
@@ -343,13 +428,15 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
 }
 
 void SmartRect::pushTo(const wxPoint2DDouble &p) {
-    wxPoint2DDouble inp(p);
+    if(p.m_x == GetLeft() && p.m_y == GetTop()) return;
+    wxDouble dx = p.m_x - GetLeft();
+    wxDouble dy = p.m_y - GetTop();
     if(useGrid()) {
-        inp.m_x = round(inp.m_x);
-        inp.m_y = round(inp.m_y);
+        dx = trunc(dx);
+        dy = trunc(dy);
     }
-    m_x = inp.m_x;
-    m_y = inp.m_y;
+    m_x += dx;
+    m_y += dy;
 }
 
 void SmartRect::pushRightBottomTo(const wxPoint2DDouble &p) {
@@ -548,7 +635,7 @@ bool SmartRect::setRestriction(const wxRect2DDouble &r) {
     rx = r.m_x;
     ry = r.m_y;
     rw = r.m_width;
-    ry = r.m_height;
+    rh = r.m_height;
     return restrict(restricted);
 }
 

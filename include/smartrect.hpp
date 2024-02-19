@@ -133,14 +133,24 @@ private:
     void saveInstant();
     bool instantChanged();
 
-    wxRect2DDouble getPlayground() const;
-    wxRect2DDouble getInnerPlayground() const;
-    void placeInPlayground(wxPoint2DDouble *p, bool inner = false) const;
+    wxRect2DDouble getCenteredPlayground() const;
+    wxRect2DDouble getMovePlayground() const;
+    wxRect2DDouble getResizePlayground(int) const;
+    void placeInsidePlayground(wxPoint2DDouble *p, int z) const;
 
     wxDouble calcAbsc(const wxDouble &ordi) const;
     wxDouble calcOrdi(const wxDouble &absc) const;
 
     bool restrictionContains(const wxPoint2DDouble &p) const;
+    wxDouble restrictionLeft() const;
+    wxDouble restrictionTop() const;
+    wxDouble restrictionRight() const;
+    wxDouble restrictionBottom() const;
+    wxDouble restrictionLeftLimit() const;
+    wxDouble restrictionTopLimit() const;
+    wxDouble restrictionRightLimit() const;
+    wxDouble restrictionBottomLimit() const;
+    wxRect2DDouble restrictionGeometryLimit() const;
 
     /* ----------------------- SmartRect main structure -----------------------
      * Internal getters are inherited from wxRect2DDouble.
