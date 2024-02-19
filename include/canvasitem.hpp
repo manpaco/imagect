@@ -139,6 +139,9 @@ private:
     SmartRect geometry;
     ExtendedCanvas *container;
 
+    /* Minimum handle dimension */
+    wxDouble hdim;
+
     friend ExtendedCanvas;
 
 };

@@ -41,6 +41,7 @@ CanvasItem::CanvasItem(int id, wxRect2DDouble geometry) {
     this->pressedZone = ict::NONE_ZONE;
     this->container = nullptr;
     this->hoverZone = ict::NONE_ZONE;
+    hdim = 15;
 }
 
 CanvasItem::~CanvasItem() {
@@ -97,21 +98,21 @@ wxDouble CanvasItem::getTop(ict::ECContext ic, bool ext) const {
 
 wxRect2DDouble CanvasItem::getZone(int z) const {
     if(z == ict::RT_ZONE) {
-        return wxRect2DDouble(getRight(ict::CANVAS_CONTEXT), getTop(ict::CANVAS_CONTEXT) - ict::CORNER, ict::CORNER, ict::CORNER);
+        return wxRect2DDouble(getRight(ict::CANVAS_CONTEXT), getTop(ict::CANVAS_CONTEXT) - hdim, hdim, hdim);
     } else if(z == ict::LT_ZONE) {
-        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT) - ict::CORNER, getTop(ict::CANVAS_CONTEXT) - ict::CORNER, ict::CORNER, ict::CORNER);
+        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT) - hdim, getTop(ict::CANVAS_CONTEXT) - hdim, hdim, hdim);
     } else if(z == ict::RB_ZONE) {
-        return wxRect2DDouble(getRight(ict::CANVAS_CONTEXT), getBottom(ict::CANVAS_CONTEXT), ict::CORNER, ict::CORNER);
+        return wxRect2DDouble(getRight(ict::CANVAS_CONTEXT), getBottom(ict::CANVAS_CONTEXT), hdim, hdim);
     } else if(z == ict::LB_ZONE) {
-        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT) - ict::CORNER, getBottom(ict::CANVAS_CONTEXT), ict::CORNER, ict::CORNER);
+        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT) - hdim, getBottom(ict::CANVAS_CONTEXT), hdim, hdim);
     } else if(z == ict::T_ZONE) {
-        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT), getTop(ict::CANVAS_CONTEXT) - ict::CORNER, getWidth(ict::CANVAS_CONTEXT), ict::CORNER);
+        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT), getTop(ict::CANVAS_CONTEXT) - hdim, getWidth(ict::CANVAS_CONTEXT), hdim);
     } else if(z == ict::B_ZONE) {
-        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT), getBottom(ict::CANVAS_CONTEXT), getWidth(ict::CANVAS_CONTEXT), ict::CORNER);
+        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT), getBottom(ict::CANVAS_CONTEXT), getWidth(ict::CANVAS_CONTEXT), hdim);
     } else if(z == ict::R_ZONE) {
-        return wxRect2DDouble(getRight(ict::CANVAS_CONTEXT), getTop(ict::CANVAS_CONTEXT), ict::CORNER, getHeight(ict::CANVAS_CONTEXT));
+        return wxRect2DDouble(getRight(ict::CANVAS_CONTEXT), getTop(ict::CANVAS_CONTEXT), hdim, getHeight(ict::CANVAS_CONTEXT));
     } else if(z == ict::L_ZONE) {
-        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT) - ict::CORNER, getTop(ict::CANVAS_CONTEXT), ict::CORNER, getHeight(ict::CANVAS_CONTEXT));
+        return wxRect2DDouble(getLeft(ict::CANVAS_CONTEXT) - hdim, getTop(ict::CANVAS_CONTEXT), hdim, getHeight(ict::CANVAS_CONTEXT));
     } else if(z == ict::IN_ZONE) {
         return getGeometry(ict::CANVAS_CONTEXT);
     } else return wxRect2DDouble(0, 0, 0, 0);
@@ -221,7 +222,7 @@ wxRect2DDouble CanvasItem::getGeometry(ict::ECContext ic) const {
 
 wxRect2DDouble CanvasItem::getArea() const {
     wxRect2DDouble area(getGeometry(ict::CANVAS_CONTEXT));
-    inflateRect(&area, ict::CORNER);
+    inflateRect(&area, hdim);
     return area;
 }
 
@@ -282,7 +283,7 @@ wxRect2DDouble CanvasItem::getUpdateArea() const {
         updArea.m_y += container->getReference(ict::VIRTUAL_CONTEXT).m_y;
     }
     scaler->scaleRect(&updArea, ict::IN_D);
-    inflateRect(&updArea, ict::CORNER);
+    inflateRect(&updArea, hdim);
     return updArea;
 }
 
