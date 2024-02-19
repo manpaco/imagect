@@ -32,11 +32,11 @@ Scaler::Scaler(wxDouble xf, wxDouble yf) {
 }
 
 void Scaler::setNewFactor(wxDouble xf, wxDouble yf) {
-    if (xf >= ict::MINUPP) {
+    if (xf >= ict::MINUPP && xf <= ict::MAXUPP) {
         this->xxOldFactor = this->xxFactor;
         this->xxFactor = xf;
     }
-    if (yf >= ict::MINUPP) {
+    if (yf >= ict::MINUPP && xf <= ict::MAXUPP) {
         this->yyOldFactor = this->yyFactor;
         this->yyFactor = yf;
     }
