@@ -29,6 +29,9 @@ inline double round_htz(const double &n) {
 inline double round_haz(const double &n) {
     return std::copysign(floor((fabs(n) + 0.5)), n);
 }
+inline int reflectionChange(const int &pReflec, const int &cReflec) {
+    return pReflec ^ cReflec;
+}
 
 namespace ict {
 
@@ -101,6 +104,8 @@ public:
     wxDouble getAspectRatio() const;
     void useGrid(bool);
     void saveBefore(bool);
+    void setDummySpace(const wxDouble &, const wxDouble &);
+    void clearDummySpace();
 
     bool isFixed() const;
     bool isCentered() const;
@@ -152,6 +157,8 @@ private:
     wxDouble ix, iy, iw, ih;
     /* Aspect ratio value */
     wxDouble aspectRatio;
+    /* Space used as dummy stripe in reflections */
+    wxDouble dummyX, dummyY;
 
     bool grid;
     bool fixed;

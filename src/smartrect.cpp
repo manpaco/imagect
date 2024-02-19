@@ -19,6 +19,7 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
     lastZone = ict::NONE_ZONE;
     saveInstant();
     setMark();
+    clearDummySpace();
 }
 
 void SmartRect::saveBefore(bool c) {
@@ -149,6 +150,14 @@ int SmartRect::getLastZone() const {
     return lastZone;
 }
 
+void SmartRect::setDummySpace(const wxDouble &dsx, const wxDouble &dsy) {
+    dummyX = abs(dsx);
+    dummyY = abs(dsy);
+}
+
+void SmartRect::clearDummySpace() {
+    dummyX = dummyY = 0;
+}
 wxRect2DDouble SmartRect::getChangeUnion() const {
     wxRect2DDouble ir(ix, iy, iw, ih);
     wxRect2DDouble gr(extGetLeft(), extGetTop(),
@@ -172,13 +181,19 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
                 limitx = GetLeft();
                 limity = GetTop();
             }
-            if(inp.m_x < limitx) {
+            if(inp.m_x < limitx - ict::MINUPP - dummyX) {
+                inp.m_x += dummyX;
                 reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
+            } else if(inp.m_x < limitx + ict::MINUPP) {
+                inp.m_x = limitx + ict::MINUPP;
             }
-            if(inp.m_y < limity) {
+            if(inp.m_y < limity - ict::MINUPP - dummyY) {
+                inp.m_y += dummyY;
                 reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
+            } else if(inp.m_y < limity + ict::MINUPP) {
+                inp.m_y = limity + ict::MINUPP;
             }
             break;
         case ict::LT_ZONE:
@@ -186,13 +201,19 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
                 limitx = GetRight();
                 limity = GetBottom();
             }
-            if(inp.m_x > limitx) {
+            if(inp.m_x > limitx + ict::MINUPP + dummyX) {
+                inp.m_x -= dummyX;
                 reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
+            } else if(inp.m_x > limitx - ict::MINUPP) {
+                inp.m_x = limitx - ict::MINUPP;
             }
-            if(inp.m_y > limity) {
+            if(inp.m_y > limity + ict::MINUPP + dummyY) {
+                inp.m_y -= dummyY;
                 reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
+            } else if(inp.m_y > limity - ict::MINUPP) {
+                inp.m_y = limity - ict::MINUPP;
             }
             break;
         case ict::RT_ZONE:
@@ -200,13 +221,19 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
                 limitx = GetLeft();
                 limity = GetBottom();
             }
-            if(inp.m_x < limitx) {
+            if(inp.m_x < limitx - ict::MINUPP - dummyX) {
+                inp.m_x += dummyX;
                 reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
+            } else if(inp.m_x < limitx + ict::MINUPP) {
+                inp.m_x = limitx + ict::MINUPP;
             }
-            if(inp.m_y > limity) {
+            if(inp.m_y > limity + ict::MINUPP + dummyY) {
+                inp.m_y -= dummyY;
                 reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
+            } else if(inp.m_y > limity - ict::MINUPP) {
+                inp.m_y = limity - ict::MINUPP;
             }
             break;
         case ict::LB_ZONE:
@@ -214,41 +241,59 @@ bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
                 limitx = GetRight();
                 limity = GetTop();
             }
-            if(inp.m_x > limitx) {
+            if(inp.m_x > limitx + ict::MINUPP + dummyX) {
+                inp.m_x -= dummyX;
                 reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
+            } else if(inp.m_x > limitx - ict::MINUPP) {
+                inp.m_x = limitx - ict::MINUPP;
             }
-            if(inp.m_y < limity) {
+            if(inp.m_y < limity - ict::MINUPP - dummyY) {
+                inp.m_y += dummyY;
                 reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
+            } else if(inp.m_y < limity + ict::MINUPP) {
+                inp.m_y = limity + ict::MINUPP;
             }
             break;
         case ict::T_ZONE:
             if(!isCentered()) limity = GetBottom();
-            if(inp.m_y > limity) {
+            if(inp.m_y > limity + ict::MINUPP + dummyY) {
+                inp.m_y -= dummyY;
                 reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y + m_height;
+            } else if(inp.m_y > limity - ict::MINUPP) {
+                inp.m_y = limity - ict::MINUPP;
             }
             break;
         case ict::B_ZONE:
             if(!isCentered()) limity = GetTop();
-            if(inp.m_y < limity) {
+            if(inp.m_y < limity - ict::MINUPP - dummyY) {
+                inp.m_y += dummyY;
                 reflection ^= lastZone ^= ict::VERT_REFLEC;
                 if(!isCentered()) m_y = m_y - m_height;
+            } else if(inp.m_y < limity + ict::MINUPP) {
+                inp.m_y = limity + ict::MINUPP;
             }
             break;
         case ict::L_ZONE:
             if(!isCentered()) limitx = GetRight();
-            if(inp.m_x > limitx) {
+            if(inp.m_x > limitx + ict::MINUPP + dummyX) {
+                inp.m_x -= dummyX;
                 reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x + m_width;
+            } else if(inp.m_x > limitx - ict::MINUPP) {
+                inp.m_x = limitx - ict::MINUPP;
             }
             break;
         case ict::R_ZONE:
             if(!isCentered()) limitx = GetLeft();
-            if(inp.m_x < limitx) {
+            if(inp.m_x < limitx - ict::MINUPP - dummyX) {
+                inp.m_x += dummyX;
                 reflection ^= lastZone ^= ict::HORI_REFLEC;
                 if(!isCentered()) m_x = m_x - m_width;
+            } else if(inp.m_x < limitx + ict::MINUPP) {
+                inp.m_x = limitx + ict::MINUPP;
             }
             break;
     }
