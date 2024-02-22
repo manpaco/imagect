@@ -196,7 +196,7 @@ void CanvasItem::hoverCollision() {
 
 void CanvasItem::hover(int z) {
     if(handleHover != z) {
-        prevHover = handleHover;
+        handleCollision = handleHover;
         handleHover = z;
         if(container) container->notifyHover(this);
     }

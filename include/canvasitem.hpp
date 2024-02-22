@@ -130,7 +130,7 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    int handleHover, prevHover, handleCollision;
+    int hovered, prevHover, collision;
     wxPoint2DDouble relativePress;
     wxPoint cPoint;
     Scaler *scaler;
