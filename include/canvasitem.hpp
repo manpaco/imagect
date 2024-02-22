@@ -43,18 +43,18 @@ public:
     bool isHidden() const;
     wxRect2DDouble getGeometry(ict::ECContext ic) const;
     wxPoint2DDouble getPosition(ict::ECContext ic) const;
-    wxPoint2DDouble getDimensions(ict::ECContext ic) const;
+    wxPoint2DDouble getSize(ict::ECContext ic) const;
     wxRect2DDouble getArea() const;
     wxRect2DDouble getHandleZone(int z) const;
-    bool setVirtualGeometry(const wxRect2DDouble &geo);
-    bool setVirtualPosition(const wxPoint2DDouble &pos);
-    bool setVirtualDimensions(const wxPoint2DDouble &dim);
+    void setVirtualGeometry(const wxRect2DDouble &geo);
+    void setVirtualPosition(const wxPoint2DDouble &pos);
+    void setVirtualSize(const wxPoint2DDouble &dim);
     bool toggleSelection();
     void select(const bool select);
     bool isSelected() const;
-    bool restrict(const bool state);
+    void restrict(const bool state);
     bool isRestricted() const;
-    bool setVirtualRestriction(const wxRect2DDouble &restriction);
+    void setVirtualRestriction(const wxRect2DDouble &restriction);
     wxDouble getAspectRatio() const;
     void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
@@ -94,7 +94,7 @@ private:
      * @param target Point used to move or resize.
      * @return true if crop rectangle changes, else false.
      */
-    bool modify(const wxPoint &avp);
+    void modify(const wxPoint &avp);
 
     /**
      * Simulate pressure at a given point.
@@ -130,12 +130,12 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    int handler, handleHover, prevHover, handleCollision;
+    int handleHover, prevHover, handleCollision;
     wxPoint2DDouble relativePress;
-    wxPoint2DDouble relativePoint;
     wxPoint cPoint;
     Scaler *scaler;
     SmartRect geometry;
+    wxRect2DDouble saved;
     ExtendedCanvas *container;
 
     /* Minimum handle dimension */

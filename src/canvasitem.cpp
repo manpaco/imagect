@@ -38,7 +38,6 @@ CanvasItem::CanvasItem(int id, wxRect2DDouble geometry) {
     this->hidden = false;
     this->locked = true;
     this->selected = false;
-    this->handler = ict::NONE_ZONE;
     this->container = nullptr;
     this->handleHover = ict::NONE_ZONE;
     hdim = 15;
@@ -146,7 +145,7 @@ wxPoint2DDouble CanvasItem::getContainerReference(ict::ECContext c) const {
 }
 
 int CanvasItem::getHandler() const {
-    return handler;
+    return geometry.activatedZone();
 }
 
 bool CanvasItem::collides(const wxPoint2DDouble &p) {
@@ -178,20 +177,17 @@ int CanvasItem::inHandle(const wxPoint2DDouble &canvasPoint) const {
 int CanvasItem::press(const wxPoint &canvasPoint) {
     if(locked) return ict::NONE_ZONE;
     cPoint = canvasPoint;
-    handler = inHandle(canvasPoint);
+    int handler = inHandle(cPoint);
+    geometry.activateZone(handler);
     if(!handler) return handler;
-    geometry.setMark();
-    relativePress = relativeToEdge(canvasPoint, handler, ict::CANVAS_CONTEXT);
+    relativePress = relativeToEdge(cPoint, handler, ict::CANVAS_CONTEXT);
     relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
-    relativePoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, ict::CANVAS_CONTEXT);
-    relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
-    relativePoint -= relativePress;
     if(container) container->notifyPressure(this);
     return handler;
 }
 
 void CanvasItem::release() {
-    handler = ict::NONE_ZONE;
+    geometry.activateZone(ict::NONE_ZONE);
 }
 
 void CanvasItem::hoverCollision() {
@@ -206,7 +202,7 @@ void CanvasItem::hover(int z) {
     }
 }
 
-wxPoint2DDouble CanvasItem::getDimensions(ict::ECContext ic) const {
+wxPoint2DDouble CanvasItem::getSize(ict::ECContext ic) const {
     return wxPoint2DDouble(getWidth(ic), getHeight(ic));
 }
 
@@ -216,7 +212,7 @@ wxPoint2DDouble CanvasItem::getPosition(ict::ECContext ic) const {
 
 wxRect2DDouble CanvasItem::getGeometry(ict::ECContext ic) const {
     wxPoint2DDouble p(getPosition(ic));
-    wxPoint2DDouble s(getDimensions(ic));
+    wxPoint2DDouble s(getSize(ic));
     return wxRect2DDouble(p.m_x, p.m_y, s.m_x, s.m_y);
 }
 
@@ -230,35 +226,28 @@ bool CanvasItem::isRestricted() const {
     return geometry.isRestricted();
 }
 
-bool CanvasItem::modify(const wxPoint &canvasPoint) {
-    if(!handler) return false;
-    if(canvasPoint == cPoint) return false;
+void CanvasItem::modify(const wxPoint &canvasPoint) {
+    if(!geometry.activatedZone()) return;
+    if(canvasPoint == cPoint) return;
     cPoint = canvasPoint;
-    relativePoint = relativeToEdge(canvasPoint, ict::NONE_ZONE, ict::CANVAS_CONTEXT);
+    wxPoint2DDouble relativePoint = relativeToEdge(cPoint, ict::NONE_ZONE,
+                                                   ict::CANVAS_CONTEXT);
     relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
     relativePoint -= relativePress;
-    int ref = geometry.getReflection();
-    geometry.setDummySpace(relativePress.m_x, relativePress.m_y);
-    bool changed = geometry.pushZoneTo(handler, relativePoint);
-    geometry.clearDummySpace();
-    ref = reflectionChange(ref, geometry.getReflection());
-    if(ref & ict::HORI_REFLEC) relativePress.m_x = 0;
-    if(ref & ict::VERT_REFLEC) relativePress.m_y = 0;
-    handler = geometry.getLastZone();
-    handleHover = handler;
-    if(changed) {
+    geometry.setZoneTo(relativePoint);
+    handleHover = geometry.activatedZone();
+    if(saved != getGeometry(ict::CANVAS_CONTEXT)) {
         if(container) container->notifyGeometry(this);
-        return true;
+        saved = getGeometry(ict::CANVAS_CONTEXT);
     }
-    else return false;
 }
 
-bool CanvasItem::setVirtualRestriction(const wxRect2DDouble &restriction) {
-    return geometry.setRestriction(restriction);
+void CanvasItem::setVirtualRestriction(const wxRect2DDouble &restriction) {
+    geometry.setRestriction(restriction);
 }
 
-bool CanvasItem::restrict(bool opt) {
-    return geometry.restrict(opt);
+void CanvasItem::restrict(bool opt) {
+    geometry.restrict(opt);
 }
 
 void CanvasItem::setAspectRatio(int xr, int yr) {
@@ -266,15 +255,13 @@ void CanvasItem::setAspectRatio(int xr, int yr) {
 }
 
 void CanvasItem::useSavedMark() {
-    if(!handler || handler == ict::IN_ZONE) return;
+    if(!geometry.resizing()) return;
     geometry.useMark();
-    geometry.saveBefore(false);
     modify(cPoint);
-    geometry.saveBefore(true);
 }
 
 void CanvasItem::expandFromCenter(bool op) {
-    geometry.expandFromCenter(op);
+    geometry.useInflate(op);
     useSavedMark();
 }
 
@@ -284,12 +271,7 @@ void CanvasItem::fixedAspectRatio(bool op) {
 }
 
 wxRect2DDouble CanvasItem::getUpdateArea() const {
-    wxRect2DDouble updArea(geometry.getChangeUnion());
-    if(container) {
-        updArea.m_x += container->getReference(ict::VIRTUAL_CONTEXT).m_x;
-        updArea.m_y += container->getReference(ict::VIRTUAL_CONTEXT).m_y;
-    }
-    scaler->scaleRect(&updArea, ict::IN_D);
+    wxRect2DDouble updArea(saved.CreateUnion(getGeometry(ict::CANVAS_CONTEXT)));
     inflateRect(&updArea, hdim);
     return updArea;
 }
@@ -297,16 +279,17 @@ wxRect2DDouble CanvasItem::getUpdateArea() const {
 wxRect2DDouble CanvasItem::getHoverUpdate() const {
     return getHandleZone(handleHover).CreateUnion(getHandleZone(prevHover));
 }
-bool CanvasItem::setVirtualDimensions(const wxPoint2DDouble &dim) {
-    return geometry.setSize(dim);
+
+void CanvasItem::setVirtualSize(const wxPoint2DDouble &dim) {
+    geometry.setSize(dim);
 }
 
-bool CanvasItem::setVirtualGeometry(const wxRect2DDouble &geo) {
-    return geometry.setGeometry(geo);
+void CanvasItem::setVirtualGeometry(const wxRect2DDouble &geo) {
+    geometry.setGeometry(geo);
 }
 
-bool CanvasItem::setVirtualPosition(const wxPoint2DDouble &pos) {
-    return geometry.setPosition(pos);
+void CanvasItem::setVirtualPosition(const wxPoint2DDouble &pos) {
+    geometry.setPosition(pos);
 }
 
 wxDouble CanvasItem::getAspectRatio() const {
