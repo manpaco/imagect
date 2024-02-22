@@ -97,14 +97,16 @@ void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
 }
 
 bool ExtendedCanvas::hoverCanvas(const wxPoint p) {
-    for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
+    for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
+            it != zOrder.rend(); it++) {
         if((*it)->collides(p)) return true;
     }
     return false;
 }
 
 bool ExtendedCanvas::pressCanvas(const wxPoint p) {
-    for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
+    for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
+            it != zOrder.rend(); it++) {
         if((*it)->press(p)) return true;
     }
     return false;
@@ -135,7 +137,8 @@ void ExtendedCanvas::paintCanvas(wxPaintEvent &event) {
     wxMemoryDC bufferPainter(*canvasBuffer);
     bufferPainter.SetBrush(*wxBLACK_BRUSH);
     bufferPainter.DrawRectangle(toPaint);
-    for (std::vector<CanvasItem *>::iterator it = zOrder.begin(); it != zOrder.end(); it++) {
+    for (std::vector<CanvasItem *>::iterator it = zOrder.begin();
+            it != zOrder.end(); it++) {
         (*it)->drawOn(&bufferPainter);
     }
     }
@@ -143,7 +146,8 @@ void ExtendedCanvas::paintCanvas(wxPaintEvent &event) {
 }
 
 CanvasItem * ExtendedCanvas::getItem(int itemId) {
-    for (std::vector<CanvasItem *>::iterator it = zOrder.begin(); it != zOrder.end(); it++) {
+    for (std::vector<CanvasItem *>::iterator it = zOrder.begin();
+            it != zOrder.end(); it++) {
         if ((*it)->getId() == itemId) return *it;
     }
     return nullptr;
@@ -228,23 +232,23 @@ void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
     // send pressure event
 }
 
-void ExtendedCanvas::notifyHover(CanvasItem *hovered) {
+void ExtendedCanvas::notifyHover(CanvasItem *changed) {
     if(hoveredItem) {
-        if(*hoveredItem != *hovered) {
-            if(hovered->handleHover) {
+        if(*hoveredItem != *changed) {
+            if(changed->hovered) {
                 hoveredItem->hover(ict::NONE_ZONE);
-                hoveredItem = hovered;
+                hoveredItem = changed;
             }
-        } else if(!hovered->handleHover) hoveredItem = nullptr;
-    } else if(hovered->handleHover) hoveredItem = hovered;
-    wxRect2DDouble ch(hovered->getHoverUpdate());
+        } else if(!changed->hovered) hoveredItem = nullptr;
+    } else if(changed->hovered) hoveredItem = changed;
+    wxRect2DDouble ch(changed->getHoverUpdate());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh);
     // send hover event
 }
 
-void ExtendedCanvas::notifyCollision(CanvasItem *tried) {
-    tried->hoverCollision();
+void ExtendedCanvas::notifyCollision(CanvasItem *target) {
+    target->hoverCollision();
 }
 
 wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {
@@ -255,7 +259,8 @@ wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {
 void ExtendedCanvas::useGrid(bool op) {
     if(grid == op) return;
     grid = op;
-    for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin(); it != zOrder.rend(); it++) {
+    for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
+            it != zOrder.rend(); it++) {
         (*it)->useGrid(grid);
     }
     refreshCanvas();

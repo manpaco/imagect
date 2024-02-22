@@ -60,8 +60,8 @@ private:
     void notifyGeometry(CanvasItem *changed);
     void notifySelection(CanvasItem *changed);
     void notifyPressure(CanvasItem *pressed);
-    void notifyHover(CanvasItem *hovered);
-    void notifyCollision(CanvasItem *tried);
+    void notifyHover(CanvasItem *changed);
+    void notifyCollision(CanvasItem *target);
     void gridToggle(wxMouseEvent &event);
 
     bool grid;

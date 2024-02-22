@@ -39,7 +39,7 @@ CanvasItem::CanvasItem(int id, wxRect2DDouble geometry) {
     this->locked = true;
     this->selected = false;
     this->container = nullptr;
-    this->handleHover = ict::NONE_ZONE;
+    this->hovered = ict::NONE_ZONE;
     hdim = 15;
 }
 
@@ -150,11 +150,11 @@ int CanvasItem::getHandler() const {
 
 bool CanvasItem::collides(const wxPoint2DDouble &p) {
     if(locked || hidden) {
-        handleCollision = ict::NONE_ZONE;
+        collision = ict::NONE_ZONE;
         return false;
     }
-    handleCollision = inHandle(p);
-    if(!handleCollision) return false;
+    collision = inHandle(p);
+    if(!collision) return false;
     if(container) container->notifyCollision(this);
     return true;
 }
@@ -191,13 +191,13 @@ void CanvasItem::release() {
 }
 
 void CanvasItem::hoverCollision() {
-    hover(handleCollision);
+    hover(collision);
 }
 
 void CanvasItem::hover(int z) {
-    if(handleHover != z) {
-        handleCollision = handleHover;
-        handleHover = z;
+    if(hovered != z) {
+        prevHover = hovered;
+        hovered = z;
         if(container) container->notifyHover(this);
     }
 }
@@ -235,7 +235,7 @@ void CanvasItem::modify(const wxPoint &canvasPoint) {
     relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
     relativePoint -= relativePress;
     geometry.setZoneTo(relativePoint);
-    handleHover = geometry.activatedZone();
+    hovered = geometry.activatedZone();
     if(saved != getGeometry(ict::CANVAS_CONTEXT)) {
         if(container) container->notifyGeometry(this);
         saved = getGeometry(ict::CANVAS_CONTEXT);
@@ -277,7 +277,7 @@ wxRect2DDouble CanvasItem::getUpdateArea() const {
 }
 
 wxRect2DDouble CanvasItem::getHoverUpdate() const {
-    return getHandleZone(handleHover).CreateUnion(getHandleZone(prevHover));
+    return getHandleZone(hovered).CreateUnion(getHandleZone(prevHover));
 }
 
 void CanvasItem::setVirtualSize(const wxPoint2DDouble &dim) {
@@ -306,9 +306,9 @@ void CanvasItem::drawOn(wxMemoryDC *pv) {
     wxRect2DDouble ddr(getGeometry(ict::CANVAS_CONTEXT));
     wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
     pv->DrawRectangle(dr);
-    if(handleHover) {
+    if(hovered) {
         pv->SetBrush(*wxYELLOW_BRUSH);
-        wxRect2DDouble ddr(getHandleZone(handleHover));
+        wxRect2DDouble ddr(getHandleZone(hovered));
         wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
         pv->DrawRectangle(dr);
     }
