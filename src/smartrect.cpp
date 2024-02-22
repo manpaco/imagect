@@ -1,5 +1,4 @@
 #include "smartrect.hpp"
-#include "recthelper.hpp"
 #include "defs.hpp"
 #include <iostream>
 #include <iomanip>
@@ -12,152 +11,110 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
     wxRect2DDouble::operator=(r);
     fixed = false;
     restricted = false;
-    centered = false;
+    clamps = ict::NONE_CLAMPED;
+    inflate = false;
     grid = false;
-    save = true;
     reflection = ict::NONE_REFLEC;
-    lastZone = ict::NONE_ZONE;
-    saveInstant();
+    activeZone = ict::NONE_ZONE;
+    restriction = *this;
     setMark();
-    clearDummySpace();
 }
 
-void SmartRect::saveBefore(bool c) {
-    save = c;
+wxDouble SmartRect::leftRestriction() const {
+    if(useGrid()) return round_rb(restriction.GetLeft());
+    else return restriction.GetLeft();
 }
 
-bool SmartRect::restrictionContains(const wxPoint2DDouble &p) const {
-    return p.m_x >= rx && p.m_x < rx + rw &&
-           p.m_y >= ry && p.m_y < ry + rh;
+wxDouble SmartRect::topRestriction() const {
+    if(useGrid()) return round_rb(restriction.GetTop());
+    else return restriction.GetTop();
 }
 
-wxDouble SmartRect::restrictionLeft() const {
-    if(useGrid()) {
-        if(rx < 0) return round_htz(rx);
-        else return round_haz(rx);
-    }
-    else return rx;
+wxDouble SmartRect::rightRestriction() const {
+    if(useGrid()) return round_lb(restriction.GetRight());
+    else return restriction.GetRight();
 }
 
-wxDouble SmartRect::restrictionTop() const {
-    if(useGrid()) {
-        if(ry < 0) return round_htz(ry);
-        else return round_haz(ry);
-    }
-    else return ry;
+wxDouble SmartRect::bottomRestriction() const {
+    if(useGrid()) return round_lb(restriction.GetBottom());
+    else return restriction.GetBottom();
 }
 
-wxDouble SmartRect::restrictionRight() const {
-    if(useGrid()) {
-        if(rx + rw < 0) return round_haz(rx + rw);
-        else return round_htz(rx + rw);
-    }
-    else return rx + rw;
+wxDouble SmartRect::leftRestrictionLimit() const {
+    if(useGrid()) return leftRestriction() - ROUND_CORRECTOR;
+    else return leftRestriction();
 }
 
-wxDouble SmartRect::restrictionBottom() const {
-    if(useGrid()) {
-        if(ry + rh < 0) return round_haz(ry + rh);
-        else return round_htz(ry + rh);
-    }
-    else return ry + rh;
+wxDouble SmartRect::topRestrictionLimit() const {
+    if(useGrid()) return topRestriction() - ROUND_CORRECTOR;
+    else return topRestriction();
 }
 
-wxDouble SmartRect::restrictionLeftLimit() const {
-    if(useGrid()) return restrictionLeft() - 0.5;
-    else return restrictionLeft();
+wxDouble SmartRect::rightRestrictionLimit() const {
+    if(useGrid()) return rightRestriction() + ROUND_CORRECTOR;
+    else return rightRestriction();
 }
 
-wxDouble SmartRect::restrictionTopLimit() const {
-    if(useGrid()) return restrictionTop() - 0.5;
-    else return restrictionTop();
+wxDouble SmartRect::bottomRestrictionLimit() const {
+    if(useGrid()) return bottomRestriction() + ROUND_CORRECTOR;
+    else return bottomRestriction();
 }
 
-wxDouble SmartRect::restrictionRightLimit() const {
-    if(useGrid()) return restrictionRight() + 0.5;
-    else return restrictionRight();
+wxRect2DDouble SmartRect::restrictionLimits() const {
+    return wxRect2DDouble(leftRestrictionLimit(), topRestrictionLimit(),
+                          rightRestrictionLimit() - leftRestrictionLimit(),
+                          bottomRestriction() - topRestrictionLimit());
 }
 
-wxDouble SmartRect::restrictionBottomLimit() const {
-    if(useGrid()) return restrictionBottom() + 0.5;
-    else return restrictionBottom();
+void SmartRect::setGeometry(const wxRect2DDouble &r) {
+    if(!resting()) return;
+    setPosition(r.GetPosition());
+    bool aux = inflate;
+    if(aux) inflate = !aux;
+    setSize(wxPoint2DDouble(r.m_width, r.m_height));
+    inflate = aux;
 }
 
-wxRect2DDouble SmartRect::restrictionGeometryLimit() const {
-    wxDouble rll(restrictionLeftLimit());
-    wxDouble rtl(restrictionTopLimit());
-    wxDouble rrl(restrictionRightLimit());
-    wxDouble rbl(restrictionBottomLimit());
-    return wxRect2DDouble(rll, rtl, rrl - rll, rbl - rtl);
+void SmartRect::setPosition(const wxPoint2DDouble &p) {
+    if(!resting()) return;
+    activateZone(ict::IN_ZONE);
+    setZoneTo(p);
+    activateZone(ict::NONE_ZONE);
 }
 
-bool SmartRect::setGeometry(const wxRect2DDouble &r) {
-    wxRect2DDouble newg(r);
-    saveInstant();
-    m_x = newg.m_x;
-    m_y = newg.m_y;
-    newg.m_width = abs(newg.m_width);
-    newg.m_height = abs(newg.m_height);
-    if(isRestricted() && !restrictionContains(GetPosition())) {
-        m_x = rx;
-        m_y = ry;
-    }
-    bool aux = centered;
-    if(aux) centered = !aux;
-    saveBefore(false);
-    pushZoneTo(ict::RB_ZONE, wxPoint2DDouble(m_x + newg.m_width,
-                                             m_y + newg.m_height));
-    saveBefore(true);
-    centered = aux;
-    return instantChanged();
-}
-
-bool SmartRect::setPosition(const wxPoint2DDouble &p) {
-    return pushZoneTo(ict::IN_ZONE, p);
-}
-
-bool SmartRect::setSize(const wxPoint2DDouble &s) {
+void SmartRect::setSize(const wxPoint2DDouble &s) {
+    if(!resting()) return;
     wxPoint2DDouble newp(s);
     newp.m_x = abs(newp.m_x);
     newp.m_y = abs(newp.m_y);
-    if(isCentered()) {
+    if(useInflate()) {
         newp.m_x /= 2;
         newp.m_y /= 2;
         newp += GetCentre();
     } else newp += GetPosition();
-    return pushZoneTo(ict::RB_ZONE, newp);
+    activateZone(ict::RB_ZONE);
+    setZoneTo(newp);
+    activateZone(ict::NONE_ZONE);
 }
 
 wxDouble SmartRect::extGetLeft() const {
-    if(useGrid()) {
-        if(m_x < 0) return round_htz(m_x);
-        else return round_haz(m_x);
-    }
-    else return m_x;
+    if(useGrid()) return round_rb(GetLeft());
+    else return GetLeft();
 }
 
 wxDouble SmartRect::extGetTop() const {
-    if(useGrid()) {
-        if(m_y < 0) return round_htz(m_y);
-        else return round_haz(m_y);
-    }
-    else return m_y;
+    if(useGrid()) return round_rb(GetTop());
+    else return GetTop();
 }
 
 wxDouble SmartRect::extGetRight() const {
-    if(useGrid()) {
-        if(m_x + m_width < 0) return round_haz(m_x + m_width);
-        else return round_htz(m_x + m_width);
-    }
-    else return m_x + m_width;
+    if(useGrid()) return round_lb(GetRight());
+    else return GetRight();
 }
 
 wxDouble SmartRect::extGetBottom() const {
-    if(useGrid()) {
-        if(m_y + m_height < 0) return round_haz(m_y + m_height);
-        else return round_htz(m_y + m_height);
-    }
-    else return m_y + m_height;
+    if(useGrid()) return round_lb(GetBottom());
+    else return GetBottom();
 }
 
 wxDouble SmartRect::extGetWidth() const {
@@ -170,19 +127,9 @@ wxDouble SmartRect::extGetHeight() const {
     else return m_height;
 }
 
-void SmartRect::placeInsidePlayground(wxPoint2DDouble *p, int z) const {
-    wxRect2DDouble playground;
-    if(z == ict::IN_ZONE) playground = getMovePlayground();
-    else {
-        /* if(isCentered()) playground = getCenteredPlayground();
-        else playground = getResizePlayground(z); */
-        playground = restrictionGeometryLimit();
-    }
-    if(playground.Contains(*p)) return;
-    if(p->m_x < playground.GetLeft()) p->m_x = playground.GetLeft();
-    else if(p->m_x > playground.GetRight()) p->m_x = playground.GetRight();
-    if(p->m_y < playground.GetTop()) p->m_y = playground.GetTop();
-    else if(p->m_y > playground.GetBottom()) p->m_y = playground.GetBottom();
+wxRect2DDouble SmartRect::extGetRect() const {
+    return wxRect2DDouble(extGetLeft(), extGetTop(),
+                          extGetWidth(), extGetHeight());
 }
 
 void SmartRect::useGrid(bool op) {
@@ -194,35 +141,6 @@ bool SmartRect::useGrid() const {
     return grid;
 }
 
-wxRect2DDouble SmartRect::getResizePlayground(int z) const {
-
-}
-
-wxRect2DDouble SmartRect::getMovePlayground() const {
-    wxRect2DDouble ret(restrictionGeometryLimit());
-    ret.m_width -= m_width;
-    ret.m_height -= m_height;
-    return ret;
-}
-
-wxRect2DDouble SmartRect::getCenteredPlayground() const {
-    /* if(isCentered()) {
-        wxRect2DDouble playground;
-        wxPoint2DDouble cen(GetCentre());
-        wxDouble minWidth = restriction.GetRight() - cen.m_x;
-        if(minWidth > cen.m_x - restriction.GetLeft()) minWidth = cen.m_x - restriction.GetLeft();
-        wxDouble minHeight = restriction.GetBottom() - cen.m_y;
-        if(minHeight > cen.m_y - restriction.GetTop()) minHeight = cen.m_y - restriction.GetTop();
-        playground.m_x = cen.m_x - minWidth;
-        playground.m_y = cen.m_y - minHeight;
-        playground.m_width = minWidth * 2;
-        playground.m_height = minHeight * 2;
-        return playground;
-    } else {
-        return restriction;
-    } */
-}
-
 wxDouble SmartRect::getAspectRatio() const {
     return aspectRatio;
 }
@@ -231,390 +149,329 @@ int SmartRect::getReflection() const {
     return reflection;
 }
 
-int SmartRect::getLastZone() const {
-    return lastZone;
-}
-
-void SmartRect::setDummySpace(const wxDouble &dsx, const wxDouble &dsy) {
-    dummyX = abs(dsx);
-    dummyY = abs(dsy);
-}
-
-void SmartRect::clearDummySpace() {
-    dummyX = dummyY = 0;
-}
-wxRect2DDouble SmartRect::getChangeUnion() const {
-    wxRect2DDouble ir(ix, iy, iw, ih);
-    wxRect2DDouble gr(extGetLeft(), extGetTop(),
-                      extGetWidth(), extGetHeight());
-    return ir.CreateUnion(gr);
-}
-
-bool SmartRect::pushZoneTo(const int z, const wxPoint2DDouble &p) {
-    if(save) saveInstant();
-    lastZone = z;
-    wxPoint2DDouble inp(p);
-    wxDouble limitx, limity;
-    if(isCentered()) {
-        wxPoint2DDouble icen(GetCentre());
-        limitx = icen.m_x;
-        limity = icen.m_y;
-    }
-    switch (lastZone) {
-        case ict::RB_ZONE:
-            if(!isCentered()) {
-                limitx = GetLeft();
-                limity = GetTop();
-            }
-            if(inp.m_x < limitx - ict::MINUPP - dummyX) {
-                inp.m_x += dummyX;
-                reflection ^= ict::HORI_REFLEC;
-                lastZone ^= ict::HORI_REFLEC;
-                if(!isCentered()) m_x = m_x - m_width;
-            } else if(inp.m_x < limitx + ict::MINUPP) {
-                inp.m_x = limitx + ict::MINUPP;
-            }
-            if(inp.m_y < limity - ict::MINUPP - dummyY) {
-                inp.m_y += dummyY;
-                reflection ^= ict::VERT_REFLEC;
-                lastZone ^= ict::VERT_REFLEC;
-                if(!isCentered()) m_y = m_y - m_height;
-            } else if(inp.m_y < limity + ict::MINUPP) {
-                inp.m_y = limity + ict::MINUPP;
-            }
-            break;
-        case ict::LT_ZONE:
-            if(!isCentered()) {
-                limitx = GetRight();
-                limity = GetBottom();
-            }
-            if(inp.m_x > limitx + ict::MINUPP + dummyX) {
-                inp.m_x -= dummyX;
-                reflection ^= ict::HORI_REFLEC;
-                lastZone ^= ict::HORI_REFLEC;
-                if(!isCentered()) m_x = m_x + m_width;
-            } else if(inp.m_x > limitx - ict::MINUPP) {
-                inp.m_x = limitx - ict::MINUPP;
-            }
-            if(inp.m_y > limity + ict::MINUPP + dummyY) {
-                inp.m_y -= dummyY;
-                reflection ^= ict::VERT_REFLEC;
-                lastZone ^= ict::VERT_REFLEC;
-                if(!isCentered()) m_y = m_y + m_height;
-            } else if(inp.m_y > limity - ict::MINUPP) {
-                inp.m_y = limity - ict::MINUPP;
-            }
-            break;
+void SmartRect::setZoneTo(const wxPoint2DDouble &p) {
+    if(resting()) return;
+    switch(activeZone) {
+        case ict::R_ZONE:
         case ict::RT_ZONE:
-            if(!isCentered()) {
-                limitx = GetLeft();
-                limity = GetBottom();
-            }
-            if(inp.m_x < limitx - ict::MINUPP - dummyX) {
-                inp.m_x += dummyX;
-                reflection ^= ict::HORI_REFLEC;
-                lastZone ^= ict::HORI_REFLEC;
-                if(!isCentered()) m_x = m_x - m_width;
-            } else if(inp.m_x < limitx + ict::MINUPP) {
-                inp.m_x = limitx + ict::MINUPP;
-            }
-            if(inp.m_y > limity + ict::MINUPP + dummyY) {
-                inp.m_y -= dummyY;
-                reflection ^= ict::VERT_REFLEC;
-                lastZone ^= ict::VERT_REFLEC;
-                if(!isCentered()) m_y = m_y + m_height;
-            } else if(inp.m_y > limity - ict::MINUPP) {
-                inp.m_y = limity - ict::MINUPP;
-            }
-            break;
-        case ict::LB_ZONE:
-            if(!isCentered()) {
-                limitx = GetRight();
-                limity = GetTop();
-            }
-            if(inp.m_x > limitx + ict::MINUPP + dummyX) {
-                inp.m_x -= dummyX;
-                reflection ^= ict::HORI_REFLEC;
-                lastZone ^= ict::HORI_REFLEC;
-                if(!isCentered()) m_x = m_x + m_width;
-            } else if(inp.m_x > limitx - ict::MINUPP) {
-                inp.m_x = limitx - ict::MINUPP;
-            }
-            if(inp.m_y < limity - ict::MINUPP - dummyY) {
-                inp.m_y += dummyY;
-                reflection ^= ict::VERT_REFLEC;
-                lastZone ^= ict::VERT_REFLEC;
-                if(!isCentered()) m_y = m_y - m_height;
-            } else if(inp.m_y < limity + ict::MINUPP) {
-                inp.m_y = limity + ict::MINUPP;
-            }
-            break;
-        case ict::T_ZONE:
-            if(!isCentered()) limity = GetBottom();
-            if(inp.m_y > limity + ict::MINUPP + dummyY) {
-                inp.m_y -= dummyY;
-                reflection ^= ict::VERT_REFLEC;
-                lastZone ^= ict::VERT_REFLEC;
-                if(!isCentered()) m_y = m_y + m_height;
-            } else if(inp.m_y > limity - ict::MINUPP) {
-                inp.m_y = limity - ict::MINUPP;
-            }
-            break;
-        case ict::B_ZONE:
-            if(!isCentered()) limity = GetTop();
-            if(inp.m_y < limity - ict::MINUPP - dummyY) {
-                inp.m_y += dummyY;
-                reflection ^= ict::VERT_REFLEC;
-                lastZone ^= ict::VERT_REFLEC;
-                if(!isCentered()) m_y = m_y - m_height;
-            } else if(inp.m_y < limity + ict::MINUPP) {
-                inp.m_y = limity + ict::MINUPP;
-            }
+        case ict::RB_ZONE:
+            SetRight(p.m_x);
             break;
         case ict::L_ZONE:
-            if(!isCentered()) limitx = GetRight();
-            if(inp.m_x > limitx + ict::MINUPP + dummyX) {
-                inp.m_x -= dummyX;
-                reflection ^= ict::HORI_REFLEC;
-                lastZone ^= ict::HORI_REFLEC;
-                if(!isCentered()) m_x = m_x + m_width;
-            } else if(inp.m_x > limitx - ict::MINUPP) {
-                inp.m_x = limitx - ict::MINUPP;
-            }
+        case ict::LT_ZONE:
+        case ict::LB_ZONE:
+            SetLeft(p.m_x);
             break;
-        case ict::R_ZONE:
-            if(!isCentered()) limitx = GetLeft();
-            if(inp.m_x < limitx - ict::MINUPP - dummyX) {
-                inp.m_x += dummyX;
-                reflection ^= ict::HORI_REFLEC;
-                lastZone ^= ict::HORI_REFLEC;
-                if(!isCentered()) m_x = m_x - m_width;
-            } else if(inp.m_x < limitx + ict::MINUPP) {
-                inp.m_x = limitx + ict::MINUPP;
-            }
-            break;
-    }
-    if(isRestricted()) placeInsidePlayground(&inp, lastZone);
-    switch (lastZone) {
         case ict::IN_ZONE:
-            pushTo(inp);
+            MoveLeftTo(p.m_x);
             break;
-        case ict::RB_ZONE:
-            pushRightBottomTo(inp);
-            break;
-        case ict::LT_ZONE:
-            pushLeftTopTo(inp);
-            break;
-        case ict::RT_ZONE:
-            pushRightTopTo(inp);
-            break;
-        case ict::LB_ZONE:
-            pushLeftBottomTo(inp);
-            break;
+    }
+    switch(activeZone) {
         case ict::T_ZONE:
-            pushTopTo(inp.m_y);
+        case ict::LT_ZONE:
+        case ict::RT_ZONE:
+            SetTop(p.m_y);
             break;
         case ict::B_ZONE:
-            pushBottomTo(inp.m_y);
+        case ict::LB_ZONE:
+        case ict::RB_ZONE:
+            SetBottom(p.m_y);
+            break;
+        case ict::IN_ZONE:
+            MoveTopTo(p.m_y);
+            break;
+    }
+    checkMinimum();
+    checkInflate();
+    checkReflection();
+    checkAspectRatio();
+    checkRestriction();
+    checkGrid();
+}
+
+int SmartRect::activatedZone() const {
+    return activeZone;
+}
+
+void SmartRect::activateZone(const int z) {
+    activeZone = z;
+    if(activeZone) setMark();
+}
+
+bool SmartRect::cornerActivated() const {
+    return activeZone > ict::RES_ZONE && activeZone <= ict::LT_ZONE;
+}
+
+bool SmartRect::edgeActivated() const {
+    return activeZone >= ict::R_ZONE && activeZone <= ict::B_ZONE;
+}
+
+bool SmartRect::resizing() const {
+    return activeZone > ict::RES_ZONE;
+}
+
+bool SmartRect::dragging() const {
+    return activeZone == ict::IN_ZONE;
+}
+
+bool SmartRect::resting() const {
+    return activeZone == ict::NONE_ZONE;
+}
+
+bool SmartRect::creating() const {
+    return activeZone == ict::NEW_ZONE;
+}
+
+void SmartRect::checkGrid() {
+    if(!useGrid() || !dragging()) return;
+    wxPoint2DDouble dp(GetPosition() - mark.GetPosition());
+    dp.m_x = trunc(dp.m_x);
+    dp.m_y = trunc(dp.m_y);
+    m_x = mark.GetPosition().m_x + dp.m_x;
+    m_y = mark.GetPosition().m_y + dp.m_y;
+}
+
+void SmartRect::checkLimits(bool doBalance) {
+    if(!restricted) return;
+    if(!dragging() && !resizing()) return;
+    clamps = ict::NONE_CLAMPED;
+    bool exceed = GetLeft() < leftRestrictionLimit();
+    if(exceed) {
+        if(dragging()) MoveLeftTo(leftRestrictionLimit());
+        else {
+            SetLeft(leftRestrictionLimit());
+            clamps |= ict::L_CLAMPED;
+        }
+    }
+    exceed = GetTop() < topRestrictionLimit();
+    if(exceed) {
+        if(dragging()) MoveTopTo(topRestrictionLimit());
+        else {
+            SetTop(topRestrictionLimit());
+            clamps |= ict::T_CLAMPED;
+        }
+    }
+    exceed = GetRight() > rightRestrictionLimit();
+    if(exceed) {
+        if(dragging()) MoveRightTo(rightRestrictionLimit());
+        else {
+            SetRight(rightRestrictionLimit());
+            clamps |= ict::R_CLAMPED;
+        }
+    }
+    exceed = GetBottom() > bottomRestrictionLimit();
+    if(exceed) {
+        if(dragging()) MoveBottomTo(bottomRestrictionLimit());
+        else {
+            SetBottom(bottomRestrictionLimit());
+            clamps |= ict::B_CLAMPED;
+        }
+    }
+    if(!clamps || dragging()) return;
+    if((clamps & ict::R_CLAMPED) && (clamps & ict::L_CLAMPED)) {
+        if(GetRight() - mark.GetCentre().m_x <
+                mark.GetCentre().m_x - GetLeft())
+            clamps ^= ict::L_CLAMPED;
+        else clamps ^= ict::R_CLAMPED;
+    }
+    if((clamps & ict::T_CLAMPED) && (clamps & ict::B_CLAMPED)) {
+        if(GetBottom() - mark.GetCentre().m_y <
+                mark.GetCentre().m_y - GetTop())
+            clamps ^= ict::T_CLAMPED;
+        else clamps ^= ict::B_CLAMPED;
+    }
+    if(!doBalance) return;
+    if(useInflate()) {
+        balance(clampedZone());
+        return;
+    }
+    int collateral = ict::NONE_ZONE;
+    if(activeZone == ict::R_ZONE || activeZone == ict::L_ZONE) {
+        if(clamps & ict::T_CLAMPED) collateral = ict::T_ZONE;
+        else if(clamps & ict::B_CLAMPED) collateral = ict::B_ZONE;
+    } else if(activeZone == ict::T_ZONE || activeZone == ict::B_ZONE) {
+        if(clamps & ict::R_CLAMPED) collateral = ict::R_ZONE;
+        else if(clamps & ict::L_CLAMPED) collateral = ict::L_ZONE;
+    }
+    if(collateral) balance(collateral);
+}
+
+int SmartRect::clampedZone() const {
+    if(clamps == ict::L_CLAMPED) return ict::L_ZONE;
+    if(clamps == ict::R_CLAMPED) return ict::R_ZONE;
+    if(clamps == ict::T_CLAMPED) return ict::T_ZONE;
+    if(clamps == ict::B_CLAMPED) return ict::B_ZONE;
+    if(clamps == ict::RT_CLAMPED) return ict::RT_ZONE;
+    if(clamps == ict::LT_CLAMPED) return ict::LT_ZONE;
+    if(clamps == ict::RB_CLAMPED) return ict::RB_ZONE;
+    if(clamps == ict::LB_CLAMPED) return ict::LB_ZONE;
+    return ict::NONE_ZONE;
+}
+
+void SmartRect::checkMinimum() {
+    wxDouble minx, miny;
+    switch(activeZone) {
+        case ict::R_ZONE:
+        case ict::RT_ZONE:
+        case ict::RB_ZONE:
+            if(!useInflate()) minx = mark.GetLeft();
+            else minx = mark.GetCentre().m_x;
+            if(GetRight() > minx - ict::MINUPP &&
+                GetRight() < minx + ict::MINUPP)
+                SetRight(minx + ict::MINUPP);
             break;
         case ict::L_ZONE:
-            pushLeftTo(inp.m_x);
+        case ict::LT_ZONE:
+        case ict::LB_ZONE:
+            if(!useInflate()) minx = mark.GetRight();
+            else minx = mark.GetCentre().m_x;
+            if(GetLeft() < minx + ict::MINUPP &&
+                GetLeft() > minx - ict::MINUPP)
+                SetLeft(minx - ict::MINUPP);
             break;
+    }
+    switch(activeZone) {
+        case ict::T_ZONE:
+        case ict::LT_ZONE:
+        case ict::RT_ZONE:
+            if(!useInflate()) miny = GetBottom();
+            else miny = mark.GetCentre().m_y;
+            if(GetTop() < miny + ict::MINUPP &&
+                GetTop() > miny - ict::MINUPP)
+                SetTop(miny - ict::MINUPP);
+            break;
+        case ict::B_ZONE:
+        case ict::LB_ZONE:
+        case ict::RB_ZONE:
+            if(!useInflate()) miny = GetTop();
+            else miny = mark.GetCentre().m_y;
+            if(GetBottom() > miny - ict::MINUPP &&
+                GetBottom() < miny + ict::MINUPP)
+                SetBottom(miny + ict::MINUPP);
+            break;
+    }
+}
+
+void SmartRect::checkInflate() {
+    if(!useInflate()) return;
+    balance(activeZone);
+}
+
+void SmartRect::balance(int zone) {
+    wxPoint2DDouble mcen(mark.GetCentre());
+    switch(zone) {
         case ict::R_ZONE:
-            pushRightTo(inp.m_x);
+        case ict::RT_ZONE:
+        case ict::RB_ZONE:
+            SetLeft(mcen.m_x - (GetRight() - mcen.m_x));
+            break;
+        case ict::L_ZONE:
+        case ict::LT_ZONE:
+        case ict::LB_ZONE:
+            SetRight(mcen.m_x + (mcen.m_x - GetLeft()));
             break;
     }
-    return instantChanged();
-}
-
-void SmartRect::pushTo(const wxPoint2DDouble &p) {
-    if(p.m_x == GetLeft() && p.m_y == GetTop()) return;
-    wxDouble dx = p.m_x - GetLeft();
-    wxDouble dy = p.m_y - GetTop();
-    if(useGrid()) {
-        dx = trunc(dx);
-        dy = trunc(dy);
+    switch(zone) {
+        case ict::T_ZONE:
+        case ict::RT_ZONE:
+        case ict::LT_ZONE:
+            SetBottom(mcen.m_y + (mcen.m_y - GetTop()));
+            break;
+        case ict::B_ZONE:
+        case ict::RB_ZONE:
+        case ict::LB_ZONE:
+            SetTop(mcen.m_y - (GetBottom() - mcen.m_y));
+            break;
     }
-    m_x += dx;
-    m_y += dy;
 }
 
-void SmartRect::pushRightBottomTo(const wxPoint2DDouble &p) {
-    if(p.m_x == GetRight() && p.m_y == GetBottom()) return;
-    wxDouble dx = p.m_x - GetRight();
-    wxDouble dy = p.m_y - GetBottom();
-    if(isFixed()) {
-        if(p.m_x >= GetRight() && p.m_y <= GetBottom()) {
-            dy = calcOrdi(dx);
-        } else if(p.m_x <= GetRight() && p.m_y >= GetBottom()) {
-            dx = calcAbsc(dy);
-        } else if(p.m_x < GetRight() && p.m_y < GetBottom()) {
-            wxDouble proy = dx / dy;
-            if(proy > aspectRatio) dx = calcAbsc(dy);
-            else dy = calcOrdi(dx);
-        } else if(p.m_x > GetRight() && p.m_y > GetBottom()) {
-            wxDouble proy = dx / dy;
-            if(proy < aspectRatio) dx = calcAbsc(dy);
-            else dy = calcOrdi(dx);
+void SmartRect::checkReflection() {
+    if(m_width < 0) {
+        reflection ^= ict::HORI_REFLEC;
+        activeZone ^= ict::HORI_REFLEC;
+        m_x += m_width;
+        m_width = abs(m_width);
+    }
+    if(m_height < 0) {
+        reflection ^= ict::VERT_REFLEC;
+        activeZone ^= ict::VERT_REFLEC;
+        m_y += m_height;
+        m_height = abs(m_height);
+    }
+}
+
+void SmartRect::checkAspectRatio(int want) {
+    if(!isFixed() || !resizing()) return;
+    wxDouble nw = m_width, nh = m_height;
+    if(m_width / m_height != aspectRatio) {
+        if(cornerActivated() || want == SMALLER_RECT) {
+            if(want == SMALLER_RECT) {
+                if(m_width / m_height < aspectRatio) nh = calcOrdi(nw);
+                else nw = calcAbsc(nh);
+            } else {
+                if(m_width / m_height < aspectRatio) nw = calcAbsc(nh);
+                else nh = calcOrdi(nw);
+            }
+        } else { // edgeActivated()
+            if(activeZone == ict::T_ZONE || activeZone == ict::B_ZONE)
+                nw = calcAbsc(nh);
+            else nh = calcOrdi(nw);
         }
     }
-    m_width += dx;
-    m_height += dy;
-    if(isCentered()) {
-        m_x -= dx; m_width += dx;
-        m_y -= dy; m_height += dy;
+    if(useInflate()) {
+        m_width += nw - m_width;;
+        m_height += nh - m_height;
+        SetCentre(mark.GetCentre());
+        return;
     }
+    switch(activeZone) {
+        case ict::R_ZONE:
+        case ict::RT_ZONE:
+        case ict::RB_ZONE:
+            m_width = nw;
+            break;
+        case ict::L_ZONE:
+        case ict::LT_ZONE:
+        case ict::LB_ZONE:
+            SetLeft(GetRight() - nw);
+            break;
+    }
+    switch(activeZone) {
+        case ict::T_ZONE:
+        case ict::LT_ZONE:
+        case ict::RT_ZONE:
+            SetTop(GetBottom() - nh);
+            break;
+        case ict::B_ZONE:
+        case ict::LB_ZONE:
+        case ict::RB_ZONE:
+            m_height = nh;
+            break;
+    }
+    if(!edgeActivated()) return;
+
+    // side effects of the previous switches,
+    // due to the use of fixed aspect ratio and edges (not corners)
+    wxPoint2DDouble ncen(GetCentre());
+    switch(activeZone) {
+        case ict::R_ZONE:
+        case ict::L_ZONE:
+            ncen.m_y = mark.GetCentre().m_y;
+            m_height = nh;
+            break;
+        case ict::T_ZONE:
+        case ict::B_ZONE:
+            ncen.m_x = mark.GetCentre().m_x;
+            m_width = nw;
+            break;
+    }
+    SetCentre(ncen);
 }
 
-void SmartRect::pushLeftTopTo(const wxPoint2DDouble &p) {
-    if(p.m_x == GetLeft() && p.m_y == GetTop()) return;
-    wxDouble dx = p.m_x - GetLeft();
-    wxDouble dy = p.m_y - GetTop();
-    if(isFixed()) {
-        if(p.m_x >= GetLeft() && p.m_y <= GetTop()) {
-            dx = calcAbsc(dy);
-        } else if(p.m_x <= GetLeft() && p.m_y >= GetTop()) {
-            dy = calcOrdi(dx);
-        } else if(p.m_x < GetLeft() && p.m_y < GetTop()) {
-            wxDouble proy = dx / dy;
-            if(proy < aspectRatio) dx = calcAbsc(dy);
-            else dy = calcOrdi(dx);
-        } else if(p.m_x > GetLeft() && p.m_y > GetTop()) {
-            wxDouble proy = dx / dy;
-            if(proy > aspectRatio) dx = calcAbsc(dy);
-            else dy = calcOrdi(dx);
-        }
-    }
-    m_x += dx;
-    m_y += dy;
-    m_width -= dx;
-    m_height -= dy;
-    if(isCentered()) {
-        m_width -= dx;
-        m_height -= dy;
-    }
-}
-
-void SmartRect::pushRightTopTo(const wxPoint2DDouble &p) {
-    if(p.m_x == GetRight() && p.m_y == GetTop()) return;
-    wxDouble dx = p.m_x - GetRight();
-    wxDouble dy = p.m_y - GetTop();
-    if(isFixed()) {
-        if(p.m_x <= GetRight() && p.m_y <= GetTop()) {
-            dx = calcAbsc(-dy);
-        } else if(p.m_x >= GetRight() && p.m_y >= GetTop()) {
-            dy = calcOrdi(-dx);
-        } else if(p.m_x > GetRight() && p.m_y < GetTop()) {
-            wxDouble proy = dx / -dy;
-            if(proy < aspectRatio) dx = calcAbsc(-dy);
-            else dy = calcOrdi(-dx);
-        } else if(p.m_x < GetRight() && p.m_y > GetTop()) {
-            wxDouble proy = dx / -dy;
-            if(proy > aspectRatio) dx = calcAbsc(-dy);
-            else dy = calcOrdi(-dx);
-        }
-    }
-    m_y += dy;
-    m_width += dx;
-    m_height -= dy;
-    if(isCentered()) {
-        m_x -= dx;
-        m_width += dx;
-        m_height -= dy;
-    }
-}
-
-void SmartRect::pushLeftBottomTo(const wxPoint2DDouble &p) {
-    if(p.m_x == GetLeft() && p.m_y == GetBottom()) return;
-    wxDouble dx = p.m_x - GetLeft();
-    wxDouble dy = p.m_y - GetBottom();
-    if(isFixed()) {
-        if(p.m_x <= GetLeft() && p.m_y <= GetBottom()) {
-            dy = calcOrdi(-dx);
-        } else if(p.m_x >= GetLeft() && p.m_y >= GetBottom()) {
-            dx = calcAbsc(-dy);
-        } else if(p.m_x > GetLeft() && p.m_y < GetBottom()) {
-            wxDouble proy = dx / -dy;
-            if(proy > aspectRatio) dx = calcAbsc(-dy);
-            else dy = calcOrdi(-dx);
-        } else if(p.m_x < GetLeft() && p.m_y > GetBottom()) {
-            wxDouble proy = dx / -dy;
-            if(proy < aspectRatio) dx = calcAbsc(-dy);
-            else dy = calcOrdi(-dx);
-        }
-    }
-    m_x += dx;
-    m_width -= dx;
-    m_height += dy;
-    if(isCentered()) {
-        m_width -= dx;
-        m_y -= dy;
-        m_height += dy;
-    }
-}
-
-void SmartRect::pushTopTo(const wxDouble &p) {
-    if(p == GetTop()) return;
-    wxDouble dx = 0;
-    wxDouble dy = p - GetTop();
-    if(isFixed()) dx = calcAbsc(dy) / 2;
-    m_x += dx;
-    m_width -= (dx * 2);
-    m_y += dy;
-    m_height -= dy;
-    if(isCentered()) {
-        m_x += dx;
-        m_width -= (dx * 2);
-        m_height -= dy;
-    }
-}
-
-void SmartRect::pushBottomTo(const wxDouble &p) {
-    if(p == GetBottom()) return;
-    wxDouble dx = 0;
-    wxDouble dy = p - GetBottom();
-    if(isFixed()) dx = calcAbsc(dy) / 2;
-    m_x -= dx;
-    m_width += dx * 2;
-    m_height += dy;
-    if(isCentered()) {
-        m_x -= dx;
-        m_width += dx * 2;
-        m_y -= dy;
-        m_height += dy;
-    }
-}
-
-void SmartRect::pushLeftTo(const wxDouble &p) {
-    if(p == GetLeft()) return;
-    wxDouble dx = p - GetLeft();
-    wxDouble dy = 0;
-    if(isFixed()) dy = calcOrdi(dx) / 2;
-    m_x += dx;
-    m_y += dy;
-    m_width -= dx;
-    m_height -= dy * 2;
-    if(isCentered()) {
-        m_width -= dx;
-        m_y += dy;
-        m_height -= dy * 2;
-    }
-}
-
-void SmartRect::pushRightTo(const wxDouble &p) {
-    if(p == GetRight()) return;
-    wxDouble dx = p - GetRight();
-    wxDouble dy = 0;
-    if(isFixed()) dy = calcOrdi(dx) / 2;
-    m_width += dx;
-    m_y -= dy;
-    m_height += dy * 2;
-    if(isCentered()) {
-        m_x -= dx;
-        m_width += dx;
-        m_y -= dy;
-        m_height += dy * 2;
-    }
+void SmartRect::checkRestriction() {
+    if(!restricted || restrictionLimits().Contains(*this)) return;
+    checkLimits(true);
+    if(resizing()) checkAspectRatio(SMALLER_RECT);
 }
 
 wxDouble SmartRect::calcAbsc(const wxDouble &ordi) const {
@@ -625,32 +482,22 @@ wxDouble SmartRect::calcOrdi(const wxDouble &absc) const {
     return absc / aspectRatio;
 }
 
-bool SmartRect::restrict(const bool r) {
+void SmartRect::restrict(const bool r) {
     restricted = r;
-    if(restricted) return setGeometry(*this);
-    else return false;
+    if(restricted) setGeometry(*this);
 }
 
-bool SmartRect::setRestriction(const wxRect2DDouble &r) {
-    rx = r.m_x;
-    ry = r.m_y;
-    rw = r.m_width;
-    rh = r.m_height;
+void SmartRect::setRestriction(const wxRect2DDouble &r) {
+    restriction = r;
     return restrict(restricted);
 }
 
 void SmartRect::setMark() {
-    mx = m_x;
-    my = m_y;
-    mw = m_width;
-    mh = m_height;
+    mark = *this;
 }
 
 void SmartRect::useMark() {
-    m_x = mx;
-    m_y = my;
-    m_width = mw;
-    m_height = mh;
+    wxRect2DDouble::operator=(mark);
 }
 
 void SmartRect::fixedAspectRatio(const bool ar) {
@@ -666,34 +513,20 @@ void SmartRect::setAspectRatio(const int x, const int y) {
     aspectRatio = (wxDouble)x / y;
 }
 
-void SmartRect::expandFromCenter(const bool ec) {
-    centered = ec;
+void SmartRect::useInflate(const bool ec) {
+    inflate = ec;
 }
 
 bool SmartRect::isFixed() const {
     return fixed;
 }
 
-bool SmartRect::isCentered() const {
-    return centered;
+bool SmartRect::useInflate() const {
+    return inflate;
 }
 
 bool SmartRect::isRestricted() const {
     return restricted;
-}
-
-void SmartRect::saveInstant() {
-    ix = extGetLeft();
-    iy = extGetTop();
-    iw = extGetWidth();
-    ih = extGetHeight();
-}
-
-bool SmartRect::instantChanged() {
-    return ix != extGetLeft() ||
-            iy != extGetTop() ||
-            iw != extGetWidth() ||
-            ih != extGetHeight();
 }
 
 SmartRect::~SmartRect() {
