@@ -419,8 +419,8 @@ void SmartRect::checkAspectRatio(int want) {
         }
     }
     if(useInflate()) {
-        m_width += nw - m_width;;
-        m_height += nh - m_height;
+        m_width = nw;
+        m_height = nh;
         SetCentre(mark.GetCentre());
         return;
     }
