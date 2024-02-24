@@ -49,7 +49,6 @@ public:
     void setVirtualGeometry(const wxRect2DDouble &geo);
     void setVirtualPosition(const wxPoint2DDouble &pos);
     void setVirtualSize(const wxPoint2DDouble &dim);
-    bool toggleSelection();
     void select(const bool select);
     bool isSelected() const;
     void restrict(const bool state);
@@ -60,6 +59,7 @@ public:
     void setScaler(Scaler *s);
     void setContainer(ExtendedCanvas *c);
     void expandFromCenter(bool op);
+    bool expandFromCenter() const;
     void useGrid(bool);
     bool useGrid() const;
 
@@ -67,6 +67,7 @@ public:
      * Enable or disable the fix aspect ratio.
      */
     void fixedAspectRatio(bool op);
+    bool fixedAspectRatio() const;
 
     /**
      * Get the zone pressed.
@@ -94,7 +95,7 @@ private:
      * @param target Point used to move or resize.
      * @return true if crop rectangle changes, else false.
      */
-    void modify(const wxPoint &avp);
+    void modify(const wxPoint &avp, bool force = false);
 
     /**
      * Simulate pressure at a given point.

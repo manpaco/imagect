@@ -226,9 +226,9 @@ bool CanvasItem::isRestricted() const {
     return geometry.isRestricted();
 }
 
-void CanvasItem::modify(const wxPoint &canvasPoint) {
+void CanvasItem::modify(const wxPoint &canvasPoint, bool force) {
     if(!geometry.activatedZone()) return;
-    if(canvasPoint == cPoint) return;
+    if(canvasPoint == cPoint && !force) return;
     cPoint = canvasPoint;
     wxPoint2DDouble relativePoint = relativeToEdge(cPoint, ict::NONE_ZONE,
                                                    ict::CANVAS_CONTEXT);
@@ -257,7 +257,7 @@ void CanvasItem::setAspectRatio(int xr, int yr) {
 void CanvasItem::useSavedMark() {
     if(!geometry.resizing()) return;
     geometry.useMark();
-    modify(cPoint);
+    modify(cPoint, true);
 }
 
 void CanvasItem::expandFromCenter(bool op) {
@@ -268,6 +268,14 @@ void CanvasItem::expandFromCenter(bool op) {
 void CanvasItem::fixedAspectRatio(bool op) {
     geometry.fixedAspectRatio(op);
     useSavedMark();
+}
+
+bool CanvasItem::expandFromCenter() const {
+    return geometry.useInflate();
+}
+
+bool CanvasItem::fixedAspectRatio() const {
+    return geometry.isFixed();
 }
 
 wxRect2DDouble CanvasItem::getUpdateArea() const {
