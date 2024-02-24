@@ -13,5 +13,5 @@ Canvas:
 - Canvas scrolling
 - Improve canvas magnification
     + Using wxDouble
-    - Use steps accumulator for the mouse wheel (stable zoom)
+    + Use steps accumulator for the mouse wheel (stable zoom)
     - Implement zoom control
