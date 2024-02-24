@@ -9,6 +9,7 @@ SmartRect::SmartRect() : SmartRect(wxRect2DDouble(0, 0, 1, 1)) {
 
 SmartRect::SmartRect(const wxRect2DDouble &r) {
     wxRect2DDouble::operator=(r);
+    aspectRatio = m_width / m_height;
     fixed = false;
     restricted = false;
     clamps = ict::NONE_CLAMPED;
@@ -187,6 +188,7 @@ void SmartRect::setZoneTo(const wxPoint2DDouble &p) {
     checkAspectRatio();
     checkRestriction();
     checkGrid();
+    if(!isFixed()) setAspectRatio(m_width / m_height);
 }
 
 int SmartRect::activatedZone() const {
@@ -494,15 +496,17 @@ void SmartRect::setRestriction(const wxRect2DDouble &r) {
 
 void SmartRect::setMark() {
     mark = *this;
+    markZone = activeZone;
 }
 
 void SmartRect::useMark() {
     wxRect2DDouble::operator=(mark);
+    activeZone = markZone;
+    setAspectRatio(m_width / m_height);
 }
 
 void SmartRect::fixedAspectRatio(const bool ar) {
     fixed = ar;
-    if(fixed) setAspectRatio(m_width, m_height);
 }
 
 void SmartRect::setAspectRatio(const wxDouble &ar) {

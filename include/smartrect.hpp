@@ -185,6 +185,7 @@ private:
     int reflection;
     int activeZone;
     int clamps;
+    int markZone;
 };
 
 #endif // !SMARTRECT
