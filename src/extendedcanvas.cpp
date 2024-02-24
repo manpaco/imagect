@@ -47,6 +47,8 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     selectedItem = nullptr;
     hoveredItem = nullptr;
     grid = false;
+    ctrlPressed = false;
+    shiftPressed = false;
     zoom = new wxWindow(this, wxID_ANY);
     zoom->SetBackgroundColour(wxColour(*wxYELLOW));
     layout->AddGrowableCol(0);
@@ -64,7 +66,70 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvas->Bind(wxEVT_LEFT_UP, &ExtendedCanvas::mouseRelease, this);
     canvas->Bind(wxEVT_SIZE, &ExtendedCanvas::resizeCanvas, this);
     canvas->Bind(wxEVT_MOUSEWHEEL, &ExtendedCanvas::mouseWheel, this);
+    canvas->Bind(wxEVT_KEY_DOWN, &ExtendedCanvas::keyDown, this);
+    canvas->Bind(wxEVT_KEY_UP, &ExtendedCanvas::keyUp, this);
     zoom->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::gridToggle, this);
+}
+
+void
+ExtendedCanvas::toggleItemOption(CanvasItem *item, ict::ItemOption option) {
+    if(!item) return;
+    switch(option) {
+        case ict::IO_LOCKED:
+            item->lock(!item->isLocked());
+            break;
+        case ict::IO_HIDDEN:
+            item->hide(!item->isHidden());
+            break;
+        case ict::IO_SELECTED:
+            item->select(!item->isSelected());
+            break;
+        case ict::IO_RESTRICTED:
+            item->restrict(!item->isRestricted());
+            break;
+        case ict::IO_FIXEDASPECTRATIO:
+            item->fixedAspectRatio(!item->fixedAspectRatio());
+            break;
+        case ict::IO_EXPANDFROMCENTER:
+            item->expandFromCenter(!item->expandFromCenter());
+            break;
+    }
+}
+
+void ExtendedCanvas::keyDown(wxKeyEvent &event) {
+    switch(event.GetKeyCode()) {
+        case WXK_CONTROL:
+            ctrlPressed = true;
+            toggleItemOption(pressedItem, ict::IO_FIXEDASPECTRATIO);
+            break;
+        case WXK_SHIFT:
+            shiftPressed = true;
+            toggleItemOption(pressedItem, ict::IO_EXPANDFROMCENTER);
+            break;
+    }
+
+    event.Skip();
+}
+
+void ExtendedCanvas::keyUp(wxKeyEvent &event) {
+    switch(event.GetKeyCode()) {
+        case WXK_CONTROL:
+            ctrlPressed = false;
+            toggleItemOption(pressedItem, ict::IO_FIXEDASPECTRATIO);
+            break;
+        case WXK_SHIFT:
+            shiftPressed = false;
+            toggleItemOption(pressedItem, ict::IO_EXPANDFROMCENTER);
+            break;
+    }
+
+    event.Skip();
+}
+
+void ExtendedCanvas::checkModKeys() {
+    if(!pressedItem) return;
+    if(ctrlPressed) toggleItemOption(pressedItem, ict::IO_FIXEDASPECTRATIO);
+    if(shiftPressed) toggleItemOption(pressedItem, ict::IO_EXPANDFROMCENTER);
 }
 
 void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
@@ -73,13 +138,15 @@ void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
 }
 
 void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
-    wxDouble plus = event.GetWheelRotation();
-    plus /= 2000;
-    wxDouble sx;
-    scaler->getNewFactor(&sx, nullptr);
-    plus *= sx;
-    scaler->plusFactor(plus, plus);
-    doMagnify(event.GetPosition());
+    if(ctrlPressed) {
+        wxDouble plus = event.GetWheelRotation();
+        plus /= 2000;
+        wxDouble sx;
+        scaler->getNewFactor(&sx, nullptr);
+        plus *= sx;
+        scaler->plusFactor(plus, plus);
+        doMagnify(event.GetPosition());
+    }
     event.Skip();
 }
 
@@ -123,6 +190,7 @@ void ExtendedCanvas::mouseRelease(wxMouseEvent &event) {
     if(canvas->HasCapture()) canvas->ReleaseMouse();
     if(pressedItem) {
         pressedItem->release();
+        checkModKeys();
         pressedItem = nullptr;
     }
     event.Skip();
@@ -226,6 +294,7 @@ void ExtendedCanvas::notifySelection(CanvasItem *changed) {
 void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
     pressedItem = pressed;
     pressedItem->select(true);
+    checkModKeys();
     // send pressure event
 }
 

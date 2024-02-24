@@ -32,6 +32,19 @@ class wxPanel;
 class Scaler;
 class CanvasItem;
 
+namespace ict {
+
+    enum ItemOption {
+        IO_NONE = 0,
+        IO_LOCKED = 1,
+        IO_HIDDEN = 2,
+        IO_SELECTED = 3,
+        IO_RESTRICTED = 4,
+        IO_FIXEDASPECTRATIO = 5,
+        IO_EXPANDFROMCENTER = 6
+    };
+}
+
 class ExtendedCanvas : public wxWindow {
 public:
     ExtendedCanvas(wxWindow *parent, wxWindowID id);
@@ -63,8 +76,13 @@ private:
     void notifyHover(CanvasItem *changed);
     void notifyCollision(CanvasItem *target);
     void gridToggle(wxMouseEvent &event);
+    void keyDown(wxKeyEvent &event);
+    void keyUp(wxKeyEvent &event);
+    void toggleItemOption(CanvasItem *item, ict::ItemOption option);
+    void checkModKeys();
 
     bool grid;
+    bool shiftPressed, ctrlPressed;
     wxScrollBar *vBar, *hBar;
     wxFlexGridSizer *layout;
     wxWindow *canvas;
