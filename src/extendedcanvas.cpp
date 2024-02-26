@@ -146,6 +146,14 @@ void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
         plus *= sx;
         scaler->plusFactor(plus, plus);
         doMagnify(event.GetPosition());
+    } else {
+        wxPoint motion(0, 0);
+        if(event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL) {
+            motion.y = event.GetWheelRotation() / 5;
+        } else {
+            motion.x = event.GetWheelRotation() / 5;
+        }
+        doScroll(motion);
     }
     event.Skip();
 }
@@ -253,12 +261,72 @@ void ExtendedCanvas::doMagnify(const wxPoint mousePosition) {
 
     scaler->clearTransfer();
     refreshCanvas();
+    adjustScrollbars();
 }
 
 void ExtendedCanvas::doScroll(const wxPoint motion) {
     if (motion.x == 0 && motion.y == 0) return;
 
+    canvasReference.m_x -= scaler->scaleX(motion.x, ict::OUT_D);
+    canvasReference.m_y += scaler->scaleY(motion.y, ict::OUT_D);
+
     refreshCanvas();
+    adjustScrollbars();
+}
+
+void ExtendedCanvas::adjustScrollbars() {
+    wxRect coverage(getItemsCoverage());
+    wxRect slideWin(0, 0, 0, 0);
+
+    slideWin.x = canvas->GetSize().GetWidth() - coverage.GetWidth();
+    int range = 0;
+    int thumb = 0;
+    range = coverage.GetWidth();
+    if(slideWin.x < 0) {
+        thumb = canvas->GetSize().GetWidth();
+        slideWin.width = abs(slideWin.x);
+    } else {
+        thumb = coverage.GetWidth();
+        slideWin.x /= 2;
+    }
+    int rangeDiff = 0;
+    int thumbPos = 0;
+    if(coverage.GetLeft() <= slideWin.GetRight()) {
+        thumbPos = slideWin.GetRight() - coverage.GetLeft();
+        if(coverage.GetLeft() <= slideWin.GetLeft())
+            rangeDiff = slideWin.GetLeft() - coverage.GetLeft();
+    } else rangeDiff = coverage.GetLeft() - slideWin.GetRight();
+    hBar->SetScrollbar(thumbPos, thumb, range + rangeDiff, thumb);
+
+    slideWin.y = canvas->GetSize().GetHeight() - coverage.GetHeight();
+    range = 0;
+    thumb = 0;
+    range = coverage.GetHeight();
+    if(slideWin.y < 0) {
+        thumb = canvas->GetSize().GetHeight();
+        slideWin.height = abs(slideWin.y);
+    } else {
+        thumb = coverage.GetHeight();
+        slideWin.y /= 2;
+    }
+    rangeDiff = 0;
+    thumbPos = 0;
+    if(coverage.GetTop() <= slideWin.GetBottom()) {
+        thumbPos = slideWin.GetBottom() - coverage.GetTop();
+        if(coverage.GetTop() <= slideWin.GetTop())
+            rangeDiff = slideWin.GetTop() - coverage.GetTop();
+    } else rangeDiff = coverage.GetTop() - slideWin.GetBottom();
+    vBar->SetScrollbar(thumbPos, thumb, range + rangeDiff, thumb);
+}
+
+wxRect ExtendedCanvas::getItemsCoverage() {
+    if(zOrder.empty()) return wxRect(0, 0, 1, 1);
+    wxRect2DDouble ret(zOrder.front()->getArea());
+    for(std::vector<CanvasItem *>::const_iterator it = zOrder.cbegin();
+            it != zOrder.cend(); it++) {
+        ret = ret.CreateUnion((*it)->getArea());
+    }
+    return wxRect(ret.m_x, ret.m_y, ret.m_width, ret.m_height);
 }
 
 void ExtendedCanvas::refreshCanvasRect(const wxRect &r) {
@@ -273,6 +341,7 @@ void ExtendedCanvas::notifyGeometry(CanvasItem *changed) {
     wxRect2DDouble ch(changed->getUpdateArea());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh.Inflate(1, 1));
+    adjustScrollbars();
     // send geometry event
 }
 

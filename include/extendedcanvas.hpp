@@ -81,6 +81,9 @@ private:
     void toggleItemOption(CanvasItem *item, ict::ItemOption option);
     void checkModKeys();
 
+    void adjustScrollbars();
+    wxRect getItemsCoverage();
+
     bool grid;
     bool shiftPressed, ctrlPressed;
     wxScrollBar *vBar, *hBar;
