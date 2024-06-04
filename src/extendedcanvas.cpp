@@ -253,7 +253,8 @@ void ExtendedCanvas::addItem(CanvasItem *item) {
 
 void ExtendedCanvas::doMagnify(const wxPoint mousePosition) {
     if (scaler && !scaler->hasTransfer()) return;
-    if (mousePosition.x < 0 || mousePosition.y < 0) return;
+    if (mousePosition.x < 0) return;
+    if (mousePosition.y < 0) return;
 
     double of, tf, nf;
     scaler->getOldFactor(&of, nullptr);
