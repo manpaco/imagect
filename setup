@@ -168,9 +168,8 @@ create_build_values() {
     return 0
 }
 
-args="$*"
-for a in $args; do
-    case "$a" in
+for opt in "$@"; do
+    case "$opt" in
         "$COMPILE_FLAGS_OPT")
             cfo=1
             ;;
