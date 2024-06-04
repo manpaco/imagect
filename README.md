@@ -47,7 +47,7 @@ This project implement an out-of-source building process, so do mkdir and cd int
 
 Run setup scripts from build directory with options that you want:
 
-    ../setup [--editorconfig] [--compile_flags] --linux
+    ../setup [--compile_flags] --linux
 
 And finally run make:
 
