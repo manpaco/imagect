@@ -64,6 +64,8 @@ private:
     void mouseRelease(wxMouseEvent &event);
     void resizeCanvas(wxSizeEvent &event);
     void mouseWheel(wxMouseEvent &event);
+    void horizontalScroll(wxScrollEvent &event);
+    void verticalScroll(wxScrollEvent &event);
     void doMagnify(const wxPoint magCenter);
     void doScroll(const wxPoint motion);
     bool pressCanvas(const wxPoint p);
@@ -87,6 +89,7 @@ private:
     bool grid;
     bool shiftPressed, ctrlPressed;
     wxScrollBar *vBar, *hBar;
+    wxPoint prevPosBars;
     wxFlexGridSizer *layout;
     wxWindow *canvas;
     wxWindow *zoom;

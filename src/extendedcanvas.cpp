@@ -56,6 +56,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     layout->Add(canvas, 1, wxEXPAND);
     hBar->SetScrollbar(0, 50, 100, 50);
     vBar->SetScrollbar(0, 50, 100, 50);
+    prevPosBars = wxPoint(0, 0);
     layout->Add(vBar, 1, wxEXPAND);
     layout->Add(hBar, 1, wxEXPAND);
     layout->Add(zoom, 1, wxEXPAND);
@@ -68,7 +69,17 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvas->Bind(wxEVT_MOUSEWHEEL, &ExtendedCanvas::mouseWheel, this);
     canvas->Bind(wxEVT_KEY_DOWN, &ExtendedCanvas::keyDown, this);
     canvas->Bind(wxEVT_KEY_UP, &ExtendedCanvas::keyUp, this);
+    hBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::horizontalScroll, this);
+    vBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::verticalScroll, this);
     zoom->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::gridToggle, this);
+}
+
+void ExtendedCanvas::horizontalScroll(wxScrollEvent &event) {
+    doScroll(wxPoint(event.GetPosition() - prevPosBars.x, 0));
+}
+
+void ExtendedCanvas::verticalScroll(wxScrollEvent &event) {
+    doScroll(wxPoint(0, prevPosBars.y - event.GetPosition()));
 }
 
 void
@@ -297,6 +308,7 @@ void ExtendedCanvas::adjustScrollbars() {
             rangeDiff = slideWin.GetLeft() - coverage.GetLeft();
     } else rangeDiff = coverage.GetLeft() - slideWin.GetRight();
     hBar->SetScrollbar(thumbPos, thumb, range + rangeDiff, thumb);
+    prevPosBars.x = thumbPos;
 
     slideWin.y = canvas->GetSize().GetHeight() - coverage.GetHeight();
     range = 0;
@@ -317,6 +329,7 @@ void ExtendedCanvas::adjustScrollbars() {
             rangeDiff = slideWin.GetTop() - coverage.GetTop();
     } else rangeDiff = coverage.GetTop() - slideWin.GetBottom();
     vBar->SetScrollbar(thumbPos, thumb, range + rangeDiff, thumb);
+    prevPosBars.y = thumbPos;
 }
 
 wxRect ExtendedCanvas::getItemsCoverage() {
