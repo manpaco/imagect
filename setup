@@ -8,10 +8,7 @@ LANGFLAG="-x${CLANG}"
 COMPILE_FLAGS_OPT="--compile_flags"
 MSYS2_OPT="--msys2"
 LINUX_OPT="--linux"
-EDITORCONFIG_OPT="--editorconfig"
 
-EDITORCONFIG_FN=".editorconfig"
-EDITORCONFIG_IN_FN="${EDITORCONFIG_FN}.in"
 COMPILE_FLAGS_FN="compile_flags.txt"
 MAKEFILE_FN="Makefile"
 MAKEFILE_IN_FN="${MAKEFILE_FN}.in"
@@ -40,8 +37,6 @@ VERSION_MINOR_M1="^v[0-9]+\.([0-9]+).*"
 VERSION_PATCH_M1="^v[0-9]+\.[0-9]+\.([0-9]+).*"
 VERSION_SUFFIX_M1="^v[0-9]+\.[0-9]+\.[0-9]+(.*)"
 
-MAKEFILE_IN_FN_R="@MAKEFILEINFN@"
-
 CXXFLAGS_R="@CXXFLAGS@"
 LIBS_R="@LIBS@"
 
@@ -55,13 +50,11 @@ _srcdir="src"
 _incdir="include"
 _windir="win"
 _output="output"
-_config="config"
 srcdir="${projdir}/${_srcdir}"
 incdir="${projdir}/${_incdir}"
 windir="${projdir}/${_windir}"
 curdir="$(pwd)"
 outdir="${curdir}/${_output}"
-configdir="${projdir}/${_config}"
 _subdirs=""
 
 compile_flags_file="${projdir}/${COMPILE_FLAGS_FN}"
@@ -69,8 +62,6 @@ makefile_file="${curdir}/${MAKEFILE_FN}"
 makefile_in_file="${projdir}/${MAKEFILE_IN_FN}"
 buildvalues_file="${incdir}/${BUILDVALUES_FN}"
 buildvalues_in_file="${projdir}/${BUILDVALUES_IN_FN}"
-editorconfig_file="${projdir}/${EDITORCONFIG_FN}"
-editorconfig_in_file="${configdir}/${EDITORCONFIG_IN_FN}"
 
 trim() {
     local var="$*"
@@ -177,34 +168,11 @@ create_build_values() {
     return 0
 }
 
-create_editorconfig() {
-    ! [[ -e $editorconfig_in_file ]] && echo "Missing ${EDITORCONFIG_IN_FN}." &&
-        return 1
-    echo "Creating $EDITORCONFIG_FN in $editorconfig_file ..."
-    get_git_tag
-    while IFS='' read -r rline; do
-        [[ "$rline" =~ $REPLACE_REGEX ]]
-        local out
-        case "${BASH_REMATCH[0]}" in
-            "$MAKEFILE_IN_FN_R") out="${MAKEFILE_IN_FN}"
-                ;;
-            *) out=""
-                ;;
-        esac
-        echo "${rline//${BASH_REMATCH[0]}/$out}"
-    done < "$editorconfig_in_file" > "$editorconfig_file"
-    echo "Done !"
-    return 0
-}
-
 args="$*"
 for a in $args; do
     case "$a" in
         "$COMPILE_FLAGS_OPT")
             cfo=1
-            ;;
-        "$EDITORCONFIG_OPT")
-            eco=1
             ;;
         "$MSYS2_OPT")
             msys2=1
@@ -217,7 +185,6 @@ for a in $args; do
     esac
 done
 [[ $cfo -eq 1 ]] && create_compile_flags
-[[ $eco -eq 1 ]] && create_editorconfig
 [[ $linux -eq 1  || $msys2 -eq 1 ]] || exit 0
 create_build_values
 if [[ $msys2 -eq 1 ]]; then
@@ -227,7 +194,6 @@ if [[ $msys2 -eq 1 ]]; then
     windir="$(cygpath -m "$windir")"
     curdir="$(cygpath -m "$curdir")"
     outdir="$(cygpath -m "$outdir")"
-    configdir="$(cygpath -m "$configdir")"
     target="${target}.${WIN_FMT}"
 fi
 create_makefile
