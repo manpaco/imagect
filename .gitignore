@@ -2,4 +2,3 @@ build/
 .cache/
 include/buildvalues.hpp
 compile_flags.txt
-.editorconfig
