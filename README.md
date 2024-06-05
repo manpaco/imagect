@@ -14,6 +14,8 @@ Licensed under [GPL-3.0-or-later](/COPYING).
 
 ### Required dependencies
 
+Here, I will show you how to build in Linux. For Windows build go to [MSW guide](/docs/msys2-build.md).
+
 ImageCT depends on one component:
 
 - [wxWidgets](https://github.com/wxWidgets/wxWidgets) >= v3.2.0
@@ -26,11 +28,7 @@ Yout also need some build tools:
 
 - A C++ compiler
 
-- To compile this project on Windows you can use [MSYS2](https://www.msys2.org/).
-
 ### Steps
-
-Here, I will show you how to build in Linux. For Windows build go to [MSW guide](/docs/msys2-build.md).
 
 First clone a release branch:
 
