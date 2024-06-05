@@ -1,8 +1,8 @@
-# ImageCT
+# imagect
 
-ImageCT is a easy-to-use, free and open source image cropping tool.
+imagect is a easy-to-use, free and open source image cropping tool.
 
-Tool to crop images using an arbitrary shape and, if the crop is outside the image the necessary, pixels will be added to avoid leaving empty areas. The pixels that are added can be chosen by the user: color, image or void.
+Tool to crop images using a custom shape. If the crop is outside the image, you can add custom pixels to avoid leaving empty areas.
 
 This project use [wxWidgets](https://www.wxwidgets.org/)
 
@@ -16,7 +16,7 @@ Licensed under [GPL-3.0-or-later](/COPYING).
 
 Here, I will show you how to build in Linux. For Windows build go to [MSW guide](/docs/msys2-build.md).
 
-ImageCT depends on one component:
+imagect depends on one component:
 
 - [wxWidgets](https://github.com/wxWidgets/wxWidgets) >= v3.2.0
 
