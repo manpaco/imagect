@@ -1,12 +1,12 @@
 # Building in MSYS2
 
-To build ImageCT under Windows, I will use the [MSYS2](https://www.msys2.org/#installation) environment.
+To build imagect under Windows, I will use the [MSYS2](https://www.msys2.org/#installation) environment.
 
 ### Info
 
-To build ImageCT for ``x86_64`` target system we need to run the UCRT64 or MINGW64 subsystem.
+To build imagect for ``x86_64`` target system we need to run the UCRT64 or MINGW64 subsystem.
 
-To build ImageCT for ``i686`` target system we need to run the MINGW32 subsystem.
+To build imagect for ``i686`` target system we need to run the MINGW32 subsystem.
 
 The environment variable ``MINGW_PREFIX`` stores the filesystem prefix of the running subsystem.
 
