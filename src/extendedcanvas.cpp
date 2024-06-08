@@ -288,48 +288,49 @@ void ExtendedCanvas::doScroll(const wxPoint motion) {
 
 void ExtendedCanvas::adjustScrollbars() {
     wxRect coverage(getItemsCoverage());
-    wxRect slideWin(0, 0, 0, 0);
+    wxRect slideWin(0, 0, 1, 1);
 
     slideWin.x = canvas->GetSize().GetWidth() - coverage.GetWidth();
-    int range = 0;
-    int thumb = 0;
-    range = coverage.GetWidth();
+    int thumbSize;
     if(slideWin.x < 0) {
-        thumb = canvas->GetSize().GetWidth();
+        thumbSize = canvas->GetSize().GetWidth();
         slideWin.width = abs(slideWin.x);
     } else {
-        thumb = coverage.GetWidth();
+        thumbSize = coverage.GetWidth();
         slideWin.x /= 2;
     }
-    int rangeDiff = 0;
     int thumbPos = 0;
-    if(coverage.GetLeft() <= slideWin.GetRight()) {
+    if(coverage.GetLeft() < slideWin.GetRight()) {
         thumbPos = slideWin.GetRight() - coverage.GetLeft();
-        if(coverage.GetLeft() <= slideWin.GetLeft())
-            rangeDiff = slideWin.GetLeft() - coverage.GetLeft();
-    } else rangeDiff = coverage.GetLeft() - slideWin.GetRight();
-    hBar->SetScrollbar(thumbPos, thumb, range + rangeDiff, thumb);
+    }
+    int range = coverage.GetWidth();
+    if(coverage.GetLeft() < slideWin.GetLeft()) {
+        range += slideWin.GetLeft() - coverage.GetLeft();
+    } else if(coverage.GetLeft() > slideWin.GetRight()) {
+        range += coverage.GetLeft() - slideWin.GetRight();
+    }
+    hBar->SetScrollbar(thumbPos, thumbSize, range, thumbSize);
     prevPosBars.x = thumbPos;
 
     slideWin.y = canvas->GetSize().GetHeight() - coverage.GetHeight();
-    range = 0;
-    thumb = 0;
-    range = coverage.GetHeight();
     if(slideWin.y < 0) {
-        thumb = canvas->GetSize().GetHeight();
+        thumbSize = canvas->GetSize().GetHeight();
         slideWin.height = abs(slideWin.y);
     } else {
-        thumb = coverage.GetHeight();
+        thumbSize = coverage.GetHeight();
         slideWin.y /= 2;
     }
-    rangeDiff = 0;
     thumbPos = 0;
-    if(coverage.GetTop() <= slideWin.GetBottom()) {
+    if(coverage.GetTop() < slideWin.GetBottom()) {
         thumbPos = slideWin.GetBottom() - coverage.GetTop();
-        if(coverage.GetTop() <= slideWin.GetTop())
-            rangeDiff = slideWin.GetTop() - coverage.GetTop();
-    } else rangeDiff = coverage.GetTop() - slideWin.GetBottom();
-    vBar->SetScrollbar(thumbPos, thumb, range + rangeDiff, thumb);
+    }
+    range = coverage.GetHeight();
+    if(coverage.GetTop() < slideWin.GetTop()) {
+        range += slideWin.GetTop() - coverage.GetTop();
+    } else if(coverage.GetTop() > slideWin.GetBottom()) {
+        range += coverage.GetTop() - slideWin.GetBottom();
+    }
+    vBar->SetScrollbar(thumbPos, thumbSize, range, thumbSize);
     prevPosBars.y = thumbPos;
 }
 
