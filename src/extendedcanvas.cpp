@@ -361,6 +361,7 @@ void ExtendedCanvas::notifyGeometry(CanvasItem *changed) {
 }
 
 void ExtendedCanvas::notifySelection(CanvasItem *changed) {
+    if(!changed) return;
     if(selectedItem) {
         if(*selectedItem != *changed) {
             if(changed->isSelected()) {
@@ -383,6 +384,7 @@ void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
 }
 
 void ExtendedCanvas::notifyHover(CanvasItem *changed) {
+    if(!changed) return;
     if(hoveredItem) {
         if(*hoveredItem != *changed) {
             if(changed->hovered) {
