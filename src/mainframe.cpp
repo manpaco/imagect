@@ -33,7 +33,7 @@
 #include "wx/menu.h"
 #include "wx/msgdlg.h"
 #include <iostream>
-#include "scrolledcanvas.hpp"
+#include "extendedcanvas.hpp"
 #include "canvasitem.hpp"
 
 #if wxUSE_STATLINE
@@ -83,12 +83,18 @@ void MainFrame::initDimensions() {
 void MainFrame::allocateMem() {
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
     sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
-    sCanvas = new ScrolledCanvas(mainSplitter, ict::SCVIEW);
-    CanvasItem *it1 = new CanvasItem(1, wxRect(0, 0, 50, 50));
+    sCanvas = new ExtendedCanvas(mainSplitter, ict::SCVIEW);
+    // sCanvas->useGrid(true);
+    wxRect2DDouble res(0, 0, 200, 200);
+    CanvasItem *it1 = new CanvasItem(1, res);
     it1->lock(false);
     sCanvas->addItem(it1);
-    CanvasItem *it2 = new CanvasItem(2, wxRect(0, 0, 50, 50));
+    CanvasItem *it2 = new CanvasItem(2, wxRect2DDouble(0, 0, 40, 80));
     it2->lock(false);
+    // it2->setVirtualRestriction(res);
+    // it2->restrict(true);
+    // it2->fixedAspectRatio(true);
+    // it2->expandFromCenter(true);
     sCanvas->addItem(it2);
     tools = new ToolsPanel(sideSplitter, ict::TOOLS);
     preview = new PreviewPanel(sideSplitter, ict::PREVIEW);

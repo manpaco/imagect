@@ -27,116 +27,88 @@ Scaler::Scaler() {
 
 }
 
-Scaler::Scaler(double xf, double yf, ict::ScaleType st) {
+Scaler::Scaler(wxDouble xf, wxDouble yf) {
     setNewFactor(xf, yf);
-    setScaleType(st);
 }
 
-void Scaler::setNewFactor(double xf, double yf) {
-    if (xf > 0.0) {
+void Scaler::setNewFactor(wxDouble xf, wxDouble yf) {
+    if (xf >= ict::MINUPP && xf <= ict::MAXUPP) {
         this->xxOldFactor = this->xxFactor;
         this->xxFactor = xf;
     }
-    if (yf > 0.0) {
+    if (yf >= ict::MINUPP && xf <= ict::MAXUPP) {
         this->yyOldFactor = this->yyFactor;
         this->yyFactor = yf;
     }
 }
 
-void Scaler::setScaleType(ict::ScaleType st) {
-    this->st = st;
-}
-
 bool Scaler::hasTransfer() const {
-    double xtf, ytf;
+    wxDouble xtf, ytf;
     getTransferFactor(&xtf, &ytf);
     return xtf != 1.0 || ytf != 1.0;
 }
 
 void Scaler::clearTransfer() {
-    double xf, yf;
-    getNewFactor(&xf, &yf);
-    setNewFactor(xf, yf);
+    setNewFactor(xxFactor, yyFactor);
 }
 
-void Scaler::addFactor(double axf, double ayf) {
-    double xf, yf;
-    getNewFactor(&xf, &yf);
-    xf += axf;
-    yf += ayf;
-    setNewFactor(xf, yf);
+void Scaler::plusFactor(wxDouble pxf, wxDouble pyf) {
+    setNewFactor(xxFactor + pxf, yyFactor + pyf);
 }
 
-void Scaler::getNewFactor(double *xf, double *yf) const {
+void Scaler::getNewFactor(wxDouble *xf, wxDouble *yf) const {
     if (xf) *xf = this->xxFactor;
     if (yf) *yf = this->yyFactor;
 }
 
-void Scaler::getOldFactor(double *xof, double *yof) const {
+void Scaler::getOldFactor(wxDouble *xof, wxDouble *yof) const {
     if (xof) *xof = this->xxOldFactor;
     if (yof) *yof = this->yyOldFactor;
 }
 
-void Scaler::getTransferFactor(double *xtf, double *ytf) const {
+void Scaler::getTransferFactor(wxDouble *xtf, wxDouble *ytf) const {
     if (xtf) *xtf = xxFactor / xxOldFactor;
     if (ytf) *ytf = yyFactor / yyOldFactor;
 }
 
-int Scaler::scale(const int v, const ict::Dot d, const double f) const {
-    double dValue;
-    if (d == ict::IN_D) dValue = v * f;
-    else dValue = v / f;
-    if (st == ict::FLOOR_ST) return floor(dValue);
-    else if (st == ict::ROUND_ST) return round(dValue);
-    else return ceill(dValue);
+wxDouble Scaler::scale(const wxDouble v, const ict::Dot d, const wxDouble f) const {
+    if (d == ict::IN_D) return v * f;
+    else return v / f;
 }
 
-int Scaler::scaleX(const int v, ict::Dot d) const {
-    double xf;
-    getNewFactor(&xf, nullptr);
-    return scale(v, d, xf);
+wxDouble Scaler::scaleX(const wxDouble &v, ict::Dot d) const {
+    return scale(v, d, xxFactor);
 }
 
-int Scaler::scaleY(const int v, ict::Dot d) const {
-    double yf;
-    getNewFactor(nullptr, &yf);
-    return scale(v, d, yf);
+wxDouble Scaler::scaleY(const wxDouble &v, ict::Dot d) const {
+    return scale(v, d, yyFactor);
 }
 
-wxPoint Scaler::scalePoint(const wxPoint &p, ict::Dot d) const {
-    return wxPoint(scaleX(p.x, d), scaleY(p.y, d));
+wxPoint2DDouble Scaler::scalePoint(const wxPoint2DDouble &p, ict::Dot d) const {
+    return wxPoint2DDouble(scaleX(p.m_x, d), scaleY(p.m_y, d));
 }
 
-wxSize Scaler::scaleSize(const wxSize &s, ict::Dot d) const {
-    return wxSize(scaleX(s.GetWidth(), d), scaleY(s.GetHeight(), d));
+void Scaler::scaleRect(wxRect2DDouble *p, ict::Dot d) const {
+    p->m_x = scaleX(p->m_x, d);
+    p->m_y = scaleY(p->m_y, d);
+    p->m_width = scaleX(p->m_width, d);
+    p->m_height = scaleY(p->m_height, d);
 }
 
-wxRect Scaler::scaleRect(const wxRect &r, ict::Dot d) const {
-    return wxRect(scalePoint(r.GetPosition(), d), scaleSize(r.GetSize(), d));
-}
-
-int Scaler::transferX(const int v, ict::Dot d) const {
-    double xtf;
+wxDouble Scaler::transferX(const wxDouble &v, ict::Dot d) const {
+    wxDouble xtf;
     getTransferFactor(&xtf, nullptr);
     return scale(v, d, xtf);
 }
 
-int Scaler::transferY(const int v, ict::Dot d) const {
-    double ytf;
+wxDouble Scaler::transferY(const wxDouble &v, ict::Dot d) const {
+    wxDouble ytf;
     getTransferFactor(nullptr, &ytf);
     return scale(v, d, ytf);
 }
 
-wxPoint Scaler::transferPoint(const wxPoint &p, ict::Dot d) const {
-    return wxPoint(transferX(p.x, d), transferY(p.y, d));
-}
-
-wxSize Scaler::transferSize(const wxSize &s, ict::Dot d) const {
-    return wxSize(transferX(s.GetWidth(), d), transferY(s.GetHeight(), d));
-}
-
-wxRect Scaler::transferRect(const wxRect &r, ict::Dot d) const {
-    return wxRect(transferPoint(r.GetPosition(), d), transferSize(r.GetSize(), d));
+wxPoint2DDouble Scaler::transferPoint(const wxPoint2DDouble &p, ict::Dot d) const {
+    return wxPoint2DDouble(transferX(p.m_x, d), transferY(p.m_y, d));
 }
 
 Scaler::~Scaler() {

@@ -22,20 +22,18 @@
 
 #include "defs.hpp"
 #include <wx/gdicmn.h>
-
-enum ItemContext {
-    VIRTUAL_CONTEXT,
-    CANVAS_CONTEXT
-};
+#include <wx/geometry.h>
+#include "smartrect.hpp"
 
 class PixelView;
 class Scaler;
 class wxMemoryDC;
+class ExtendedCanvas;
 
 class CanvasItem {
 public:
     CanvasItem();
-    CanvasItem(int id, wxRect geometry);
+    CanvasItem(int id, wxRect2DDouble geometry);
 
     int getId() const;
     virtual void drawOn(wxMemoryDC *pv);
@@ -43,62 +41,38 @@ public:
     bool isLocked();
     void hide(bool opt);
     bool isHidden() const;
-    int getX(ItemContext ic) const;
-    int getY(ItemContext ic) const;
-    int xVirtualUnref() const;
-    int yVirtualUnref() const;
-    int getWidth(ItemContext ic) const;
-    int getHeight(ItemContext ic) const;
-    wxRect getGeometry(ItemContext ic) const;
-    wxPoint getPosition(ItemContext ic) const;
-    wxSize getDimensions(ItemContext ic) const;
-    wxRect getArea() const;
-    wxRect getZone(ict::ItemZone z) const;
-    bool setVirtualGeometry(const wxRect &geo);
-    bool setVirtualPosition(const wxPoint &pos);
-    bool setVirtualDimensions(const wxSize &dim);
-    bool toggleSelection();
+    wxRect2DDouble getGeometry(ict::ECContext ic) const;
+    wxPoint2DDouble getPosition(ict::ECContext ic) const;
+    wxPoint2DDouble getSize(ict::ECContext ic) const;
+    wxRect2DDouble getArea() const;
+    wxRect2DDouble getHandleZone(int z) const;
+    void setVirtualGeometry(const wxRect2DDouble &geo);
+    void setVirtualPosition(const wxPoint2DDouble &pos);
+    void setVirtualSize(const wxPoint2DDouble &dim);
     void select(const bool select);
     bool isSelected() const;
-    bool restrict(const bool state);
+    void restrict(const bool state);
     bool isRestricted() const;
-    void setVirtualRestriction(const wxRect &restriction);
-    double getAspectRatio() const;
+    void setVirtualRestriction(const wxRect2DDouble &restriction);
+    wxDouble getAspectRatio() const;
     void setAspectRatio(int xr, int yr);
     void setScaler(Scaler *s);
-    void setOffset(wxPoint vo);
-    wxPoint getOffset() const;
-    void setCanvasReference(CanvasItem *r);
+    void setContainer(ExtendedCanvas *c);
+    void expandFromCenter(bool op);
+    bool expandFromCenter() const;
+    void useGrid(bool);
+    bool useGrid() const;
 
     /**
      * Enable or disable the fix aspect ratio.
      */
-    void fixAspectRatio(bool op);
-
-    /**
-     * Modify the the item geometry.
-     *
-     * @param target Point used to move or resize.
-     * @return true if crop rectangle changes, else false.
-     */
-    bool modify(const wxPoint &avp);
-
-    /**
-     * Simulate pressure at a given point.
-     *
-     * @param p point, used to calculate zone and offset in pressure.
-     */
-    ict::ItemZone press(const wxPoint &avp);
-
-    /**
-     * Release the simulated pressure.
-     */
-    void release();
+    void fixedAspectRatio(bool op);
+    bool fixedAspectRatio() const;
 
     /**
      * Get the zone pressed.
      */
-    ict::ItemZone getZonePressed() const;
+    int getHandler() const;
 
     bool operator==(const CanvasItem &);
     bool operator!=(const CanvasItem &);
@@ -106,77 +80,70 @@ public:
     ~CanvasItem();
 
 private:
-    int getRight(ItemContext ic) const;
-    int getLeft(ItemContext ic) const;
-    int getTop(ItemContext ic) const;
-    int getBottom(ItemContext ic) const;
+    wxDouble getWidth(ict::ECContext ic, bool ext = true) const;
+    wxDouble getHeight(ict::ECContext ic, bool ext = true) const;
+    wxDouble getRight(ict::ECContext ic, bool ext = true) const;
+    wxDouble getLeft(ict::ECContext ic, bool ext = true) const;
+    wxDouble getTop(ict::ECContext ic, bool ext = true) const;
+    wxDouble getBottom(ict::ECContext ic, bool ext = true) const;
 
-    bool applyGeometry(const wxRect &geo);
-
-    /**
-     * Move the crop rectangle such that it fits in the constraint.
-     */
-    void pushToRestriction();
+    void useSavedMark();
 
     /**
-     * Fit the crop rectangle in the constraint holding the position. That
-     * means the size is modified.
+     * Modify the the item geometry.
+     *
+     * @param target Point used to move or resize.
+     * @return true if crop rectangle changes, else false.
      */
-    void fitInRestriction(ict::ItemZone simulation);
+    void modify(const wxPoint &avp, bool force = false);
 
     /**
-     * Use delta in y axis to calculate delta in x axis. Here the ratio is
-     * considered
+     * Simulate pressure at a given point.
+     *
+     * @param p point, used to calculate zone and offset in pressure.
      */
-    void accumulateX(int &dxToCalc, int &dyToUse);
+    int press(const wxPoint &avp);
+
+    void hoverCollision();
+    void hover(int z);
+    bool collides(const wxPoint2DDouble &);
+
+    wxRect2DDouble getUpdateArea() const;
+    wxRect2DDouble getHoverUpdate() const;
 
     /**
-     * Use delta in x axis to calculate delta in y axis. Here the ratio is
-     * considered
+     * Release the simulated pressure.
      */
-    void accumulateY(int &dyToCalc, int &dxToUse);
-
-    /**
-     * Move to target point. Relative pressure is considered.
-     */
-    void move(const wxPoint &t);
-
-    /**
-     * Resize to target point. Relative pressure and edge zones are
-     * considered.
-     */
-    void resize(const wxPoint &t);
+    void release();
 
     /**
      * Get offset from p to respective zone.
      */
+    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c);
 
-    wxPoint relativeToEdge(const wxPoint &p, ict::ItemZone z);
+    int inHandle(const wxPoint2DDouble &vp) const;
 
-    ict::ItemZone getLocation(const wxPoint &vp) const;
+    void drawHandles(wxMemoryDC *pv);
 
-    double getUnmodAspectRatio() const;
-
-    void resetAccums();
-
-    void drawEntries(wxMemoryDC *pv);
+    wxPoint2DDouble getContainerReference(ict::ECContext c) const;
 
     int id;
-    wxRect geometry;
-    wxRect restriction;
-    wxRect unmodGeometry;
     bool selected;
     bool locked;
-    bool fixed;
-    bool restricted;
     bool hidden;
-    double accumX = 0.0, accumY = 0.0;
-    ict::ItemZone zonePressed;
-    wxPoint relativePress;
-    wxPoint lastPoint;
-    wxPoint offset;
+    int hovered, prevHover, collision;
+    wxPoint2DDouble relativePress;
+    wxPoint cPoint;
     Scaler *scaler;
-    CanvasItem *reference;
+    SmartRect geometry;
+    wxRect2DDouble saved;
+    ExtendedCanvas *container;
+
+    /* Minimum handle dimension */
+    wxDouble hdim;
+
+    friend ExtendedCanvas;
+
 };
 
 #endif // !CANVASITEM_H

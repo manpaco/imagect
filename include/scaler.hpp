@@ -3,48 +3,37 @@
 
 #include <wx/gdicmn.h>
 #include "defs.hpp"
-
-const double minScaleFactor = 1.0 / 256;
-const double maxScaleFactor = 256;
-
-enum ScaleTarget {
-    IN_TARGET = 0,
-    OUT_TARGET
-};
+#include <wx/geometry.h>
 
 class Scaler {
 public:
     Scaler();
-    Scaler(double xxf, double yyf, ict::ScaleType st);
+    Scaler(wxDouble xxf, wxDouble yyf);
 
-    void setNewFactor(double xf, double yf);
-    void setScaleType(ict::ScaleType st);
-    void getNewFactor(double *xf, double *yf) const;
-    void getOldFactor(double *xof, double *yof) const;
-    void getTransferFactor(double *xtf, double *ytf) const;
+    void setNewFactor(wxDouble xf, wxDouble yf);
+    void getNewFactor(wxDouble *xf, wxDouble *yf) const;
+    void getOldFactor(wxDouble *xof, wxDouble *yof) const;
+    void getTransferFactor(wxDouble *xtf, wxDouble *ytf) const;
     bool hasTransfer() const;
     void clearTransfer();
-    void addFactor(double axf, double ayf);
+    void plusFactor(wxDouble pxf, wxDouble pyf);
 
-    int scale(const int v, const ict::Dot d, const double f) const;
-    int scaleX(const int v, ict::Dot d) const;
-    int scaleY(const int v, ict::Dot d) const;
-    wxPoint scalePoint(const wxPoint &p, ict::Dot d) const;
-    wxSize scaleSize(const wxSize &s, ict::Dot d) const;
-    wxRect scaleRect(const wxRect &r, ict::Dot d) const;
+    wxDouble scaleX(const wxDouble &v, ict::Dot d) const;
+    wxDouble scaleY(const wxDouble &v, ict::Dot d) const;
+    wxPoint2DDouble scalePoint(const wxPoint2DDouble &p, ict::Dot d) const;
+    void scaleRect(wxRect2DDouble *p, ict::Dot d) const;
 
-    int transferX(const int v, ict::Dot d) const;
-    int transferY(const int v, ict::Dot d) const;
-    wxPoint transferPoint(const wxPoint &p, ict::Dot d) const;
-    wxSize transferSize(const wxSize &s, ict::Dot d) const;
-    wxRect transferRect(const wxRect &r, ict::Dot d) const;
+    wxDouble transferX(const wxDouble &v, ict::Dot d) const;
+    wxDouble transferY(const wxDouble &v, ict::Dot d) const;
+    wxPoint2DDouble transferPoint(const wxPoint2DDouble &p, ict::Dot d) const;
 
     ~Scaler();
 
 private:
-    double xxFactor = 1.0, yyFactor = 1.0;
-    double xxOldFactor = 1.0, yyOldFactor = 1.0;
-    ict::ScaleType st = ict::FLOOR_ST;
+    wxDouble scale(const wxDouble v, const ict::Dot d, const wxDouble f) const;
+
+    wxDouble xxFactor = 1.0, yyFactor = 1.0;
+    wxDouble xxOldFactor = 1.0, yyOldFactor = 1.0;
 };
 
 #endif // !SCALER_H

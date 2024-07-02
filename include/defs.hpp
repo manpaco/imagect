@@ -25,9 +25,9 @@
 
 namespace ict {
 
-const int IMG_MULTIPLIER = 3;
-const int SHADOW_OFFSET = 2;
-const int CORNER = 10;
+const double MAXUPP = 256;
+const double MINUPP = 1 / MAXUPP;
+
 const unsigned int MIN_CROP = 1;
 const unsigned int MIN_STROKE = 0;
 const int BEST_SPACE = 5;
@@ -98,20 +98,6 @@ enum ShapeChoice {
     SHAPE_CHOICE_SIZE
 };
 
-enum ItemZone {
-    NONE = -1,
-    INNER,
-    N,
-    NE,
-    NW,
-    S,
-    SE,
-    SW,
-    E,
-    W,
-    NUM_ZONES
-};
-
 enum Channel {
     RGB,
     ALPHA
@@ -135,10 +121,15 @@ enum Dot {
     OUT_D
 };
 
-enum ScaleType {
+enum TruncType {
     FLOOR_ST,
     ROUND_ST,
     CEILL_ST
+};
+
+enum ECContext {
+    VIRTUAL_CONTEXT,
+    CANVAS_CONTEXT
 };
 
 }

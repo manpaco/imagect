@@ -1,0 +1,17 @@
+Canvas:
++ Change from integer to float/double (best precision)
++ Due to the above, implement canvas grid (1x1 px)
++ Improve item resize (limits, fixed ratio, etc)
++ Send notification on item change
++ Rename from ScrolledCanvas to ExtendedCanvas
++ Improve item selection
++ Implement accumulators (works fine)
++ Fix some getters in SmartRect (consistency between getters when using grid)
+    + Fixed when I implement accumulators
++ Improve playground (SmartRect)
++ Fix setters in SmartRect (does not respect restrictions or grid)
+- Canvas scrolling
+- Improve canvas magnification
+    + Using wxDouble
+    + Use steps accumulator for the mouse wheel (stable zoom)
+    - Implement zoom control
