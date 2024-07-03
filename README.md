@@ -12,9 +12,9 @@ Licensed under [GPL-3.0-or-later](/COPYING).
 
 ## Build
 
-### Required dependencies
-
 Here, I will show you how to build in Linux. For Windows build go to [MSW guide](/docs/msys2-build.md).
+
+### Required dependencies
 
 imagect depends on one component:
 
