@@ -16,7 +16,7 @@ Here, I will show you how to build in Linux. For Windows build go to [MSW guide]
 
 ### Required dependencies
 
-imagect depends on one component:
+imagect depends on:
 
 - [wxWidgets](https://github.com/wxWidgets/wxWidgets) >= v3.2.0
 
