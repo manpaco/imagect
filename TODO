@@ -1,0 +1,3 @@
+- Move grid implementation from SmartRect to CanvasItem.
+- Improve CanvasItem event notification (probably extend CanvasItem from wxObject, and use wxEvent).
+- Implement ZoomControl.
