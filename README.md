@@ -1,6 +1,6 @@
 # imagect
 
-imagect is a easy-to-use, free and open source image cropping tool.
+imagect is an easy-to-use, free and open source image cropping tool.
 
 Tool to crop images using a custom shape. If the crop is outside the image, you can add custom pixels to avoid leaving empty areas.
 
