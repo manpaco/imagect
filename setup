@@ -180,6 +180,8 @@ for opt in "$@"; do
             linux=1
             ;;
         *)
+            echo "option '$opt' is not valid !" 1>&2
+            exit 1
             ;;
     esac
 done
