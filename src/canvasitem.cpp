@@ -242,7 +242,7 @@ void CanvasItem::useSavedMark() {
 }
 
 void CanvasItem::expandFromCenter(bool op) {
-    geometry.useInflate(op);
+    geometry.expandFromCenter(op);
     useSavedMark();
 }
 
@@ -252,11 +252,11 @@ void CanvasItem::fixedAspectRatio(bool op) {
 }
 
 bool CanvasItem::expandFromCenter() const {
-    return geometry.useInflate();
+    return geometry.expandFromCenter();
 }
 
 bool CanvasItem::fixedAspectRatio() const {
-    return geometry.isFixed();
+    return geometry.fixedAspectRatio();
 }
 
 wxRect2DDouble CanvasItem::getUpdateArea() const {
