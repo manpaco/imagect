@@ -183,7 +183,7 @@ void SmartRect::setZoneTo(const wxPoint2DDouble &p) {
             break;
     }
     checkMinimum();
-    checkInflate();
+    checkExpansion();
     checkReflection();
     checkAspectRatio();
     checkRestriction();
@@ -354,7 +354,7 @@ void SmartRect::checkMinimum() {
     }
 }
 
-void SmartRect::checkInflate() {
+void SmartRect::checkExpansion() {
     if(!expandFromCenter()) return;
     balance(activeZone);
 }

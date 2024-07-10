@@ -135,7 +135,7 @@ private:
     wxRect2DDouble restrictionLimits() const;
 
     void checkMinimum();
-    void checkInflate();
+    void checkExpansion();
     void checkReflection();
     void checkAspectRatio(int want = BIGGER_RECT);
     void checkRestriction();
