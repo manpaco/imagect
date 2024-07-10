@@ -188,7 +188,7 @@ void SmartRect::setZoneTo(const wxPoint2DDouble &p) {
     checkAspectRatio();
     checkRestriction();
     checkGrid();
-    if(!isFixed()) setAspectRatio(m_width / m_height);
+    if(!fixedAspectRatio()) setAspectRatio(m_width / m_height);
 }
 
 int SmartRect::activatedZone() const {
@@ -403,7 +403,7 @@ void SmartRect::checkReflection() {
 }
 
 void SmartRect::checkAspectRatio(int want) {
-    if(!isFixed() || !resizing()) return;
+    if(!fixedAspectRatio() || !resizing()) return;
     wxDouble nw = m_width, nh = m_height;
     if(m_width / m_height != aspectRatio) {
         if(cornerActivated() || want == SMALLER_RECT) {
@@ -521,7 +521,7 @@ void SmartRect::useInflate(const bool ec) {
     inflate = ec;
 }
 
-bool SmartRect::isFixed() const {
+bool SmartRect::fixedAspectRatio() const {
     return fixed;
 }
 

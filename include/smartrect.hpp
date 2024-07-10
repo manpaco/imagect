@@ -101,7 +101,7 @@ public:
     void useInflate(const bool i);
     void useGrid(bool);
 
-    bool isFixed() const;
+    bool fixedAspectRatio() const;
     bool useInflate() const;
     bool isRestricted() const;
     int getReflection() const;
