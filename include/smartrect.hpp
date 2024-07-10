@@ -98,11 +98,11 @@ public:
     void fixedAspectRatio(const bool ar);
     void setAspectRatio(const wxDouble &ar);
     void setAspectRatio(const int x, const int y);
-    void useInflate(const bool i);
+    void expandFromCenter(const bool i);
     void useGrid(bool);
 
     bool fixedAspectRatio() const;
-    bool useInflate() const;
+    bool expandFromCenter() const;
     bool isRestricted() const;
     int getReflection() const;
     bool useGrid() const;

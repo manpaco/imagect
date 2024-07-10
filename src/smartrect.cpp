@@ -88,7 +88,7 @@ void SmartRect::setSize(const wxPoint2DDouble &s) {
     wxPoint2DDouble newp(s);
     newp.m_x = abs(newp.m_x);
     newp.m_y = abs(newp.m_y);
-    if(useInflate()) {
+    if(expandFromCenter()) {
         newp.m_x /= 2;
         newp.m_y /= 2;
         newp += GetCentre();
@@ -283,7 +283,7 @@ void SmartRect::checkLimits(bool doBalance) {
         else clamps ^= ict::B_CLAMPED;
     }
     if(!doBalance) return;
-    if(useInflate()) {
+    if(expandFromCenter()) {
         balance(clampedZone());
         return;
     }
@@ -316,7 +316,7 @@ void SmartRect::checkMinimum() {
         case ict::R_ZONE:
         case ict::RT_ZONE:
         case ict::RB_ZONE:
-            if(!useInflate()) minx = mark.GetLeft();
+            if(!expandFromCenter()) minx = mark.GetLeft();
             else minx = mark.GetCentre().m_x;
             if(GetRight() > minx - ict::MINUPP &&
                 GetRight() < minx + ict::MINUPP)
@@ -325,7 +325,7 @@ void SmartRect::checkMinimum() {
         case ict::L_ZONE:
         case ict::LT_ZONE:
         case ict::LB_ZONE:
-            if(!useInflate()) minx = mark.GetRight();
+            if(!expandFromCenter()) minx = mark.GetRight();
             else minx = mark.GetCentre().m_x;
             if(GetLeft() < minx + ict::MINUPP &&
                 GetLeft() > minx - ict::MINUPP)
@@ -336,7 +336,7 @@ void SmartRect::checkMinimum() {
         case ict::T_ZONE:
         case ict::LT_ZONE:
         case ict::RT_ZONE:
-            if(!useInflate()) miny = GetBottom();
+            if(!expandFromCenter()) miny = GetBottom();
             else miny = mark.GetCentre().m_y;
             if(GetTop() < miny + ict::MINUPP &&
                 GetTop() > miny - ict::MINUPP)
@@ -345,7 +345,7 @@ void SmartRect::checkMinimum() {
         case ict::B_ZONE:
         case ict::LB_ZONE:
         case ict::RB_ZONE:
-            if(!useInflate()) miny = GetTop();
+            if(!expandFromCenter()) miny = GetTop();
             else miny = mark.GetCentre().m_y;
             if(GetBottom() > miny - ict::MINUPP &&
                 GetBottom() < miny + ict::MINUPP)
@@ -355,7 +355,7 @@ void SmartRect::checkMinimum() {
 }
 
 void SmartRect::checkInflate() {
-    if(!useInflate()) return;
+    if(!expandFromCenter()) return;
     balance(activeZone);
 }
 
@@ -420,7 +420,7 @@ void SmartRect::checkAspectRatio(int want) {
             else nh = calcOrdi(nw);
         }
     }
-    if(useInflate()) {
+    if(expandFromCenter()) {
         m_width = nw;
         m_height = nh;
         SetCentre(mark.GetCentre());
@@ -517,7 +517,7 @@ void SmartRect::setAspectRatio(const int x, const int y) {
     aspectRatio = (wxDouble)x / y;
 }
 
-void SmartRect::useInflate(const bool ec) {
+void SmartRect::expandFromCenter(const bool ec) {
     inflate = ec;
 }
 
@@ -525,7 +525,7 @@ bool SmartRect::fixedAspectRatio() const {
     return fixed;
 }
 
-bool SmartRect::useInflate() const {
+bool SmartRect::expandFromCenter() const {
     return inflate;
 }
 
