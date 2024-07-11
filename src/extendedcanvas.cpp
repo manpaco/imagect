@@ -353,12 +353,11 @@ void ExtendedCanvas::notifyGeometry(CanvasItem *changed) {
 void ExtendedCanvas::notifySelection(CanvasItem *changed) {
     if(!changed) return;
     if(selectedItem) {
-        if(*selectedItem != *changed) {
-            if(changed->isSelected()) {
-                selectedItem->select(false);
-                selectedItem = changed;
-            }
-        } else if(!changed->isSelected()) selectedItem = nullptr;
+        if(*selectedItem != *changed && changed->isSelected()) {
+            selectedItem->select(false);
+            selectedItem = changed;
+        } else if(*selectedItem == *changed && !changed->isSelected())
+            selectedItem = nullptr;
     } else if(changed->isSelected()) selectedItem = changed;
     wxRect2DDouble ch(changed->getArea());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
