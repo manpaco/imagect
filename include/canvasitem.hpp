@@ -110,12 +110,12 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    int hovered, prevHover;
+    int hover, sHover;
     wxPoint2DDouble relativePress;
     wxPoint cPoint;
     Scaler *scaler;
     SmartRect geometry;
-    wxRect2DDouble saved;
+    wxRect2DDouble sGeometry;
     ExtendedCanvas *container;
 
     /* Minimum handle dimension */

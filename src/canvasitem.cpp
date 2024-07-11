@@ -20,7 +20,7 @@ CanvasItem::CanvasItem(int id, wxRect2DDouble geometry) {
     this->locked = true;
     this->selected = false;
     this->container = nullptr;
-    this->hovered = ict::NONE_ZONE;
+    this->hover = ict::NONE_ZONE;
     hdim = 15;
 }
 
@@ -160,10 +160,10 @@ void CanvasItem::release() {
 }
 
 bool CanvasItem::doHover(int z) {
-    if(hovered != z) {
-        prevHover = hovered;
-        hovered = z;
-        return hovered != prevHover;
+    if(hover != z) {
+        sHover = hover;
+        hover = z;
+        return hover != sHover;
     }
     return false;
 }
@@ -201,10 +201,10 @@ void CanvasItem::modify(const wxPoint &canvasPoint, bool force) {
     relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
     relativePoint -= relativePress;
     geometry.setZoneTo(relativePoint);
-    hovered = geometry.activatedZone();
-    if(saved != getGeometry(ict::CANVAS_CONTEXT)) {
+    hover = geometry.activatedZone();
+    if(sGeometry != getGeometry(ict::CANVAS_CONTEXT)) {
         if(container) container->notifyGeometry(this);
-        saved = getGeometry(ict::CANVAS_CONTEXT);
+        sGeometry = getGeometry(ict::CANVAS_CONTEXT);
     }
 }
 
@@ -245,13 +245,13 @@ bool CanvasItem::fixedAspectRatio() const {
 }
 
 wxRect2DDouble CanvasItem::getUpdateArea() const {
-    wxRect2DDouble updArea(saved.CreateUnion(getGeometry(ict::CANVAS_CONTEXT)));
+    wxRect2DDouble updArea(sGeometry.CreateUnion(getGeometry(ict::CANVAS_CONTEXT)));
     inflateRect(&updArea, hdim);
     return updArea;
 }
 
 wxRect2DDouble CanvasItem::getHoverUpdate() const {
-    return getHandleZone(hovered).CreateUnion(getHandleZone(prevHover));
+    return getHandleZone(hover).CreateUnion(getHandleZone(sHover));
 }
 
 void CanvasItem::setVirtualSize(const wxPoint2DDouble &dim) {
@@ -280,9 +280,9 @@ void CanvasItem::drawOn(wxMemoryDC *pv) {
     wxRect2DDouble ddr(getGeometry(ict::CANVAS_CONTEXT));
     wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
     pv->DrawRectangle(dr);
-    if(hovered) {
+    if(hover) {
         pv->SetBrush(*wxYELLOW_BRUSH);
-        wxRect2DDouble ddr(getHandleZone(hovered));
+        wxRect2DDouble ddr(getHandleZone(hover));
         wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
         pv->DrawRectangle(dr);
     }
