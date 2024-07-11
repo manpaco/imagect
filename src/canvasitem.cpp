@@ -159,18 +159,13 @@ void CanvasItem::release() {
     geometry.activateZone(ict::NONE_ZONE);
 }
 
-void CanvasItem::hover(int z) {
+bool CanvasItem::hover(int z) {
     if(hovered != z) {
         prevHover = hovered;
         hovered = z;
-        if(container) container->notifyHover(this);
+        return hovered != prevHover;
     }
-}
-
-int CanvasItem::hover(const wxPoint &p) {
-    if(locked || hidden) return ict::NONE_ZONE;
-    hover(inHandle(p));
-    return hovered;
+    return false;
 }
 
 wxPoint2DDouble CanvasItem::getSize(ict::ECContext ic) const {

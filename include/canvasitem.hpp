@@ -85,8 +85,7 @@ private:
      */
     int press(const wxPoint &avp);
 
-    void hover(int z);
-    int hover(const wxPoint &p);
+    bool hover(int z);
 
     wxRect2DDouble getUpdateArea() const;
     wxRect2DDouble getHoverUpdate() const;
