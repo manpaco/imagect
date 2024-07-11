@@ -26,7 +26,6 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvasBuffer = nullptr;
     pressedItem = nullptr;
     selectedItem = nullptr;
-    hoveredItem = nullptr;
     grid = false;
     ctrlPressed = false;
     shiftPressed = false;
@@ -163,11 +162,15 @@ void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
 }
 
 bool ExtendedCanvas::hoverCanvas(const wxPoint p) {
+    int collision = ict::NONE_ZONE;
     for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
             it != zOrder.rend(); it++) {
-        if((*it)->hover(p)) return true;
+        if(!collision) {
+            collision = (*it)->inHandle(p);
+            if((*it)->hover(collision)) notifyHover(*it);
+        } else if((*it)->hover(ict::NONE_ZONE)) notifyHover(*it);
     }
-    return false;
+    return collision;
 }
 
 bool ExtendedCanvas::pressCanvas(const wxPoint p) {
@@ -368,15 +371,6 @@ void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
 }
 
 void ExtendedCanvas::notifyHover(CanvasItem *changed) {
-    if(!changed) return;
-    if(hoveredItem) {
-        if(*hoveredItem != *changed) {
-            if(changed->hovered) {
-                hoveredItem->hover(ict::NONE_ZONE);
-                hoveredItem = changed;
-            }
-        } else if(!changed->hovered) hoveredItem = nullptr;
-    } else if(changed->hovered) hoveredItem = changed;
     wxRect2DDouble ch(changed->getHoverUpdate());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh);
