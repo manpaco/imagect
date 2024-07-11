@@ -57,7 +57,6 @@ private:
     void notifySelection(CanvasItem *changed);
     void notifyPressure(CanvasItem *pressed);
     void notifyHover(CanvasItem *changed);
-    void notifyCollision(CanvasItem *target);
     void gridToggle(wxMouseEvent &event);
     void keyDown(wxKeyEvent &event);
     void keyUp(wxKeyEvent &event);

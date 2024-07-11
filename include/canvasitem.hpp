@@ -85,9 +85,8 @@ private:
      */
     int press(const wxPoint &avp);
 
-    void hoverCollision();
     void hover(int z);
-    bool collides(const wxPoint2DDouble &);
+    int hover(const wxPoint &p);
 
     wxRect2DDouble getUpdateArea() const;
     wxRect2DDouble getHoverUpdate() const;
@@ -112,7 +111,7 @@ private:
     bool selected;
     bool locked;
     bool hidden;
-    int hovered, prevHover, collision;
+    int hovered, prevHover;
     wxPoint2DDouble relativePress;
     wxPoint cPoint;
     Scaler *scaler;

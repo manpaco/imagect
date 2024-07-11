@@ -158,15 +158,14 @@ void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
 
 void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
     if(pressedItem) pressedItem->modify(event.GetPosition());
-    else if(!hoverCanvas(event.GetPosition()))
-        if(hoveredItem) hoveredItem->hover(ict::NONE_ZONE);
+    else hoverCanvas(event.GetPosition());
     event.Skip();
 }
 
 bool ExtendedCanvas::hoverCanvas(const wxPoint p) {
     for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
             it != zOrder.rend(); it++) {
-        if((*it)->collides(p)) return true;
+        if((*it)->hover(p)) return true;
     }
     return false;
 }
@@ -378,10 +377,6 @@ void ExtendedCanvas::notifyHover(CanvasItem *changed) {
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh);
     // send hover event
-}
-
-void ExtendedCanvas::notifyCollision(CanvasItem *target) {
-    target->hoverCollision();
 }
 
 wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {

@@ -129,17 +129,6 @@ int CanvasItem::getHandler() const {
     return geometry.activatedZone();
 }
 
-bool CanvasItem::collides(const wxPoint2DDouble &p) {
-    if(locked || hidden) {
-        collision = ict::NONE_ZONE;
-        return false;
-    }
-    collision = inHandle(p);
-    if(!collision) return false;
-    if(container) container->notifyCollision(this);
-    return true;
-}
-
 int CanvasItem::inHandle(const wxPoint2DDouble &canvasPoint) const {
     if (selected) {
         if(getHandleZone(ict::RT_ZONE).Contains(canvasPoint)) return ict::RT_ZONE;
@@ -171,16 +160,18 @@ void CanvasItem::release() {
     geometry.activateZone(ict::NONE_ZONE);
 }
 
-void CanvasItem::hoverCollision() {
-    hover(collision);
-}
-
 void CanvasItem::hover(int z) {
     if(hovered != z) {
         prevHover = hovered;
         hovered = z;
         if(container) container->notifyHover(this);
     }
+}
+
+int CanvasItem::hover(const wxPoint &p) {
+    if(locked || hidden) return ict::NONE_ZONE;
+    hover(inHandle(p));
+    return hovered;
 }
 
 wxPoint2DDouble CanvasItem::getSize(ict::ECContext ic) const {
