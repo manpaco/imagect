@@ -173,15 +173,21 @@ bool ExtendedCanvas::hoverCanvas(const wxPoint p) {
 bool ExtendedCanvas::pressCanvas(const wxPoint p) {
     for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
             it != zOrder.rend(); it++) {
-        if((*it)->press(p)) return true;
+        if((*it)->press(p)) {
+            pressedItem = *it;
+            notifyPressure(pressedItem);
+            checkModKeys();
+            pressedItem->select(true);
+            return true;
+        }
     }
+    if(selectedItem) selectedItem->select(false);
     return false;
 }
 
 void ExtendedCanvas::mousePress(wxMouseEvent &event) {
     if(!canvas->HasCapture()) canvas->CaptureMouse();
-    if(!pressCanvas(event.GetPosition()))
-        if(selectedItem) selectedItem->select(false);
+    pressCanvas(event.GetPosition());
     event.Skip();
 }
 
@@ -189,6 +195,7 @@ void ExtendedCanvas::mouseRelease(wxMouseEvent &event) {
     if(canvas->HasCapture()) canvas->ReleaseMouse();
     if(pressedItem) {
         pressedItem->release();
+        notifyPressure(pressedItem);
         checkModKeys();
         pressedItem = nullptr;
     }
@@ -357,9 +364,6 @@ void ExtendedCanvas::notifySelection(CanvasItem *changed) {
 }
 
 void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
-    pressedItem = pressed;
-    pressedItem->select(true);
-    checkModKeys();
     // send pressure event
 }
 

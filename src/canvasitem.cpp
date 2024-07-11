@@ -152,7 +152,6 @@ int CanvasItem::press(const wxPoint &canvasPoint) {
     if(!handler) return handler;
     relativePress = relativeToEdge(cPoint, handler, ict::CANVAS_CONTEXT);
     relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
-    if(container) container->notifyPressure(this);
     return handler;
 }
 
