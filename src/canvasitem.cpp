@@ -159,7 +159,7 @@ void CanvasItem::release() {
     geometry.activateZone(ict::NONE_ZONE);
 }
 
-bool CanvasItem::hover(int z) {
+bool CanvasItem::doHover(int z) {
     if(hovered != z) {
         prevHover = hovered;
         hovered = z;

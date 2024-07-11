@@ -167,8 +167,8 @@ bool ExtendedCanvas::hoverCanvas(const wxPoint p) {
             it != zOrder.rend(); it++) {
         if(!collision) {
             collision = (*it)->inHandle(p);
-            if((*it)->hover(collision)) notifyHover(*it);
-        } else if((*it)->hover(ict::NONE_ZONE)) notifyHover(*it);
+            if((*it)->doHover(collision)) notifyHover(*it);
+        } else if((*it)->doHover(ict::NONE_ZONE)) notifyHover(*it);
     }
     return collision;
 }
