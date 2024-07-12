@@ -153,6 +153,7 @@ void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
     if (canvasBuffer) delete canvasBuffer;
     canvasBuffer = new wxBitmap(event.GetSize().GetWidth(), event.GetSize().GetHeight());
     refreshCanvas();
+    adjustScrollbars();
 }
 
 void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
@@ -239,6 +240,7 @@ void ExtendedCanvas::addItem(CanvasItem *item) {
     zOrder.push_back(item);
     wxRect2DDouble fresh(item->getArea());
     refreshCanvasRect(wxRect(fresh.m_x, fresh.m_y, fresh.m_width, fresh.m_height));
+    adjustScrollbars();
 }
 
 void ExtendedCanvas::doMagnify(const wxPoint mousePosition) {
