@@ -34,9 +34,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     layout->AddGrowableCol(0);
     layout->AddGrowableRow(0);
     layout->Add(canvas, 1, wxEXPAND);
-    hBar->SetScrollbar(0, 50, 100, 50);
-    vBar->SetScrollbar(0, 50, 100, 50);
-    prevPosBars = wxPoint(0, 0);
+    initScrollbars();
     layout->Add(vBar, 1, wxEXPAND);
     layout->Add(hBar, 1, wxEXPAND);
     layout->Add(zoom, 1, wxEXPAND);
@@ -52,6 +50,12 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     hBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::horizontalScroll, this);
     vBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::verticalScroll, this);
     zoom->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::gridToggle, this);
+}
+
+void ExtendedCanvas::initScrollbars() {
+    hBar->SetScrollbar(0, 50, 50, 50);
+    vBar->SetScrollbar(0, 50, 50, 50);
+    prevPosBars = wxPoint(0, 0);
 }
 
 void ExtendedCanvas::horizontalScroll(wxScrollEvent &event) {
@@ -284,6 +288,10 @@ void ExtendedCanvas::doScroll(const wxPoint motion) {
 }
 
 void ExtendedCanvas::adjustScrollbars() {
+    if(!hasItems()) {
+        initScrollbars();
+        return;
+    }
     wxRect coverage(getItemsCoverage());
     wxRect slideWin(0, 0, 1, 1);
 
@@ -400,6 +408,10 @@ void ExtendedCanvas::useGrid(bool op) {
 
 bool ExtendedCanvas::useGrid() const {
     return grid;
+}
+
+bool ExtendedCanvas::hasItems() const {
+    return !zOrder.empty();
 }
 
 ExtendedCanvas::~ExtendedCanvas() {

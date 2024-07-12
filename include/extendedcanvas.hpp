@@ -35,6 +35,7 @@ public:
     wxPoint2DDouble getReference(ict::ECContext c) const;
     void useGrid(bool);
     bool useGrid() const;
+    bool hasItems() const;
 
     ~ExtendedCanvas();
 
@@ -62,6 +63,7 @@ private:
     void keyUp(wxKeyEvent &event);
     void toggleItemOption(CanvasItem *item, ict::ItemOption option);
     void checkModKeys();
+    void initScrollbars();
 
     void adjustScrollbars();
     wxRect getItemsCoverage();
