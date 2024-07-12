@@ -144,7 +144,8 @@ void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
     } else {
         wxPoint motion(0, 0);
         if(event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL) {
-            motion.y = event.GetWheelRotation() / 5;
+            if(shiftPressed) motion.x = event.GetWheelRotation() / 5;
+            else motion.y = event.GetWheelRotation() / 5;
         } else {
             motion.x = event.GetWheelRotation() / 5;
         }
