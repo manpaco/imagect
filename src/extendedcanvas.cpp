@@ -70,23 +70,25 @@ void
 ExtendedCanvas::toggleItemOption(CanvasItem *item, ict::ItemOption option) {
     if(!item) return;
     switch(option) {
-        case ict::IO_LOCKED:
+        case ict::IOPT_LOCK:
             item->lock(!item->isLocked());
             break;
-        case ict::IO_HIDDEN:
+        case ict::IOPT_HIDE:
             item->hide(!item->isHidden());
             break;
-        case ict::IO_SELECTED:
+        case ict::IOPT_SELECT:
             item->select(!item->isSelected());
             break;
-        case ict::IO_RESTRICTED:
+        case ict::IOPT_RESTRICT:
             item->restrict(!item->isRestricted());
             break;
-        case ict::IO_FIXEDASPECTRATIO:
+        case ict::IOPT_FIXEDASPECTRATIO:
             item->fixedAspectRatio(!item->fixedAspectRatio());
             break;
-        case ict::IO_EXPANDFROMCENTER:
+        case ict::IOPT_EXPANDFROMCENTER:
             item->expandFromCenter(!item->expandFromCenter());
+            break;
+        default:
             break;
     }
 }
@@ -95,11 +97,11 @@ void ExtendedCanvas::keyDown(wxKeyEvent &event) {
     switch(event.GetKeyCode()) {
         case WXK_CONTROL:
             ctrlPressed = true;
-            toggleItemOption(pressedItem, ict::IO_FIXEDASPECTRATIO);
+            toggleItemOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
             break;
         case WXK_SHIFT:
             shiftPressed = true;
-            toggleItemOption(pressedItem, ict::IO_EXPANDFROMCENTER);
+            toggleItemOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
             break;
     }
 
@@ -110,11 +112,11 @@ void ExtendedCanvas::keyUp(wxKeyEvent &event) {
     switch(event.GetKeyCode()) {
         case WXK_CONTROL:
             ctrlPressed = false;
-            toggleItemOption(pressedItem, ict::IO_FIXEDASPECTRATIO);
+            toggleItemOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
             break;
         case WXK_SHIFT:
             shiftPressed = false;
-            toggleItemOption(pressedItem, ict::IO_EXPANDFROMCENTER);
+            toggleItemOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
             break;
     }
 
@@ -123,8 +125,8 @@ void ExtendedCanvas::keyUp(wxKeyEvent &event) {
 
 void ExtendedCanvas::checkModKeys() {
     if(!pressedItem) return;
-    if(ctrlPressed) toggleItemOption(pressedItem, ict::IO_FIXEDASPECTRATIO);
-    if(shiftPressed) toggleItemOption(pressedItem, ict::IO_EXPANDFROMCENTER);
+    if(ctrlPressed) toggleItemOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
+    if(shiftPressed) toggleItemOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
 }
 
 void ExtendedCanvas::gridToggle(wxMouseEvent &event) {

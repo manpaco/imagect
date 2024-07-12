@@ -16,13 +16,13 @@ class CanvasItem;
 namespace ict {
 
     enum ItemOption {
-        IO_NONE = 0,
-        IO_LOCKED = 1,
-        IO_HIDDEN = 2,
-        IO_SELECTED = 3,
-        IO_RESTRICTED = 4,
-        IO_FIXEDASPECTRATIO = 5,
-        IO_EXPANDFROMCENTER = 6
+        IOPT_NONE = 0,
+        IOPT_LOCK = 1,
+        IOPT_HIDE = 2,
+        IOPT_SELECT = 3,
+        IOPT_RESTRICT = 4,
+        IOPT_FIXEDASPECTRATIO = 5,
+        IOPT_EXPANDFROMCENTER = 6
     };
 }
 
