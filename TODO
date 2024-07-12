@@ -1,6 +1,6 @@
 - Move grid implementation from SmartRect to CanvasItem.
-+- Improve CanvasItem event notification (probably extend CanvasItem from wxObject, and use wxEvent).
-   Done, but 'extend' not implemented (I think it is not necessary).
++ Improve CanvasItem event notification (probably extend CanvasItem from wxObject, and use wxEvent).
+  |--> Done, BUT 'extend' not implemented (I think it is not necessary).
 - Implement ZoomControl.
 - Implement Auto-scrolling.
   |--> improve getAreaUpdate function (CanvasItem)
