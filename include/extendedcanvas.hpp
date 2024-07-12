@@ -61,7 +61,7 @@ private:
     void gridToggle(wxMouseEvent &event);
     void keyDown(wxKeyEvent &event);
     void keyUp(wxKeyEvent &event);
-    void toggleItemOption(CanvasItem *item, ict::ItemOption option);
+    void toggleOption(CanvasItem *item, ict::ItemOption option);
     void checkModKeys();
     void initScrollbars();
 

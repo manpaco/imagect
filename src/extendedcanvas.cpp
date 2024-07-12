@@ -67,7 +67,7 @@ void ExtendedCanvas::verticalScroll(wxScrollEvent &event) {
 }
 
 void
-ExtendedCanvas::toggleItemOption(CanvasItem *item, ict::ItemOption option) {
+ExtendedCanvas::toggleOption(CanvasItem *item, ict::ItemOption option) {
     if(!item) return;
     switch(option) {
         case ict::IOPT_LOCK:
@@ -97,11 +97,11 @@ void ExtendedCanvas::keyDown(wxKeyEvent &event) {
     switch(event.GetKeyCode()) {
         case WXK_CONTROL:
             ctrlPressed = true;
-            toggleItemOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
+            toggleOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
             break;
         case WXK_SHIFT:
             shiftPressed = true;
-            toggleItemOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
+            toggleOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
             break;
     }
 
@@ -112,11 +112,11 @@ void ExtendedCanvas::keyUp(wxKeyEvent &event) {
     switch(event.GetKeyCode()) {
         case WXK_CONTROL:
             ctrlPressed = false;
-            toggleItemOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
+            toggleOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
             break;
         case WXK_SHIFT:
             shiftPressed = false;
-            toggleItemOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
+            toggleOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
             break;
     }
 
@@ -125,8 +125,8 @@ void ExtendedCanvas::keyUp(wxKeyEvent &event) {
 
 void ExtendedCanvas::checkModKeys() {
     if(!pressedItem) return;
-    if(ctrlPressed) toggleItemOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
-    if(shiftPressed) toggleItemOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
+    if(ctrlPressed) toggleOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
+    if(shiftPressed) toggleOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
 }
 
 void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
