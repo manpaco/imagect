@@ -129,6 +129,10 @@ void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
 }
 
 void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
+    if(pressedItem) {
+        event.Skip();
+        return;
+    }
     if(ctrlPressed) {
         wxDouble plus = event.GetWheelRotation();
         plus /= 2000;
