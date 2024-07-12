@@ -87,7 +87,7 @@ private:
 
     bool doHover(int z);
 
-    wxRect2DDouble getUpdateArea() const;
+    wxRect2DDouble getAreaUpdate() const;
     wxRect2DDouble getHoverUpdate() const;
 
     /**

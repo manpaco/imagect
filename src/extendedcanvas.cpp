@@ -343,7 +343,7 @@ void ExtendedCanvas::refreshCanvas() {
 }
 
 void ExtendedCanvas::notifyGeometry(CanvasItem *changed) {
-    wxRect2DDouble ch(changed->getUpdateArea());
+    wxRect2DDouble ch(changed->getAreaUpdate());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh.Inflate(1, 1));
     adjustScrollbars();

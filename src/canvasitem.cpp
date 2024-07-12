@@ -244,7 +244,7 @@ bool CanvasItem::fixedAspectRatio() const {
     return geometry.fixedAspectRatio();
 }
 
-wxRect2DDouble CanvasItem::getUpdateArea() const {
+wxRect2DDouble CanvasItem::getAreaUpdate() const {
     wxRect2DDouble updArea(sGeometry.CreateUnion(getGeometry(ict::CANVAS_CONTEXT)));
     inflateRect(&updArea, hdim);
     return updArea;
