@@ -157,7 +157,7 @@ private:
     bool loose;
     bool fixed;
     bool restricted;
-    bool inflate;
+    bool expand;
 
     int reflection;
     int activeZone;

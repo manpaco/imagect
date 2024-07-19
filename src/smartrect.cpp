@@ -13,7 +13,7 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
     fixed = false;
     restricted = false;
     clamps = ict::NONE_CLAMPED;
-    inflate = false;
+    expand = false;
     loose = false;
     reflection = ict::NONE_REFLEC;
     activeZone = ict::NONE_ZONE;
@@ -50,10 +50,10 @@ wxRect2DDouble SmartRect::restrictionLimits() const {
 void SmartRect::setGeometry(const wxRect2DDouble &r) {
     if(!resting()) return;
     setPosition(r.GetPosition());
-    bool aux = inflate;
-    if(aux) inflate = !aux;
+    bool aux = expand;
+    if(aux) expand = !aux;
     setSize(wxPoint2DDouble(r.m_width, r.m_height));
-    inflate = aux;
+    expand = aux;
 }
 
 void SmartRect::setPosition(const wxPoint2DDouble &p) {
@@ -498,7 +498,7 @@ void SmartRect::setAspectRatio(const int x, const int y) {
 }
 
 void SmartRect::expandFromCenter(const bool ec) {
-    inflate = ec;
+    expand = ec;
 }
 
 bool SmartRect::fixedAspectRatio() const {
@@ -506,7 +506,7 @@ bool SmartRect::fixedAspectRatio() const {
 }
 
 bool SmartRect::expandFromCenter() const {
-    return inflate;
+    return expand;
 }
 
 bool SmartRect::isRestricted() const {
