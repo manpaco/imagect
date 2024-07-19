@@ -128,10 +128,6 @@ private:
     wxDouble topRestriction() const;
     wxDouble rightRestriction() const;
     wxDouble bottomRestriction() const;
-    wxDouble leftRestrictionLimit() const;
-    wxDouble topRestrictionLimit() const;
-    wxDouble rightRestrictionLimit() const;
-    wxDouble bottomRestrictionLimit() const;
     wxRect2DDouble restrictionLimits() const;
 
     void checkMinimum();

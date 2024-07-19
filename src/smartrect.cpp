@@ -22,49 +22,29 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
 }
 
 wxDouble SmartRect::leftRestriction() const {
-    if(looseRestriction()) return round_rb(restriction.GetLeft());
+    if(looseRestriction()) return round_rb(restriction.GetLeft()) - ROUND_CORRECTOR;
     else return restriction.GetLeft();
 }
 
 wxDouble SmartRect::topRestriction() const {
-    if(looseRestriction()) return round_rb(restriction.GetTop());
+    if(looseRestriction()) return round_rb(restriction.GetTop()) - ROUND_CORRECTOR;
     else return restriction.GetTop();
 }
 
 wxDouble SmartRect::rightRestriction() const {
-    if(looseRestriction()) return round_lb(restriction.GetRight());
+    if(looseRestriction()) return round_lb(restriction.GetRight()) + ROUND_CORRECTOR;
     else return restriction.GetRight();
 }
 
 wxDouble SmartRect::bottomRestriction() const {
-    if(looseRestriction()) return round_lb(restriction.GetBottom());
+    if(looseRestriction()) return round_lb(restriction.GetBottom()) + ROUND_CORRECTOR;
     else return restriction.GetBottom();
 }
 
-wxDouble SmartRect::leftRestrictionLimit() const {
-    if(looseRestriction()) return leftRestriction() - ROUND_CORRECTOR;
-    else return leftRestriction();
-}
-
-wxDouble SmartRect::topRestrictionLimit() const {
-    if(looseRestriction()) return topRestriction() - ROUND_CORRECTOR;
-    else return topRestriction();
-}
-
-wxDouble SmartRect::rightRestrictionLimit() const {
-    if(looseRestriction()) return rightRestriction() + ROUND_CORRECTOR;
-    else return rightRestriction();
-}
-
-wxDouble SmartRect::bottomRestrictionLimit() const {
-    if(looseRestriction()) return bottomRestriction() + ROUND_CORRECTOR;
-    else return bottomRestriction();
-}
-
 wxRect2DDouble SmartRect::restrictionLimits() const {
-    return wxRect2DDouble(leftRestrictionLimit(), topRestrictionLimit(),
-                          rightRestrictionLimit() - leftRestrictionLimit(),
-                          bottomRestriction() - topRestrictionLimit());
+    return wxRect2DDouble(leftRestriction(), topRestriction(),
+                          rightRestriction() - leftRestriction(),
+                          bottomRestriction() - topRestriction());
 }
 
 void SmartRect::setGeometry(const wxRect2DDouble &r) {
@@ -237,35 +217,35 @@ void SmartRect::checkLimits(bool doBalance) {
     if(!restricted) return;
     if(!dragging() && !resizing()) return;
     clamps = ict::NONE_CLAMPED;
-    bool exceed = GetLeft() < leftRestrictionLimit();
+    bool exceed = GetLeft() < leftRestriction();
     if(exceed) {
-        if(dragging()) MoveLeftTo(leftRestrictionLimit());
+        if(dragging()) MoveLeftTo(leftRestriction());
         else {
-            SetLeft(leftRestrictionLimit());
+            SetLeft(leftRestriction());
             clamps |= ict::L_CLAMPED;
         }
     }
-    exceed = GetTop() < topRestrictionLimit();
+    exceed = GetTop() < topRestriction();
     if(exceed) {
-        if(dragging()) MoveTopTo(topRestrictionLimit());
+        if(dragging()) MoveTopTo(topRestriction());
         else {
-            SetTop(topRestrictionLimit());
+            SetTop(topRestriction());
             clamps |= ict::T_CLAMPED;
         }
     }
-    exceed = GetRight() > rightRestrictionLimit();
+    exceed = GetRight() > rightRestriction();
     if(exceed) {
-        if(dragging()) MoveRightTo(rightRestrictionLimit());
+        if(dragging()) MoveRightTo(rightRestriction());
         else {
-            SetRight(rightRestrictionLimit());
+            SetRight(rightRestriction());
             clamps |= ict::R_CLAMPED;
         }
     }
-    exceed = GetBottom() > bottomRestrictionLimit();
+    exceed = GetBottom() > bottomRestriction();
     if(exceed) {
-        if(dragging()) MoveBottomTo(bottomRestrictionLimit());
+        if(dragging()) MoveBottomTo(bottomRestriction());
         else {
-            SetBottom(bottomRestrictionLimit());
+            SetBottom(bottomRestriction());
             clamps |= ict::B_CLAMPED;
         }
     }
