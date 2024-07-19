@@ -78,41 +78,6 @@ void SmartRect::setSize(const wxPoint2DDouble &s) {
     activateZone(ict::NONE_ZONE);
 }
 
-wxDouble SmartRect::extGetLeft() const {
-    if(looseRestriction()) return round_rb(GetLeft());
-    else return GetLeft();
-}
-
-wxDouble SmartRect::extGetTop() const {
-    if(looseRestriction()) return round_rb(GetTop());
-    else return GetTop();
-}
-
-wxDouble SmartRect::extGetRight() const {
-    if(looseRestriction()) return round_lb(GetRight());
-    else return GetRight();
-}
-
-wxDouble SmartRect::extGetBottom() const {
-    if(looseRestriction()) return round_lb(GetBottom());
-    else return GetBottom();
-}
-
-wxDouble SmartRect::extGetWidth() const {
-    if(looseRestriction()) return extGetRight() - extGetLeft();
-    else return m_width;
-}
-
-wxDouble SmartRect::extGetHeight() const {
-    if(looseRestriction()) return extGetBottom() - extGetTop();
-    else return m_height;
-}
-
-wxRect2DDouble SmartRect::extGetRect() const {
-    return wxRect2DDouble(extGetLeft(), extGetTop(),
-                          extGetWidth(), extGetHeight());
-}
-
 void SmartRect::looseRestriction(bool op) {
     loose = op;
     restrict(restricted);

@@ -80,14 +80,6 @@ public:
     void setPosition(const wxPoint2DDouble &r);
     void setSize(const wxPoint2DDouble &r);
 
-    wxDouble extGetLeft() const;
-    wxDouble extGetTop() const;
-    wxDouble extGetRight() const;
-    wxDouble extGetBottom() const;
-    wxDouble extGetWidth() const;
-    wxDouble extGetHeight() const;
-    wxRect2DDouble extGetRect() const;
-
     void activateZone(const int z);
     void setZoneTo(const wxPoint2DDouble &p);
 
