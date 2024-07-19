@@ -96,6 +96,7 @@ public:
     bool fixedAspectRatio() const;
     bool expandFromCenter() const;
     bool isRestricted() const;
+    wxRect2DDouble getRestriction(bool force = false) const;
     int getReflection() const;
     bool looseRestriction() const;
     wxDouble getAspectRatio() const;
@@ -120,7 +121,6 @@ private:
     wxDouble topRestriction() const;
     wxDouble rightRestriction() const;
     wxDouble bottomRestriction() const;
-    wxRect2DDouble restrictionLimits() const;
 
     void checkMinimum();
     void checkExpansion();

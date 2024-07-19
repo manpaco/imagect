@@ -41,8 +41,9 @@ wxDouble SmartRect::bottomRestriction() const {
     else return restriction.GetBottom();
 }
 
-wxRect2DDouble SmartRect::restrictionLimits() const {
-    return wxRect2DDouble(leftRestriction(), topRestriction(),
+wxRect2DDouble SmartRect::getRestriction(bool force) const {
+    if(force) return restriction;
+    else return wxRect2DDouble(leftRestriction(), topRestriction(),
                           rightRestriction() - leftRestriction(),
                           bottomRestriction() - topRestriction());
 }
@@ -406,7 +407,7 @@ void SmartRect::checkAspectRatio(int want) {
 }
 
 void SmartRect::checkRestriction() {
-    if(!restricted || restrictionLimits().Contains(*this)) return;
+    if(!restricted || getRestriction().Contains(*this)) return;
     checkLimits(true);
     if(resizing()) checkAspectRatio(SMALLER_RECT);
 }
