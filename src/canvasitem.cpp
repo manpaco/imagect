@@ -28,9 +28,44 @@ CanvasItem::~CanvasItem() {
 
 }
 
+wxDouble CanvasItem::extGetLeft() const {
+    if(useGrid()) return round_rb(geometry.GetLeft());
+    else return geometry.GetLeft();
+}
+
+wxDouble CanvasItem::extGetTop() const {
+    if(useGrid()) return round_rb(geometry.GetTop());
+    else return geometry.GetTop();
+}
+
+wxDouble CanvasItem::extGetRight() const {
+    if(useGrid()) return round_lb(geometry.GetRight());
+    else return geometry.GetRight();
+}
+
+wxDouble CanvasItem::extGetBottom() const {
+    if(useGrid()) return round_lb(geometry.GetBottom());
+    else return geometry.GetBottom();
+}
+
+wxDouble CanvasItem::extGetWidth() const {
+    if(useGrid()) return extGetRight() - extGetLeft();
+    else return geometry.m_width;
+}
+
+wxDouble CanvasItem::extGetHeight() const {
+    if(useGrid()) return extGetBottom() - extGetTop();
+    else return geometry.m_height;
+}
+
+wxRect2DDouble CanvasItem::extGetRect() const {
+    return wxRect2DDouble(extGetLeft(), extGetTop(),
+                          extGetWidth(), extGetHeight());
+}
+
 wxDouble CanvasItem::getWidth(ict::ECContext ic, bool ext) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return geometry.extGetWidth();
+        if(ext) return extGetWidth();
         else return geometry.m_width;
     }
     else return scaler->scaleX(getWidth(ict::VIRTUAL_CONTEXT), ict::IN_D);
@@ -38,7 +73,7 @@ wxDouble CanvasItem::getWidth(ict::ECContext ic, bool ext) const {
 
 wxDouble CanvasItem::getHeight(ict::ECContext ic, bool ext) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return geometry.extGetHeight();
+        if(ext) return extGetHeight();
         else return geometry.m_height;
     }
     else return scaler->scaleY(getHeight(ict::VIRTUAL_CONTEXT), ict::IN_D);
@@ -46,7 +81,7 @@ wxDouble CanvasItem::getHeight(ict::ECContext ic, bool ext) const {
 
 wxDouble CanvasItem:: getRight(ict::ECContext ic, bool ext) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_x + geometry.extGetRight();
+        if(ext) return getContainerReference(ic).m_x + extGetRight();
         else return getContainerReference(ic).m_x + geometry.GetRight();
     }
     else return scaler->scaleX(getRight(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
@@ -54,7 +89,7 @@ wxDouble CanvasItem:: getRight(ict::ECContext ic, bool ext) const {
 
 wxDouble CanvasItem::getBottom(ict::ECContext ic, bool ext) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_y + geometry.extGetBottom();
+        if(ext) return getContainerReference(ic).m_y + extGetBottom();
         else return getContainerReference(ic).m_y + geometry.GetBottom();
     }
     else return scaler->scaleY(getBottom(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
@@ -62,7 +97,7 @@ wxDouble CanvasItem::getBottom(ict::ECContext ic, bool ext) const {
 
 wxDouble CanvasItem::getLeft(ict::ECContext ic, bool ext) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_x + geometry.extGetLeft();
+        if(ext) return getContainerReference(ic).m_x + extGetLeft();
         else return getContainerReference(ic).m_x + geometry.GetLeft();
     }
     else return scaler->scaleX(getLeft(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
@@ -70,7 +105,7 @@ wxDouble CanvasItem::getLeft(ict::ECContext ic, bool ext) const {
 
 wxDouble CanvasItem::getTop(ict::ECContext ic, bool ext) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_y + geometry.extGetTop();
+        if(ext) return getContainerReference(ic).m_y + extGetTop();
         else return getContainerReference(ic).m_y + geometry.GetTop();
     }
     else return scaler->scaleY(getTop(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);

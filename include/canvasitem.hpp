@@ -61,6 +61,14 @@ public:
     ~CanvasItem();
 
 private:
+    wxDouble extGetLeft() const;
+    wxDouble extGetTop() const;
+    wxDouble extGetRight() const;
+    wxDouble extGetBottom() const;
+    wxDouble extGetWidth() const;
+    wxDouble extGetHeight() const;
+    wxRect2DDouble extGetRect() const;
+
     wxDouble getWidth(ict::ECContext ic, bool ext = true) const;
     wxDouble getHeight(ict::ECContext ic, bool ext = true) const;
     wxDouble getRight(ict::ECContext ic, bool ext = true) const;
