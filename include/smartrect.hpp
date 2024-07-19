@@ -128,16 +128,10 @@ private:
     void checkAspectRatio(int want = BIGGER_RECT);
     void checkRestriction();
     void checkLimits(bool doBalance = false);
-    void checkGrid();
     void balance(int zone);
     int clampedZone() const;
 
-    /* ----------------------- SmartRect main structure -----------------------
-     * Internal getters are inherited from wxRect2DDouble.
-     * External getters are identified by "ext" prefix.
-     *
-     * When grid is enabled: external =/= internal, most of the time.
-     * When grid is disabled: external == internal, always. */
+    // ----------------------- SmartRect main structure -----------------------
 
     /* Restriction values */
     wxRect2DDouble restriction;

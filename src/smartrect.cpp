@@ -132,7 +132,6 @@ void SmartRect::setZoneTo(const wxPoint2DDouble &p) {
     checkReflection();
     checkAspectRatio();
     checkRestriction();
-    checkGrid();
     if(!fixedAspectRatio()) setAspectRatio(m_width / m_height);
 }
 
@@ -167,15 +166,6 @@ bool SmartRect::resting() const {
 
 bool SmartRect::creating() const {
     return activeZone == ict::NEW_ZONE;
-}
-
-void SmartRect::checkGrid() {
-    if(!looseRestriction() || !dragging()) return;
-    wxPoint2DDouble dp(GetPosition() - mark.GetPosition());
-    dp.m_x = trunc(dp.m_x);
-    dp.m_y = trunc(dp.m_y);
-    m_x = mark.GetPosition().m_x + dp.m_x;
-    m_y = mark.GetPosition().m_y + dp.m_y;
 }
 
 void SmartRect::checkLimits(bool doBalance) {
