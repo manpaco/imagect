@@ -340,9 +340,9 @@ bool CanvasItem::isHidden() const {
 }
 
 void CanvasItem::useGrid(bool op) {
-    geometry.useGrid(op);
+    geometry.looseRestriction(op);
 }
 
 bool CanvasItem::useGrid() const {
-    return geometry.useGrid();
+    return geometry.looseRestriction();
 }

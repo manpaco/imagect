@@ -14,7 +14,7 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
     restricted = false;
     clamps = ict::NONE_CLAMPED;
     inflate = false;
-    grid = false;
+    loose = false;
     reflection = ict::NONE_REFLEC;
     activeZone = ict::NONE_ZONE;
     restriction = *this;
@@ -22,42 +22,42 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
 }
 
 wxDouble SmartRect::leftRestriction() const {
-    if(useGrid()) return round_rb(restriction.GetLeft());
+    if(looseRestriction()) return round_rb(restriction.GetLeft());
     else return restriction.GetLeft();
 }
 
 wxDouble SmartRect::topRestriction() const {
-    if(useGrid()) return round_rb(restriction.GetTop());
+    if(looseRestriction()) return round_rb(restriction.GetTop());
     else return restriction.GetTop();
 }
 
 wxDouble SmartRect::rightRestriction() const {
-    if(useGrid()) return round_lb(restriction.GetRight());
+    if(looseRestriction()) return round_lb(restriction.GetRight());
     else return restriction.GetRight();
 }
 
 wxDouble SmartRect::bottomRestriction() const {
-    if(useGrid()) return round_lb(restriction.GetBottom());
+    if(looseRestriction()) return round_lb(restriction.GetBottom());
     else return restriction.GetBottom();
 }
 
 wxDouble SmartRect::leftRestrictionLimit() const {
-    if(useGrid()) return leftRestriction() - ROUND_CORRECTOR;
+    if(looseRestriction()) return leftRestriction() - ROUND_CORRECTOR;
     else return leftRestriction();
 }
 
 wxDouble SmartRect::topRestrictionLimit() const {
-    if(useGrid()) return topRestriction() - ROUND_CORRECTOR;
+    if(looseRestriction()) return topRestriction() - ROUND_CORRECTOR;
     else return topRestriction();
 }
 
 wxDouble SmartRect::rightRestrictionLimit() const {
-    if(useGrid()) return rightRestriction() + ROUND_CORRECTOR;
+    if(looseRestriction()) return rightRestriction() + ROUND_CORRECTOR;
     else return rightRestriction();
 }
 
 wxDouble SmartRect::bottomRestrictionLimit() const {
-    if(useGrid()) return bottomRestriction() + ROUND_CORRECTOR;
+    if(looseRestriction()) return bottomRestriction() + ROUND_CORRECTOR;
     else return bottomRestriction();
 }
 
@@ -99,32 +99,32 @@ void SmartRect::setSize(const wxPoint2DDouble &s) {
 }
 
 wxDouble SmartRect::extGetLeft() const {
-    if(useGrid()) return round_rb(GetLeft());
+    if(looseRestriction()) return round_rb(GetLeft());
     else return GetLeft();
 }
 
 wxDouble SmartRect::extGetTop() const {
-    if(useGrid()) return round_rb(GetTop());
+    if(looseRestriction()) return round_rb(GetTop());
     else return GetTop();
 }
 
 wxDouble SmartRect::extGetRight() const {
-    if(useGrid()) return round_lb(GetRight());
+    if(looseRestriction()) return round_lb(GetRight());
     else return GetRight();
 }
 
 wxDouble SmartRect::extGetBottom() const {
-    if(useGrid()) return round_lb(GetBottom());
+    if(looseRestriction()) return round_lb(GetBottom());
     else return GetBottom();
 }
 
 wxDouble SmartRect::extGetWidth() const {
-    if(useGrid()) return extGetRight() - extGetLeft();
+    if(looseRestriction()) return extGetRight() - extGetLeft();
     else return m_width;
 }
 
 wxDouble SmartRect::extGetHeight() const {
-    if(useGrid()) return extGetBottom() - extGetTop();
+    if(looseRestriction()) return extGetBottom() - extGetTop();
     else return m_height;
 }
 
@@ -133,13 +133,13 @@ wxRect2DDouble SmartRect::extGetRect() const {
                           extGetWidth(), extGetHeight());
 }
 
-void SmartRect::useGrid(bool op) {
-    grid = op;
+void SmartRect::looseRestriction(bool op) {
+    loose = op;
     restrict(restricted);
 }
 
-bool SmartRect::useGrid() const {
-    return grid;
+bool SmartRect::looseRestriction() const {
+    return loose;
 }
 
 wxDouble SmartRect::getAspectRatio() const {
@@ -225,7 +225,7 @@ bool SmartRect::creating() const {
 }
 
 void SmartRect::checkGrid() {
-    if(!useGrid() || !dragging()) return;
+    if(!looseRestriction() || !dragging()) return;
     wxPoint2DDouble dp(GetPosition() - mark.GetPosition());
     dp.m_x = trunc(dp.m_x);
     dp.m_y = trunc(dp.m_y);

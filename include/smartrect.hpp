@@ -99,13 +99,13 @@ public:
     void setAspectRatio(const wxDouble &ar);
     void setAspectRatio(const int x, const int y);
     void expandFromCenter(const bool i);
-    void useGrid(bool);
+    void looseRestriction(bool);
 
     bool fixedAspectRatio() const;
     bool expandFromCenter() const;
     bool isRestricted() const;
     int getReflection() const;
-    bool useGrid() const;
+    bool looseRestriction() const;
     wxDouble getAspectRatio() const;
     int activatedZone() const;
     bool cornerActivated() const;
@@ -158,7 +158,7 @@ private:
     /* Aspect ratio value */
     wxDouble aspectRatio;
 
-    bool grid;
+    bool loose;
     bool fixed;
     bool restricted;
     bool inflate;
