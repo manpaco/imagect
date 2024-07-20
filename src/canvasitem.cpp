@@ -145,25 +145,25 @@ wxRect2DDouble CanvasItem::getHandleZone(int z) const {
     } else return wxRect2DDouble(0, 0, 0, 0);
 }
 
-wxPoint2DDouble CanvasItem::relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c) {
+wxPoint2DDouble CanvasItem::relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c, bool ext, bool ref) {
     if(z == ict::RT_ZONE) {
-        return wxPoint2DDouble(p.m_x - getRight(c, false), p.m_y - getTop(c, false));
+        return wxPoint2DDouble(p.m_x - getRight(c, ext, ref), p.m_y - getTop(c, ext, ref));
     } else if(z == ict::LT_ZONE) {
-        return wxPoint2DDouble(p.m_x - getLeft(c, false), p.m_y - getTop(c, false));
+        return wxPoint2DDouble(p.m_x - getLeft(c, ext, ref), p.m_y - getTop(c, ext, ref));
     } else if(z == ict::RB_ZONE) {
-        return wxPoint2DDouble(p.m_x - getRight(c, false), p.m_y - getBottom(c, false));
+        return wxPoint2DDouble(p.m_x - getRight(c, ext, ref), p.m_y - getBottom(c, ext, ref));
     } else if(z == ict::LB_ZONE) {
-        return wxPoint2DDouble(p.m_x - getLeft(c, false), p.m_y - getBottom(c, false));
+        return wxPoint2DDouble(p.m_x - getLeft(c, ext, ref), p.m_y - getBottom(c, ext, ref));
     } else if(z == ict::T_ZONE) {
-        return wxPoint2DDouble(0, p.m_y - getTop(c, false));
+        return wxPoint2DDouble(0, p.m_y - getTop(c, ext, ref));
     } else if(z == ict::B_ZONE) {
-        return wxPoint2DDouble(0, p.m_y - getBottom(c, false));
+        return wxPoint2DDouble(0, p.m_y - getBottom(c, ext, ref));
     } else if(z == ict::R_ZONE) {
-        return wxPoint2DDouble(p.m_x - getRight(c, false), 0);
+        return wxPoint2DDouble(p.m_x - getRight(c, ext, ref), 0);
     } else if(z == ict::L_ZONE) {
-        return wxPoint2DDouble(p.m_x - getLeft(c, false), 0);
+        return wxPoint2DDouble(p.m_x - getLeft(c, ext, ref), 0);
     } else if(z == ict::IN_ZONE) {
-        return p - getPosition(c);
+        return p - getPosition(c, ext, ref);
     } else return p - getContainerReference(c);
 }
 
@@ -215,17 +215,17 @@ bool CanvasItem::doHover(int z) {
     return false;
 }
 
-wxPoint2DDouble CanvasItem::getSize(ict::ECContext ic) const {
-    return wxPoint2DDouble(getWidth(ic), getHeight(ic));
+wxPoint2DDouble CanvasItem::getSize(ict::ECContext ic, bool ext) const {
+    return wxPoint2DDouble(getWidth(ic, ext), getHeight(ic, ext));
 }
 
-wxPoint2DDouble CanvasItem::getPosition(ict::ECContext ic) const {
-    return wxPoint2DDouble(getLeft(ic), getTop(ic));
+wxPoint2DDouble CanvasItem::getPosition(ict::ECContext ic, bool ext, bool ref) const {
+    return wxPoint2DDouble(getLeft(ic, ext, ref), getTop(ic, ext, ref));
 }
 
-wxRect2DDouble CanvasItem::getGeometry(ict::ECContext ic) const {
-    wxPoint2DDouble p(getPosition(ic));
-    wxPoint2DDouble s(getSize(ic));
+wxRect2DDouble CanvasItem::getGeometry(ict::ECContext ic, bool ext, bool ref) const {
+    wxPoint2DDouble p(getPosition(ic, ext, ref));
+    wxPoint2DDouble s(getSize(ic, ext));
     return wxRect2DDouble(p.m_x, p.m_y, s.m_x, s.m_y);
 }
 

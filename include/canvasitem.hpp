@@ -22,9 +22,9 @@ public:
     bool isLocked();
     void hide(bool opt);
     bool isHidden() const;
-    wxRect2DDouble getGeometry(ict::ECContext ic) const;
-    wxPoint2DDouble getPosition(ict::ECContext ic) const;
-    wxPoint2DDouble getSize(ict::ECContext ic) const;
+    wxRect2DDouble getGeometry(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxPoint2DDouble getPosition(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxPoint2DDouble getSize(ict::ECContext ic, bool ext = true) const;
     wxRect2DDouble getArea() const;
     wxRect2DDouble getHandleZone(int z) const;
     void setVirtualGeometry(const wxRect2DDouble &geo);
@@ -106,7 +106,7 @@ private:
     /**
      * Get offset from p to respective zone.
      */
-    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c);
+    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c, bool ext = true, bool ref = true);
 
     int inHandle(const wxPoint2DDouble &vp) const;
 
