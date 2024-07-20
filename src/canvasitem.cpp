@@ -204,6 +204,7 @@ int CanvasItem::press(const wxPoint &canvasPoint) {
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
     rPressure = relativeToEdge(canvasPoint, handler, ict::CANVAS_CONTEXT, false);
     rPressure = scaler->scalePoint(rPressure, ict::OUT_D);
+    lastPoint -= rPressure;
     return handler;
 }
 
@@ -248,11 +249,12 @@ void CanvasItem::modify(const wxPoint &canvasPoint) {
     if(!geometry.activatedZone()) return;
     lastPoint = relativeToReference(canvasPoint, ict::CANVAS_CONTEXT);
     lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
+    lastPoint -= rPressure;
     virtualModify(lastPoint);
 }
 
 void CanvasItem::virtualModify(const wxPoint2DDouble &vp) {
-    geometry.setZoneTo(vp - rPressure);
+    geometry.setZoneTo(vp);
     hover = geometry.activatedZone();
     if(sGeometry != getGeometry(ict::CANVAS_CONTEXT)) {
         if(container) container->notifyGeometry(this);
