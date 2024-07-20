@@ -1,4 +1,5 @@
-- Move grid implementation from SmartRect to CanvasItem.
++ Move grid implementation from SmartRect to CanvasItem.
+  |--> Done, BUT 'looseRestriction()' is necessary on SmartRect.
 + Improve CanvasItem event notification (probably extend CanvasItem from wxObject, and use wxEvent).
   |--> Done, BUT 'extend' not implemented (I think it is not necessary).
 - Implement ZoomControl.
