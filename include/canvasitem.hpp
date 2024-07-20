@@ -71,10 +71,10 @@ private:
 
     wxDouble getWidth(ict::ECContext ic, bool ext = true) const;
     wxDouble getHeight(ict::ECContext ic, bool ext = true) const;
-    wxDouble getRight(ict::ECContext ic, bool ext = true) const;
-    wxDouble getLeft(ict::ECContext ic, bool ext = true) const;
-    wxDouble getTop(ict::ECContext ic, bool ext = true) const;
-    wxDouble getBottom(ict::ECContext ic, bool ext = true) const;
+    wxDouble getRight(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxDouble getLeft(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxDouble getTop(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxDouble getBottom(ict::ECContext ic, bool ext = true, bool ref = true) const;
 
     void useSavedMark();
 

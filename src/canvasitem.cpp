@@ -79,36 +79,48 @@ wxDouble CanvasItem::getHeight(ict::ECContext ic, bool ext) const {
     else return scaler->scaleY(getHeight(ict::VIRTUAL_CONTEXT), ict::IN_D);
 }
 
-wxDouble CanvasItem:: getRight(ict::ECContext ic, bool ext) const {
+wxDouble CanvasItem:: getRight(ict::ECContext ic, bool ext, bool ref) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_x + extGetRight();
-        else return getContainerReference(ic).m_x + geometry.GetRight();
+        wxDouble ret;
+        if(ext) ret = extGetRight();
+        else ret = geometry.GetRight();
+        if(ref) ret += getContainerReference(ic).m_x;
+        return ret;
     }
-    else return scaler->scaleX(getRight(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
+    else return scaler->scaleX(getRight(ict::VIRTUAL_CONTEXT, ext, ref), ict::IN_D);
 }
 
-wxDouble CanvasItem::getBottom(ict::ECContext ic, bool ext) const {
+wxDouble CanvasItem::getBottom(ict::ECContext ic, bool ext, bool ref) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_y + extGetBottom();
-        else return getContainerReference(ic).m_y + geometry.GetBottom();
+        wxDouble ret;
+        if(ext) ret = extGetBottom();
+        else ret = geometry.GetBottom();
+        if(ref) ret += getContainerReference(ic).m_y;
+        return ret;
     }
-    else return scaler->scaleY(getBottom(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
+    else return scaler->scaleY(getBottom(ict::VIRTUAL_CONTEXT, ext, ref), ict::IN_D);
 }
 
-wxDouble CanvasItem::getLeft(ict::ECContext ic, bool ext) const {
+wxDouble CanvasItem::getLeft(ict::ECContext ic, bool ext, bool ref) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_x + extGetLeft();
-        else return getContainerReference(ic).m_x + geometry.GetLeft();
+        wxDouble ret;
+        if(ext) ret = extGetLeft();
+        else ret = geometry.GetLeft();
+        if(ref) ret += getContainerReference(ic).m_x;
+        return ret;
     }
-    else return scaler->scaleX(getLeft(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
+    else return scaler->scaleX(getLeft(ict::VIRTUAL_CONTEXT, ext, ref), ict::IN_D);
 }
 
-wxDouble CanvasItem::getTop(ict::ECContext ic, bool ext) const {
+wxDouble CanvasItem::getTop(ict::ECContext ic, bool ext, bool ref) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_y + extGetTop();
-        else return getContainerReference(ic).m_y + geometry.GetTop();
+        wxDouble ret;
+        if(ext) ret = extGetTop();
+        else ret = geometry.GetTop();
+        if(ref) ret += getContainerReference(ic).m_y;
+        return ret;
     }
-    else return scaler->scaleY(getTop(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
+    else return scaler->scaleY(getTop(ict::VIRTUAL_CONTEXT, ext, ref), ict::IN_D);
 }
 
 wxRect2DDouble CanvasItem::getHandleZone(int z) const {
