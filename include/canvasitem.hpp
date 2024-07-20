@@ -119,7 +119,7 @@ private:
     bool locked;
     bool hidden;
     int hover, sHover;
-    wxPoint2DDouble relativePress;
+    wxPoint2DDouble rPressure;
     wxPoint cPoint;
     Scaler *scaler;
     SmartRect geometry;

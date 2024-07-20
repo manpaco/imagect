@@ -185,8 +185,8 @@ int CanvasItem::press(const wxPoint &canvasPoint) {
     int handler = inHandle(cPoint);
     geometry.activateZone(handler);
     if(!handler) return handler;
-    relativePress = relativeToEdge(cPoint, handler, ict::CANVAS_CONTEXT);
-    relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
+    rPressure = relativeToEdge(cPoint, handler, ict::CANVAS_CONTEXT);
+    rPressure = scaler->scalePoint(rPressure, ict::OUT_D);
     return handler;
 }
 
@@ -234,7 +234,7 @@ void CanvasItem::modify(const wxPoint &canvasPoint, bool force) {
     wxPoint2DDouble relativePoint = relativeToEdge(cPoint, ict::NONE_ZONE,
                                                    ict::CANVAS_CONTEXT);
     relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
-    relativePoint -= relativePress;
+    relativePoint -= rPressure;
     geometry.setZoneTo(relativePoint);
     hover = geometry.activatedZone();
     if(sGeometry != getGeometry(ict::CANVAS_CONTEXT)) {
