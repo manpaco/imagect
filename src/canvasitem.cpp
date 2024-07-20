@@ -68,7 +68,7 @@ wxDouble CanvasItem::getWidth(ict::ECContext ic, bool ext) const {
         if(ext) return extGetWidth();
         else return geometry.m_width;
     }
-    else return scaler->scaleX(getWidth(ict::VIRTUAL_CONTEXT), ict::IN_D);
+    else return scaler->scaleX(getWidth(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
 }
 
 wxDouble CanvasItem::getHeight(ict::ECContext ic, bool ext) const {
@@ -76,7 +76,7 @@ wxDouble CanvasItem::getHeight(ict::ECContext ic, bool ext) const {
         if(ext) return extGetHeight();
         else return geometry.m_height;
     }
-    else return scaler->scaleY(getHeight(ict::VIRTUAL_CONTEXT), ict::IN_D);
+    else return scaler->scaleY(getHeight(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
 }
 
 wxDouble CanvasItem:: getRight(ict::ECContext ic, bool ext, bool ref) const {
