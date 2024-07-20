@@ -197,11 +197,12 @@ int CanvasItem::inHandle(const wxPoint2DDouble &canvasPoint) const {
 
 int CanvasItem::press(const wxPoint &canvasPoint) {
     if(locked) return ict::NONE_ZONE;
-    cPoint = canvasPoint;
-    int handler = inHandle(cPoint);
+    int handler = inHandle(canvasPoint);
     geometry.activateZone(handler);
     if(!handler) return handler;
-    rPressure = relativeToEdge(cPoint, handler, ict::CANVAS_CONTEXT);
+    lastPoint = relativeToReference(canvasPoint, ict::CANVAS_CONTEXT);
+    lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
+    rPressure = relativeToEdge(canvasPoint, handler, ict::CANVAS_CONTEXT, false);
     rPressure = scaler->scalePoint(rPressure, ict::OUT_D);
     return handler;
 }
@@ -243,14 +244,15 @@ bool CanvasItem::isRestricted() const {
     return geometry.isRestricted();
 }
 
-void CanvasItem::modify(const wxPoint &canvasPoint, bool force) {
+void CanvasItem::modify(const wxPoint &canvasPoint) {
     if(!geometry.activatedZone()) return;
-    if(canvasPoint == cPoint && !force) return;
-    cPoint = canvasPoint;
-    wxPoint2DDouble relativePoint = relativeToReference(cPoint, ict::CANVAS_CONTEXT);
-    relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
-    relativePoint -= rPressure;
-    geometry.setZoneTo(relativePoint);
+    lastPoint = relativeToReference(canvasPoint, ict::CANVAS_CONTEXT);
+    lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
+    virtualModify(lastPoint);
+}
+
+void CanvasItem::virtualModify(const wxPoint2DDouble &vp) {
+    geometry.setZoneTo(vp - rPressure);
     hover = geometry.activatedZone();
     if(sGeometry != getGeometry(ict::CANVAS_CONTEXT)) {
         if(container) container->notifyGeometry(this);
@@ -273,7 +275,7 @@ void CanvasItem::setAspectRatio(int xr, int yr) {
 void CanvasItem::useSavedMark() {
     if(!geometry.resizing()) return;
     geometry.useMark();
-    modify(cPoint, true);
+    virtualModify(lastPoint);
 }
 
 void CanvasItem::expandFromCenter(bool op) {

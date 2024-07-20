@@ -84,7 +84,8 @@ private:
      * @param target Point used to move or resize.
      * @return true if crop rectangle changes, else false.
      */
-    void modify(const wxPoint &avp, bool force = false);
+    void modify(const wxPoint &p);
+    void virtualModify(const wxPoint2DDouble &vp);
 
     /**
      * Simulate pressure at a given point.
@@ -120,8 +121,7 @@ private:
     bool locked;
     bool hidden;
     int hover, sHover;
-    wxPoint2DDouble rPressure;
-    wxPoint cPoint;
+    wxPoint2DDouble rPressure, lastPoint;
     Scaler *scaler;
     SmartRect geometry;
     wxRect2DDouble sGeometry;
