@@ -245,11 +245,32 @@ bool CanvasItem::isRestricted() const {
     return geometry.isRestricted();
 }
 
+void CanvasItem::pushToRestriction(wxPoint2DDouble &p, int z) {
+    wxRect2DDouble aux = geometry.getRestriction();
+    if(z == ict::IN_ZONE) {
+        aux.m_width -= geometry.m_width;
+        aux.m_height -= geometry.m_height;
+    }
+    if(aux.GetLeft() > p.m_x) p.m_x = aux.GetLeft();
+    else if(aux.GetRight() < p.m_x) p.m_x = aux.GetRight();
+    if(aux.GetTop() > p.m_y) p.m_y = aux.GetTop();
+    else if(aux.GetBottom() < p.m_y) p.m_y = aux.GetBottom();
+}
+
 void CanvasItem::modify(const wxPoint &canvasPoint) {
     if(!geometry.activatedZone()) return;
-    lastPoint = relativeToReference(canvasPoint, ict::CANVAS_CONTEXT);
-    lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
-    lastPoint -= rPressure;
+    if(useGrid()) {
+        wxPoint2DDouble newPoint = relativeToReference(canvasPoint, ict::CANVAS_CONTEXT);
+        newPoint = scaler->scalePoint(newPoint, ict::OUT_D);
+        newPoint -= rPressure;
+        if(isRestricted()) pushToRestriction(newPoint, geometry.activatedZone());
+        lastPoint.m_x += trunc(newPoint.m_x - lastPoint.m_x);
+        lastPoint.m_y += trunc(newPoint.m_y - lastPoint.m_y);
+    } else {
+        lastPoint = relativeToReference(canvasPoint, ict::CANVAS_CONTEXT);
+        lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
+        lastPoint -= rPressure;
+    }
     virtualModify(lastPoint);
 }
 

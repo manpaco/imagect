@@ -116,6 +116,8 @@ private:
 
     wxPoint2DDouble getContainerReference(ict::ECContext c) const;
 
+    void pushToRestriction(wxPoint2DDouble &p, int z);
+
     int id;
     bool selected;
     bool locked;
