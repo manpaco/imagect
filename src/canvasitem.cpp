@@ -162,9 +162,13 @@ wxPoint2DDouble CanvasItem::relativeToEdge(const wxPoint2DDouble &p, int z, ict:
         return wxPoint2DDouble(p.m_x - getRight(c, ext, ref), 0);
     } else if(z == ict::L_ZONE) {
         return wxPoint2DDouble(p.m_x - getLeft(c, ext, ref), 0);
-    } else if(z == ict::IN_ZONE) {
+    } else { // IN_ZONE
         return p - getPosition(c, ext, ref);
-    } else return p - getContainerReference(c);
+    }
+}
+
+wxPoint2DDouble CanvasItem::relativeToReference(const wxPoint2DDouble &p, ict::ECContext c) {
+    return p - getContainerReference(c);
 }
 
 wxPoint2DDouble CanvasItem::getContainerReference(ict::ECContext c) const {
@@ -243,8 +247,7 @@ void CanvasItem::modify(const wxPoint &canvasPoint, bool force) {
     if(!geometry.activatedZone()) return;
     if(canvasPoint == cPoint && !force) return;
     cPoint = canvasPoint;
-    wxPoint2DDouble relativePoint = relativeToEdge(cPoint, ict::NONE_ZONE,
-                                                   ict::CANVAS_CONTEXT);
+    wxPoint2DDouble relativePoint = relativeToReference(cPoint, ict::CANVAS_CONTEXT);
     relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
     relativePoint -= rPressure;
     geometry.setZoneTo(relativePoint);

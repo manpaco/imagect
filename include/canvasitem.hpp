@@ -107,6 +107,7 @@ private:
      * Get offset from p to respective zone.
      */
     wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c, bool ext = true, bool ref = true);
+    wxPoint2DDouble relativeToReference(const wxPoint2DDouble &p, ict::ECContext c);
 
     int inHandle(const wxPoint2DDouble &vp) const;
 
