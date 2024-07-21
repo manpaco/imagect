@@ -6,8 +6,6 @@
 #include "toolspanel.hpp"
 #include "filext.hpp"
 #include "exportdlg.hpp"
-#include "zoomctrl.hpp"
-#include "zoomevent.hpp"
 #include "wx/settings.h"
 #include "wx/button.h"
 #include "wx/sizer.h"
@@ -82,7 +80,6 @@ void MainFrame::allocateMem() {
     mainSizer = new wxBoxSizer(wxVERTICAL);
     apply = new wxButton(this, ict::APPLY_BT, "Apply");
     reset = new wxButton(this, ict::RESET_CROP_BT, "Reset crop area");
-    zoom = new ZoomCtrl(this, ict::ZOOM_CT);
 }
 
 void MainFrame::createMenuBar() {
@@ -122,7 +119,6 @@ void MainFrame::overlayPanels() {
     buttonsSizer->AddSpacer(ict::BEST_SPACE);
     buttonsSizer->Add(reset);
     buttonsSizer->AddStretchSpacer();
-    buttonsSizer->Add(zoom);
     buttonsSizer->AddSpacer(ict::BEST_SPACE);
     mainSizer->AddSpacer(ict::BEST_SPACE);
     mainSizer->Add(buttonsSizer, 0, wxEXPAND);
@@ -152,7 +148,6 @@ void MainFrame::bindElements() {
     tools->
         Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this,
              ict::GROW_CHECK_CB);
-    zoom->Bind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
 void MainFrame::unbindElements() {
@@ -166,8 +161,6 @@ void MainFrame::unbindElements() {
     tools->
         Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this,
                ict::GROW_CHECK_CB);
-    zoom->
-        Unbind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
 void MainFrame::onAbout(wxCommandEvent &event) {
@@ -265,10 +258,6 @@ void MainFrame::openImage(const wxString &p) {
 //        std::cerr << e.what() << std::endl;
 //        wxMessageBox(e.what(), "Error opening image");
 //    }
-}
-
-void MainFrame::onZoomChange(ZoomEvent &event) {
-//    sView->scaleFactor(event.getScaleFactor());
 }
 
 void MainFrame::initParams() {

@@ -8,8 +8,6 @@ class wxBoxSizer;
 class wxButton;
 class wxSplitterWindow;
 class ScrolledView;
-class ZoomCtrl;
-class ZoomEvent;
 class ExtendedCanvas;
 
 #include "wx/frame.h"
@@ -50,7 +48,6 @@ class MainFrame: public wxFrame {
         void onQuitFrame(wxCloseEvent &event);
         void onAbout(wxCommandEvent &event);
         void resetCrop(wxCommandEvent &event);
-        void onZoomChange(ZoomEvent &event);
         void onCropChange(CropEvent &);
         // ---------------------- END EVENT HANDLERS --------------------------
 
@@ -95,7 +92,6 @@ class MainFrame: public wxFrame {
 
         wxButton *apply;
         wxButton *reset;
-        ZoomCtrl *zoom;
 
         wxMenuBar *topMenuBar;
         wxMenu *mFile, *mEdit, *mHelp;
