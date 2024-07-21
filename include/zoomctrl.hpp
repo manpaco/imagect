@@ -19,8 +19,8 @@ class ZoomCtrl : public wxControl {
         ~ZoomCtrl();
 
     private:
-        void onZout(wxCommandEvent &event);
-        void onZin(wxCommandEvent &event);
+        void onZoomOut(wxCommandEvent &event);
+        void onZoomIn(wxCommandEvent &event);
         void sendZoomEvent();
         void showPercent(float sf);
         void initStacks();

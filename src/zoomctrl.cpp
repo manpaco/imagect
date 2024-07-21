@@ -21,11 +21,11 @@ ZoomCtrl::ZoomCtrl(wxWindow *parent, wxWindowID id) :
     SetSizerAndFit(zSizer);
     initStacks();
     checkStacks();
-    Bind(wxEVT_BUTTON, &ZoomCtrl::onZout, this, ict::ZOUT_BT);
-    Bind(wxEVT_BUTTON, &ZoomCtrl::onZin, this, ict::ZIN_BT);
+    Bind(wxEVT_BUTTON, &ZoomCtrl::onZoomOut, this, ict::ZOUT_BT);
+    Bind(wxEVT_BUTTON, &ZoomCtrl::onZoomIn, this, ict::ZIN_BT);
 }
 
-void ZoomCtrl::onZout(wxCommandEvent &event) {
+void ZoomCtrl::onZoomOut(wxCommandEvent &event) {
     inStack.push(current);
     current = outStack.top();
     outStack.pop();
@@ -34,7 +34,7 @@ void ZoomCtrl::onZout(wxCommandEvent &event) {
     sendZoomEvent();
 }
 
-void ZoomCtrl::onZin(wxCommandEvent &event) {
+void ZoomCtrl::onZoomIn(wxCommandEvent &event) {
     outStack.push(current);
     current = inStack.top();
     inStack.pop();
