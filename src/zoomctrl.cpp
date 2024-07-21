@@ -10,7 +10,7 @@ ZoomCtrl::ZoomCtrl(wxWindow *parent, wxWindowID id) :
     wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxNO_BORDER) {
     zIn = new wxButton(this, ict::ZIN_BT, _("+"));
     zOut = new wxButton(this, ict::ZOUT_BT, _("-"));
-    percent = new wxTextCtrl(this, wxID_ANY, _("100%"), wxDefaultPosition,
+    percent = new wxTextCtrl(this, wxID_ANY, _("NULL"), wxDefaultPosition,
                              wxDefaultSize, wxTE_READONLY | wxTE_CENTRE);
     wxBoxSizer *zSizer = new wxBoxSizer(wxHORIZONTAL);
     zSizer->Add(zOut);
@@ -21,6 +21,7 @@ ZoomCtrl::ZoomCtrl(wxWindow *parent, wxWindowID id) :
     SetSizerAndFit(zSizer);
     initStacks();
     checkStacks();
+    showPercent(current);
     Bind(wxEVT_BUTTON, &ZoomCtrl::onZoomOut, this, ict::ZOUT_BT);
     Bind(wxEVT_BUTTON, &ZoomCtrl::onZoomIn, this, ict::ZIN_BT);
 }
