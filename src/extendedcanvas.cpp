@@ -174,6 +174,7 @@ void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
 
 void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
     if (canvasBuffer) delete canvasBuffer;
+    if(event.GetSize().x == 0 || event.GetSize().y == 0) return;
     canvasBuffer = new wxBitmap(event.GetSize().GetWidth(), event.GetSize().GetHeight());
     refreshCanvas();
     adjustScrollbars();
