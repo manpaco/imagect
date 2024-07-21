@@ -78,6 +78,7 @@ private:
     wxFlexGridSizer *layout;
     wxWindow *canvas;
     ZoomCtrl *zoom;
+    wxWindow *generic;
     Scaler *scaler;
     std::vector<CanvasItem *> zOrder;
     CanvasItem *pressedItem, *selectedItem, *hoveredItem;

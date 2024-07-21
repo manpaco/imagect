@@ -25,6 +25,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     vBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
     zoom = new ZoomCtrl(this, ict::ZOOM_CT);
+    generic = new wxWindow(this, wxID_ANY);
     scaler = new Scaler(1.0, 1.0);
     canvasBuffer = nullptr;
     pressedItem = nullptr;
@@ -38,6 +39,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     initScrollbars();
     layout->Add(vBar, 1, wxEXPAND);
     layout->Add(hBar, 1, wxEXPAND);
+    layout->Add(generic, 1, wxEXPAND);
     layout->Add(zoom, 1, wxEXPAND);
     SetSizer(layout);
     canvas->Bind(wxEVT_PAINT, &ExtendedCanvas::paintCanvas, this);
@@ -51,6 +53,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     zoom->Bind(EVT_ZOOM_CHANGE, &ExtendedCanvas::onZoomChange, this, ict::ZOOM_CT);
     hBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::horizontalScroll, this);
     vBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::verticalScroll, this);
+    generic->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::gridToggle, this);
 }
 
 void ExtendedCanvas::onZoomChange(ZoomEvent &event) {
