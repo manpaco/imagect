@@ -12,6 +12,8 @@ class wxFlexGridSizer;
 class wxPanel;
 class Scaler;
 class CanvasItem;
+class ZoomCtrl;
+class ZoomEvent;
 
 namespace ict {
 
@@ -61,6 +63,7 @@ private:
     void gridToggle(wxMouseEvent &event);
     void keyDown(wxKeyEvent &event);
     void keyUp(wxKeyEvent &event);
+    void onZoomChange(ZoomEvent &event);
     void toggleOption(CanvasItem *item, ict::ItemOption option);
     void checkModKeys();
     void initScrollbars();
@@ -74,7 +77,7 @@ private:
     wxPoint prevPosBars;
     wxFlexGridSizer *layout;
     wxWindow *canvas;
-    wxWindow *zoom;
+    ZoomCtrl *zoom;
     Scaler *scaler;
     std::vector<CanvasItem *> zOrder;
     CanvasItem *pressedItem, *selectedItem, *hoveredItem;

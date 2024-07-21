@@ -14,14 +14,17 @@
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
 #include <wx/utils.h>
+#include "zoomctrl.hpp"
+#include "zoomevent.hpp"
 
 ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(parent, id) {
-    layout = new wxFlexGridSizer(2, 2, 0, 0);
+    layout = new wxFlexGridSizer(3, 2, 0, 0);
     canvas = new wxWindow(this, wxID_ANY);
     canvas->SetBackgroundStyle(wxBG_STYLE_PAINT);
     canvasReference = wxPoint2DDouble(0, 0);
     vBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
+    zoom = new ZoomCtrl(this, ict::ZOOM_CT);
     scaler = new Scaler(1.0, 1.0);
     canvasBuffer = nullptr;
     pressedItem = nullptr;
@@ -29,8 +32,6 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     grid = false;
     ctrlPressed = false;
     shiftPressed = false;
-    zoom = new wxWindow(this, wxID_ANY);
-    zoom->SetBackgroundColour(wxColour(*wxYELLOW));
     layout->AddGrowableCol(0);
     layout->AddGrowableRow(0);
     layout->Add(canvas, 1, wxEXPAND);
@@ -47,9 +48,17 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvas->Bind(wxEVT_MOUSEWHEEL, &ExtendedCanvas::mouseWheel, this);
     canvas->Bind(wxEVT_KEY_DOWN, &ExtendedCanvas::keyDown, this);
     canvas->Bind(wxEVT_KEY_UP, &ExtendedCanvas::keyUp, this);
+    zoom->Bind(EVT_ZOOM_CHANGE, &ExtendedCanvas::onZoomChange, this, ict::ZOOM_CT);
     hBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::horizontalScroll, this);
     vBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::verticalScroll, this);
-    zoom->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::gridToggle, this);
+}
+
+void ExtendedCanvas::onZoomChange(ZoomEvent &event) {
+    scaler->setNewFactor(event.getScaleFactor(), event.getScaleFactor());
+    wxPoint centre;
+    centre.x = canvas->GetSize().x / 2;
+    centre.y = canvas->GetSize().y / 2;
+    doMagnify(centre);
 }
 
 void ExtendedCanvas::initScrollbars() {
