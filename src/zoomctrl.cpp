@@ -49,8 +49,8 @@ void ZoomCtrl::sendZoomEvent() {
     ProcessWindowEvent(toSend);
 }
 
-void ZoomCtrl::showPercent(float sf) {
-    double p = sf * 100;
+void ZoomCtrl::showPercent(double factor) {
+    double p = factor * 100;
     std::string toShow = std::to_string(p) + "%";
     percent->SetValue(toShow);
 }

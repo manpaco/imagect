@@ -22,7 +22,7 @@ class ZoomCtrl : public wxControl {
         void onZoomOut(wxCommandEvent &event);
         void onZoomIn(wxCommandEvent &event);
         void sendZoomEvent();
-        void showPercent(float sf);
+        void showPercent(double factor);
         void initStacks();
         void checkStacks();
 
