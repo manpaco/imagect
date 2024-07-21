@@ -54,14 +54,12 @@ void MainFrame::initDimensions() {
     minSideSplitterSize =
         wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) / sideSplitterFactor;
     mainSplitter->SetMinimumPaneSize(minMainSplitterSize);
-    sideSplitter->SetMinimumPaneSize(minSideSplitterSize);
     SetMinClientSize(wxSize(minMainSplitterSize * (mainSplitterFactor - 1),
                             minSideSplitterSize * (sideSplitterFactor - 1)));
 }
 
 void MainFrame::allocateMem() {
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
-    sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
     sCanvas = new ExtendedCanvas(mainSplitter, ict::SCVIEW);
     // sCanvas->useGrid(true);
     wxRect2DDouble res(0, 0, 200, 200);
@@ -75,11 +73,8 @@ void MainFrame::allocateMem() {
     // it2->fixedAspectRatio(true);
     // it2->expandFromCenter(true);
     sCanvas->addItem(it2);
-    tools = new ToolsPanel(sideSplitter, ict::TOOLS);
-    preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
+    tools = new ToolsPanel(mainSplitter, ict::TOOLS);
     mainSizer = new wxBoxSizer(wxVERTICAL);
-    apply = new wxButton(this, ict::APPLY_BT, "Apply");
-    reset = new wxButton(this, ict::RESET_CROP_BT, "Reset crop area");
 }
 
 void MainFrame::createMenuBar() {
@@ -111,20 +106,7 @@ void MainFrame::createMenuBar() {
 }
 
 void MainFrame::overlayPanels() {
-    sideSplitter->SplitHorizontally(preview, tools);
-    mainSplitter->SplitVertically(sideSplitter, sCanvas);
-    wxBoxSizer *buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
-    buttonsSizer->AddSpacer(ict::BEST_SPACE);
-    buttonsSizer->Add(apply);
-    buttonsSizer->AddSpacer(ict::BEST_SPACE);
-    buttonsSizer->Add(reset);
-    buttonsSizer->AddStretchSpacer();
-    buttonsSizer->AddSpacer(ict::BEST_SPACE);
-    mainSizer->AddSpacer(ict::BEST_SPACE);
-    mainSizer->Add(buttonsSizer, 0, wxEXPAND);
-    mainSizer->AddSpacer(ict::BEST_SPACE);
-    wxStaticLine *hLine = new wxStaticLine(this);
-    mainSizer->Add(hLine, 0, wxEXPAND);
+    mainSplitter->SplitVertically(tools, sCanvas);
     mainSizer->Add(mainSplitter, 1, wxEXPAND);
     SetSizerAndFit(mainSizer);
 }
@@ -285,7 +267,6 @@ void MainFrame::clear() {
     tools->Enable(false);
     tools->collapseBlocks();
 //    sView->clear();
-    preview->clear();
 }
 
 void MainFrame::onFixRatio(wxCommandEvent &event) {

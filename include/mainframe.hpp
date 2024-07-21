@@ -86,12 +86,7 @@ class MainFrame: public wxFrame {
         ExtendedCanvas *sCanvas = nullptr;
         ToolsPanel *tools = nullptr;
         wxSplitterWindow *mainSplitter = nullptr;
-        wxSplitterWindow *sideSplitter = nullptr;
-        PreviewPanel *preview = nullptr;
         wxBoxSizer *mainSizer = nullptr;
-
-        wxButton *apply;
-        wxButton *reset;
 
         wxMenuBar *topMenuBar;
         wxMenu *mFile, *mEdit, *mHelp;
