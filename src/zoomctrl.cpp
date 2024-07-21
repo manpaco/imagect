@@ -4,6 +4,7 @@
 #include "wx/sizer.h"
 #include <wx/gdicmn.h>
 #include "zoomevent.hpp"
+#include "defs.hpp"
 
 ZoomCtrl::ZoomCtrl(wxWindow *parent, wxWindowID id) :
     wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxNO_BORDER) {
@@ -18,39 +19,57 @@ ZoomCtrl::ZoomCtrl(wxWindow *parent, wxWindowID id) :
     zSizer->AddSpacer(ict::BEST_SPACE);
     zSizer->Add(zIn);
     SetSizerAndFit(zSizer);
-    zIt = &zValues.at(3);
+    initStacks();
+    checkStacks();
     Bind(wxEVT_BUTTON, &ZoomCtrl::onZout, this, ict::ZOUT_BT);
     Bind(wxEVT_BUTTON, &ZoomCtrl::onZin, this, ict::ZIN_BT);
 }
 
 void ZoomCtrl::onZout(wxCommandEvent &event) {
-    zIt--;
-    if(zIt == zValues.begin()) zOut->Enable(false);
-    if(!zIn->IsEnabled()) zIn->Enable();
-    showPercent(*zIt);
+    inStack.push(current);
+    current = outStack.top();
+    outStack.pop();
+    checkStacks();
+    showPercent(current);
     sendZoomEvent();
 }
 
 void ZoomCtrl::onZin(wxCommandEvent &event) {
-    zIt++;
-    ict::ZoomArray::const_iterator last = zValues.end();
-    last--;
-    if(zIt == last) zIn->Enable(false);
-    if(!zOut->IsEnabled()) zOut->Enable();
-    showPercent(*zIt);
+    outStack.push(current);
+    current = inStack.top();
+    inStack.pop();
+    checkStacks();
+    showPercent(current);
     sendZoomEvent();
 }
 
 void ZoomCtrl::sendZoomEvent() {
-    ZoomEvent toSend(EVT_ZOOM_CHANGE, GetId(), *zIt);
+    ZoomEvent toSend(EVT_ZOOM_CHANGE, GetId(), current);
     toSend.SetEventObject(this);
     ProcessWindowEvent(toSend);
 }
 
 void ZoomCtrl::showPercent(float sf) {
-    int p = sf * 100;
+    double p = sf * 100;
     std::string toShow = std::to_string(p) + "%";
     percent->SetValue(toShow);
+}
+
+void ZoomCtrl::initStacks() {
+    for(double factor = ict::MINUPP; factor < 1; factor *= 2) {
+        outStack.push(factor);
+    }
+    for(double factor = ict::MAXUPP; factor > 1; factor /= 2) {
+        inStack.push(factor);
+    }
+    current = 1;
+}
+
+void ZoomCtrl::checkStacks() {
+    if(outStack.empty()) zOut->Disable();
+    else zOut->Enable();
+    if(inStack.empty()) zIn->Disable();
+    else zIn->Enable();
 }
 
 ZoomCtrl::~ZoomCtrl() {

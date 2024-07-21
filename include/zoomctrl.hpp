@@ -5,11 +5,7 @@ class wxButton;
 class wxTextCtrl;
 
 #include "wx/control.h"
-#include "defs.hpp"
-
-static const ict::ZoomArray zValues = {
-    0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0
-};
+#include <stack>
 
 /**
  * Implementation of a zoom control
@@ -27,10 +23,15 @@ class ZoomCtrl : public wxControl {
         void onZin(wxCommandEvent &event);
         void sendZoomEvent();
         void showPercent(float sf);
+        void initStacks();
+        void checkStacks();
 
-        ict::ZoomArray::const_iterator zIt;
         wxButton *zIn, *zOut;
         wxTextCtrl *percent;
+
+        bool custom;
+        double current;
+        std::stack<double> outStack, inStack;
 };
 
 #endif // ZOOMCTRL_H
