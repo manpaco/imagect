@@ -5,6 +5,7 @@
 #include <wx/gdicmn.h>
 #include "zoomevent.hpp"
 #include "defs.hpp"
+#include <format>
 
 ZoomCtrl::ZoomCtrl(wxWindow *parent, wxWindowID id) :
     wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxNO_BORDER) {
@@ -52,7 +53,7 @@ void ZoomCtrl::sendZoomEvent() {
 
 void ZoomCtrl::showPercent(double factor) {
     double p = factor * 100;
-    std::string toShow = std::to_string(p) + "%";
+    std::string toShow = std::format("{}", p) + "%";
     percent->SetValue(toShow);
 }
 
