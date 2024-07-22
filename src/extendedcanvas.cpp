@@ -153,12 +153,14 @@ void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
     }
     if(ctrlPressed) {
         wxDouble plus = event.GetWheelRotation();
-        plus /= 2000;
+        plus /= 1000;
         wxDouble sx;
         scaler->getNewFactor(&sx, nullptr);
         plus *= sx;
         scaler->plusFactor(plus, plus);
         doMagnify(event.GetPosition());
+        scaler->getNewFactor(&sx, nullptr);
+        zoom->setCustom(sx);
     } else {
         wxPoint motion(0, 0);
         if(event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL) {
