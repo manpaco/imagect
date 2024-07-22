@@ -16,15 +16,17 @@ class wxTextCtrl;
 class ZoomCtrl : public wxControl {
     public:
         ZoomCtrl(wxWindow *parent, wxWindowID id);
+        void setCustom(const double &factor);
         ~ZoomCtrl();
 
     private:
         void onZoomOut(wxCommandEvent &event);
         void onZoomIn(wxCommandEvent &event);
         void sendZoomEvent();
-        void showPercent(double factor);
+        void updatePercent();
         void initStacks();
         void checkStacks();
+        void dumpToInStack();
 
         wxButton *zIn, *zOut;
         wxTextCtrl *percent;

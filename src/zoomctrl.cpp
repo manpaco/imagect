@@ -22,26 +22,56 @@ ZoomCtrl::ZoomCtrl(wxWindow *parent, wxWindowID id) :
     SetSizerAndFit(zSizer);
     initStacks();
     checkStacks();
-    showPercent(current);
+    updatePercent();
     Bind(wxEVT_BUTTON, &ZoomCtrl::onZoomOut, this, ict::ZOUT_BT);
     Bind(wxEVT_BUTTON, &ZoomCtrl::onZoomIn, this, ict::ZIN_BT);
 }
 
+void ZoomCtrl::setCustom(const double &factor) {
+    if(factor < ict::MINUPP || factor > ict::MAXUPP) return;
+    dumpToInStack();
+    bool setted = false;
+    while(!inStack.empty() && !setted) {
+        if(factor > inStack.top()) {
+            outStack.push(inStack.top());
+            inStack.pop();
+        } else {
+            if(factor == inStack.top()) inStack.pop();
+            else custom = true;
+            current = factor;
+            setted = true;
+        }
+    }
+    checkStacks();
+    updatePercent();
+}
+
+void ZoomCtrl::dumpToInStack() {
+    if(!custom) inStack.push(current);
+    else custom = false;
+    while(!outStack.empty()) {
+        inStack.push(outStack.top());
+        outStack.pop();
+    }
+}
+
 void ZoomCtrl::onZoomOut(wxCommandEvent &event) {
-    inStack.push(current);
+    if(!custom) inStack.push(current);
+    else custom = false;
     current = outStack.top();
     outStack.pop();
     checkStacks();
-    showPercent(current);
+    updatePercent();
     sendZoomEvent();
 }
 
 void ZoomCtrl::onZoomIn(wxCommandEvent &event) {
-    outStack.push(current);
+    if(!custom) outStack.push(current);
+    else custom = false;
     current = inStack.top();
     inStack.pop();
     checkStacks();
-    showPercent(current);
+    updatePercent();
     sendZoomEvent();
 }
 
@@ -51,9 +81,11 @@ void ZoomCtrl::sendZoomEvent() {
     ProcessWindowEvent(toSend);
 }
 
-void ZoomCtrl::showPercent(double factor) {
-    double p = factor * 100;
-    std::string toShow = std::format("{}", p) + "%";
+void ZoomCtrl::updatePercent() {
+    double p = current * 100;
+    std::string toShow;
+    if(!custom) toShow = std::format("{}%", p);
+    else toShow = std::format("{:.2f}%", p);
     percent->SetValue(toShow);
 }
 
@@ -65,6 +97,7 @@ void ZoomCtrl::initStacks() {
         inStack.push(factor);
     }
     current = 1;
+    custom = false;
 }
 
 void ZoomCtrl::checkStacks() {
