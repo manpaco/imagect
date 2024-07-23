@@ -14,11 +14,11 @@ inline double round_htz(const double &n) {
 inline double round_haz(const double &n) {
     return std::copysign(floor((fabs(n) + ROUND_CORRECTOR)), n);
 }
-inline double round_rb(const double &n) {
+inline double round_btr(const double &n) {
     if(n < 0) return round_htz(n);
     else return round_haz(n);
 }
-inline double round_lb(const double &n) {
+inline double round_btl(const double &n) {
     if(n > 0) return round_htz(n);
     else return round_haz(n);
 }

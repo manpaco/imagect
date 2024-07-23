@@ -22,22 +22,22 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
 }
 
 wxDouble SmartRect::leftRestriction() const {
-    if(looseRestriction()) return round_rb(restriction.GetLeft()) - ROUND_CORRECTOR;
+    if(looseRestriction()) return round_btl(restriction.GetLeft()) - ROUND_CORRECTOR;
     else return restriction.GetLeft();
 }
 
 wxDouble SmartRect::topRestriction() const {
-    if(looseRestriction()) return round_rb(restriction.GetTop()) - ROUND_CORRECTOR;
+    if(looseRestriction()) return round_btl(restriction.GetTop()) - ROUND_CORRECTOR;
     else return restriction.GetTop();
 }
 
 wxDouble SmartRect::rightRestriction() const {
-    if(looseRestriction()) return round_lb(restriction.GetRight()) + ROUND_CORRECTOR;
+    if(looseRestriction()) return round_btr(restriction.GetRight()) + ROUND_CORRECTOR;
     else return restriction.GetRight();
 }
 
 wxDouble SmartRect::bottomRestriction() const {
-    if(looseRestriction()) return round_lb(restriction.GetBottom()) + ROUND_CORRECTOR;
+    if(looseRestriction()) return round_btr(restriction.GetBottom()) + ROUND_CORRECTOR;
     else return restriction.GetBottom();
 }
 

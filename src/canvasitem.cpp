@@ -29,22 +29,22 @@ CanvasItem::~CanvasItem() {
 }
 
 wxDouble CanvasItem::extGetLeft() const {
-    if(useGrid()) return round_rb(geometry.GetLeft());
+    if(useGrid()) return round_btl(geometry.GetLeft());
     else return geometry.GetLeft();
 }
 
 wxDouble CanvasItem::extGetTop() const {
-    if(useGrid()) return round_rb(geometry.GetTop());
+    if(useGrid()) return round_btl(geometry.GetTop());
     else return geometry.GetTop();
 }
 
 wxDouble CanvasItem::extGetRight() const {
-    if(useGrid()) return round_lb(geometry.GetRight());
+    if(useGrid()) return round_btr(geometry.GetRight());
     else return geometry.GetRight();
 }
 
 wxDouble CanvasItem::extGetBottom() const {
-    if(useGrid()) return round_lb(geometry.GetBottom());
+    if(useGrid()) return round_btr(geometry.GetBottom());
     else return geometry.GetBottom();
 }
 
