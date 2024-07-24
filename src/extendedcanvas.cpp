@@ -40,7 +40,13 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     layout->Add(vBar, 1, wxEXPAND);
     layout->Add(hBar, 1, wxEXPAND);
     layout->Add(generic, 1, wxEXPAND);
-    layout->Add(zoom, 1, wxEXPAND);
+    wxBoxSizer *vertToolBarSizer = new wxBoxSizer(wxVERTICAL);
+    vertToolBarSizer->AddSpacer(ict::BEST_SPACE);
+    wxBoxSizer *toolBarSizer = new wxBoxSizer(wxHORIZONTAL);
+    toolBarSizer->Add(zoom);
+    vertToolBarSizer->Add(toolBarSizer);
+    vertToolBarSizer->AddSpacer(ict::BEST_SPACE);
+    layout->Add(vertToolBarSizer, 0, wxALIGN_CENTRE_HORIZONTAL);
     SetSizer(layout);
     canvas->Bind(wxEVT_PAINT, &ExtendedCanvas::paintCanvas, this);
     canvas->Bind(wxEVT_MOTION, &ExtendedCanvas::mouseMotion, this);
