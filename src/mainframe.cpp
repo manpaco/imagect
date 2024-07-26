@@ -278,16 +278,3 @@ void MainFrame::onCropChange(CropEvent &event) {
     wxRect newGeometry(event.getOffset(), event.getSize());
     tools->cropGeometry(newGeometry);
 }
-
-void MainFrame::composePreview() {
-//    OptionsContainer aux(currentState);
-//    aux.cropSize =
-//        sView->getCanvas()->
-//            translateSize(aux.cropSize, ict::COMPRESS_T, ict::IN_D);
-//    aux.cropOff =
-//        sView->getCanvas()->
-//            translatePoint(aux.cropOff, ict::COMPRESS_T, ict::IN_D);
-//    Magick::Image newImg = composeState(*compImg, aux);
-//    wxBitmap newPreview(createImage(newImg));
-//    preview->updatePreview(newPreview);
-}

@@ -60,11 +60,6 @@ class MainFrame: public wxFrame {
         void clear();
 
         /**
-         * Compose current state on the compressed image.
-         */
-        void composePreview();
-
-        /**
          * Show export dialog.
          */
         void exportImage(const wxString &p);
