@@ -88,18 +88,12 @@ void MainFrame::createMenuBar() {
     mFile->AppendSeparator();
     mFile->Append(wxID_EXIT);
 
-    mEdit = new wxMenu;
-    mEdit->Append(wxID_UNDO);
-    mEdit->Append(wxID_REDO);
-    mEdit->Append(wxID_APPLY);
-
     mHelp = new wxMenu;
     mHelp->Append(wxID_HELP);
     mHelp->AppendSeparator();
     mHelp->Append(wxID_ABOUT);
 
     topMenuBar->Append(mFile, "File");
-    topMenuBar->Append(mEdit, "Edit");
     topMenuBar->Append(mHelp, "More");
 
     SetMenuBar(topMenuBar);
@@ -246,9 +240,6 @@ void MainFrame::initParams() {
 //    currentState = OptionsContainer();
     openedImg = false;
     exportedImg = false;
-    mEdit->Enable(wxID_APPLY, false);
-    mEdit->Enable(wxID_UNDO, false);
-    mEdit->Enable(wxID_REDO, false);
 }
 
 void MainFrame::clear() {

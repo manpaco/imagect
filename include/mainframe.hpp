@@ -89,7 +89,7 @@ class MainFrame: public wxFrame {
         wxBoxSizer *mainSizer = nullptr;
 
         wxMenuBar *topMenuBar;
-        wxMenu *mFile, *mEdit, *mHelp;
+        wxMenu *mFile, *mHelp;
 
         bool openedImg, exportedImg;
 
