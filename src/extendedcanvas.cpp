@@ -14,6 +14,7 @@
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
 #include <wx/utils.h>
+#include <wx/checkbox.h>
 #include "zoomctrl.hpp"
 #include "zoomevent.hpp"
 
@@ -25,12 +26,11 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     vBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
     zoom = new ZoomCtrl(this, ict::ZOOM_CT);
-    generic = new wxWindow(this, wxID_ANY);
+    gridBox = new wxCheckBox(this, wxID_ANY, _("Use grid"));
     scaler = new Scaler(1.0, 1.0);
     canvasBuffer = nullptr;
     pressedItem = nullptr;
     selectedItem = nullptr;
-    grid = false;
     ctrlPressed = false;
     shiftPressed = false;
     layout->AddGrowableCol(0);
@@ -39,14 +39,17 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     initScrollbars();
     layout->Add(vBar, 1, wxEXPAND);
     layout->Add(hBar, 1, wxEXPAND);
-    layout->Add(generic, 1, wxEXPAND);
+    layout->Add(new wxWindow(this, wxID_ANY), 1, wxEXPAND);
     wxBoxSizer *vertToolBarSizer = new wxBoxSizer(wxVERTICAL);
     vertToolBarSizer->AddSpacer(ict::BEST_SPACE);
     wxBoxSizer *toolBarSizer = new wxBoxSizer(wxHORIZONTAL);
+    toolBarSizer->AddSpacer(ict::BEST_SPACE);
     toolBarSizer->Add(zoom);
-    vertToolBarSizer->Add(toolBarSizer);
+    toolBarSizer->AddStretchSpacer();
+    toolBarSizer->Add(gridBox, 0, wxALIGN_CENTER_VERTICAL);
+    vertToolBarSizer->Add(toolBarSizer, 0, wxEXPAND);
     vertToolBarSizer->AddSpacer(ict::BEST_SPACE);
-    layout->Add(vertToolBarSizer, 0, wxALIGN_CENTRE_HORIZONTAL);
+    layout->Add(vertToolBarSizer, 0, wxEXPAND);
     SetSizer(layout);
     canvas->Bind(wxEVT_PAINT, &ExtendedCanvas::paintCanvas, this);
     canvas->Bind(wxEVT_MOTION, &ExtendedCanvas::mouseMotion, this);
@@ -59,7 +62,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     zoom->Bind(EVT_ZOOM_CHANGE, &ExtendedCanvas::onZoomChange, this, ict::ZOOM_CT);
     hBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::horizontalScroll, this);
     vBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::verticalScroll, this);
-    generic->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::gridToggle, this);
+    gridBox->Bind(wxEVT_CHECKBOX, &ExtendedCanvas::gridToggle, this);
 }
 
 void ExtendedCanvas::onZoomChange(ZoomEvent &event) {
@@ -147,8 +150,8 @@ void ExtendedCanvas::checkModKeys() {
     if(shiftPressed) toggleOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
 }
 
-void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
-    useGrid(!grid);
+void ExtendedCanvas::gridToggle(wxCommandEvent &event) {
+    useGrid(event.IsChecked());
     event.Skip();
 }
 
@@ -268,7 +271,7 @@ void ExtendedCanvas::addItem(CanvasItem *item) {
     if (getItem(item->getId())) return;
     item->setScaler(scaler);
     item->setContainer(this);
-    item->useGrid(grid);
+    item->useGrid(gridBox->IsChecked());
     zOrder.push_back(item);
     wxRect2DDouble fresh(item->getArea());
     refreshCanvasRect(wxRect(fresh.m_x, fresh.m_y, fresh.m_width, fresh.m_height));
@@ -420,17 +423,15 @@ wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {
 }
 
 void ExtendedCanvas::useGrid(bool op) {
-    if(grid == op) return;
-    grid = op;
     for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
             it != zOrder.rend(); it++) {
-        (*it)->useGrid(grid);
+        (*it)->useGrid(op);
     }
     refreshCanvas();
 }
 
 bool ExtendedCanvas::useGrid() const {
-    return grid;
+    return gridBox->IsChecked();
 }
 
 bool ExtendedCanvas::hasItems() const {

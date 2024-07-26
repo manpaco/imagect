@@ -10,6 +10,7 @@
 class wxScrollBar;
 class wxFlexGridSizer;
 class wxPanel;
+class wxCheckBox;
 class Scaler;
 class CanvasItem;
 class ZoomCtrl;
@@ -60,7 +61,7 @@ private:
     void notifySelection(CanvasItem *changed);
     void notifyPressure(CanvasItem *pressed);
     void notifyHover(CanvasItem *changed);
-    void gridToggle(wxMouseEvent &event);
+    void gridToggle(wxCommandEvent &event);
     void keyDown(wxKeyEvent &event);
     void keyUp(wxKeyEvent &event);
     void onZoomChange(ZoomEvent &event);
@@ -71,14 +72,13 @@ private:
     void adjustScrollbars();
     wxRect getItemsCoverage();
 
-    bool grid;
     bool shiftPressed, ctrlPressed;
     wxScrollBar *vBar, *hBar;
     wxPoint prevPosBars;
     wxFlexGridSizer *layout;
     wxWindow *canvas;
     ZoomCtrl *zoom;
-    wxWindow *generic;
+    wxCheckBox *gridBox;
     Scaler *scaler;
     std::vector<CanvasItem *> zOrder;
     CanvasItem *pressedItem, *selectedItem, *hoveredItem;
