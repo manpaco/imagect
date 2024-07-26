@@ -109,7 +109,6 @@ void MainFrame::bindMenuBar() {
     Bind(wxEVT_MENU, &MainFrame::onOpen, this, wxID_OPEN);
     Bind(wxEVT_MENU, &MainFrame::onExport, this, ict::EXPORT_MI);
     Bind(wxEVT_MENU, &MainFrame::onQuit, this, wxID_EXIT);
-    Bind(wxEVT_MENU, &MainFrame::saveState, this, wxID_APPLY);
     Bind(wxEVT_MENU, &MainFrame::onClose, this, wxID_CLOSE);
     Bind(wxEVT_MENU, &MainFrame::onAbout, this, wxID_ABOUT);
 }
@@ -117,7 +116,6 @@ void MainFrame::bindMenuBar() {
 void MainFrame::bindElements() {
 //    sView->
 //        getCanvas()->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
-    Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Bind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->
         Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
@@ -129,7 +127,6 @@ void MainFrame::bindElements() {
 void MainFrame::unbindElements() {
 //    sView->
 //        getCanvas()->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
-    Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Unbind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->
         Unbind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this,
@@ -294,18 +291,3 @@ void MainFrame::composePreview() {
 //    wxBitmap newPreview(createImage(newImg));
 //    preview->updatePreview(newPreview);
 }
-
-void MainFrame::saveState(wxCommandEvent &event) {
-//    if(!tools->valid()) return;
-//    OptionsContainer toSave = tools->currentOpts();
-//    if(toSave.cropSize != currentState.cropSize) {
-//        wxSize ts(toSave.cropSize);
-//        if(!sView->getCanvas()->cropSize(&ts)) {
-//            tools->cropSize(ts);
-//            toSave.cropSize = ts;
-//        }
-//    }
-//    if(toSave == currentState) return;
-//    updateHistory(toSave);
-}
-

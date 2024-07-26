@@ -38,7 +38,6 @@ class MainFrame: public wxFrame {
 
     private:
         // ------------------------ EVENT HANDLERS ----------------------------
-        void saveState(wxCommandEvent &);
         void onFixRatio(wxCommandEvent &);
         void onAllowGrow(wxCommandEvent &event);
         void onClose(wxCommandEvent &event);
