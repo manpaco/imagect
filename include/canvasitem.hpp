@@ -41,8 +41,6 @@ public:
     void setContainer(ExtendedCanvas *c);
     void expandFromCenter(bool op);
     bool expandFromCenter() const;
-    void useGrid(bool);
-    bool useGrid() const;
 
     /**
      * Enable or disable the fix aspect ratio.
@@ -76,6 +74,8 @@ private:
     wxDouble getTop(ict::ECContext ic, bool ext = true, bool ref = true) const;
     wxDouble getBottom(ict::ECContext ic, bool ext = true, bool ref = true) const;
 
+    void useGrid(bool);
+    bool useGrid() const;
     void useSavedMark();
 
     /**
