@@ -11,6 +11,7 @@ class wxScrollBar;
 class wxFlexGridSizer;
 class wxPanel;
 class wxCheckBox;
+class wxButton;
 class Scaler;
 class CanvasItem;
 class ZoomCtrl;
@@ -80,6 +81,7 @@ private:
     wxWindow *canvas;
     ZoomCtrl *zoom;
     wxCheckBox *gridBox;
+    wxButton *centerButton;
     Scaler *scaler;
     std::vector<CanvasItem *> zOrder;
     CanvasItem *pressedItem, *selectedItem;
