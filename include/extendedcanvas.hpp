@@ -82,7 +82,7 @@ private:
     wxCheckBox *gridBox;
     Scaler *scaler;
     std::vector<CanvasItem *> zOrder;
-    CanvasItem *pressedItem, *selectedItem, *hoveredItem;
+    CanvasItem *pressedItem, *selectedItem;
     wxPoint2DDouble canvasReference;
 
     wxBitmap *canvasBuffer;
