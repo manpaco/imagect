@@ -8,3 +8,4 @@
   |--> use wxGetMousePosition() to obtain mouse position in screen coordinates
        and later convert to canvas coordinates. This new mouse position is used
        in pressed item.
+- 'Center view' button.
