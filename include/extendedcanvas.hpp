@@ -70,6 +70,7 @@ private:
     void checkModKeys();
     void initScrollbars();
     void setItemsGrid(bool state);
+    void centerView(wxCommandEvent &event);
 
     void adjustScrollbars();
     wxRect getItemsCoverage();

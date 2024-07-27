@@ -15,6 +15,7 @@
 #include <wx/scrolbar.h>
 #include <wx/utils.h>
 #include <wx/checkbox.h>
+#include <wx/button.h>
 #include "zoomctrl.hpp"
 #include "zoomevent.hpp"
 
@@ -27,6 +28,7 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
     zoom = new ZoomCtrl(this, ict::ZOOM_CT);
     gridBox = new wxCheckBox(this, wxID_ANY, _("Use grid"));
+    centerButton = new wxButton(this, wxID_ANY, _("Center view"));
     scaler = new Scaler(1.0, 1.0);
     canvasBuffer = nullptr;
     pressedItem = nullptr;
@@ -45,6 +47,8 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     wxBoxSizer *toolBarSizer = new wxBoxSizer(wxHORIZONTAL);
     toolBarSizer->AddSpacer(ict::BEST_SPACE);
     toolBarSizer->Add(zoom);
+    toolBarSizer->AddSpacer(ict::BEST_SPACE);
+    toolBarSizer->Add(centerButton);
     toolBarSizer->AddStretchSpacer();
     toolBarSizer->Add(gridBox, 0, wxALIGN_CENTER_VERTICAL);
     vertToolBarSizer->Add(toolBarSizer, 0, wxEXPAND);
@@ -63,6 +67,11 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     hBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::horizontalScroll, this);
     vBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::verticalScroll, this);
     gridBox->Bind(wxEVT_CHECKBOX, &ExtendedCanvas::gridToggle, this);
+    centerButton->Bind(wxEVT_BUTTON, &ExtendedCanvas::centerView, this);
+}
+
+void ExtendedCanvas::centerView(wxCommandEvent &event) {
+
 }
 
 void ExtendedCanvas::onZoomChange(ZoomEvent &event) {
