@@ -151,7 +151,7 @@ void ExtendedCanvas::checkModKeys() {
 }
 
 void ExtendedCanvas::gridToggle(wxCommandEvent &event) {
-    useGrid(event.IsChecked());
+    setItemsGrid(event.IsChecked());
     event.Skip();
 }
 
@@ -422,12 +422,18 @@ wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {
     else return scaler->scalePoint(canvasReference, ict::IN_D);
 }
 
-void ExtendedCanvas::useGrid(bool op) {
+void ExtendedCanvas::setItemsGrid(bool state) {
     for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
             it != zOrder.rend(); it++) {
-        (*it)->useGrid(op);
+        (*it)->useGrid(state);
     }
     refreshCanvas();
+}
+
+void ExtendedCanvas::useGrid(bool state) {
+    if(gridBox->IsChecked() == state) return;
+    gridBox->SetValue(state);
+    setItemsGrid(state);
 }
 
 bool ExtendedCanvas::useGrid() const {
