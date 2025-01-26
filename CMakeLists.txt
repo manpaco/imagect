@@ -19,7 +19,7 @@ endif()
 
 set(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
-configure_file(${PROJECT_SOURCE_DIR}/buildvalues.hpp.in
+configure_file(${PROJECT_SOURCE_DIR}/templates/buildvalues.hpp.in
                ${PROJECT_SOURCE_DIR}/include/buildvalues.hpp @ONLY)
 
 list(APPEND SRC_FILES
@@ -45,7 +45,7 @@ if(CMAKE_SYSTEM MATCHES Windows)
     list(APPEND RCS_FILES
         "wimagect.rc"
     )
-    list(TRANSFORM RCS_FILES PREPEND "${PROJECT_SOURCE_DIR}/win/")
+    list(TRANSFORM RCS_FILES PREPEND "${PROJECT_SOURCE_DIR}/resources/win/")
 endif()
 
 add_executable(${PROJECT} ${SRC_FILES} ${RCS_FILES})
