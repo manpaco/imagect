@@ -13,7 +13,7 @@ string(REGEX REPLACE "^v([0-9]+).*" "\\1" VERSION_MAJOR "${LATEST_TAG}")
 string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${LATEST_TAG}")
 string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_PATCH "${LATEST_TAG}")
 string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1" VERSION_SUFFIX "${LATEST_TAG}")
-if(${VERSION_SUFFIX})
+if(NOT "${VERSION_SUFFIX}" EQUAL "")
     set(VERSION_SUFFIX "-dirty")
 endif()
 
