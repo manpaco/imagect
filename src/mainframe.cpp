@@ -140,6 +140,7 @@ void MainFrame::onAbout(wxCommandEvent &event) {
     std::string aboutTxt = projectName;
     aboutTxt += " - v";
     aboutTxt += versionString;
+    aboutTxt += versionSuffix;
     aboutTxt += "\nby manpaco";
     wxMessageBox(aboutTxt, _("About"), wxOK | wxICON_INFORMATION);
 }
