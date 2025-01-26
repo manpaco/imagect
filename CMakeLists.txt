@@ -23,19 +23,21 @@ configure_file(${PROJECT_SOURCE_DIR}/buildvalues.hpp.in
                ${PROJECT_SOURCE_DIR}/include/buildvalues.hpp @ONLY)
 
 list(APPEND SRC_FILES
+    "canvasitem.cpp"
+    "cropevent.cpp"
+    "exportdlg.cpp"
+    "extendedcanvas.cpp"
+    "filext.cpp"
     "imagectapp.cpp"
+    "imagewindow.cpp"
     "mainframe.cpp"
     "previewpanel.cpp"
+    "recthelper.cpp"
+    "scaler.cpp"
+    "smartrect.cpp"
     "toolspanel.cpp"
-    "cropevent.cpp"
-    "imagewindow.cpp"
-    "filext.cpp"
-    "exportdlg.cpp"
     "zoomctrl.cpp"
     "zoomevent.cpp"
-    "scrolledcanvas.cpp"
-    "canvasitem.cpp"
-    "scaler.cpp"
 )
 list(TRANSFORM SRC_FILES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
