@@ -20,7 +20,7 @@ CanvasItem::CanvasItem(int id, wxRect2DDouble geometry) {
     this->locked = true;
     this->selected = false;
     this->container = nullptr;
-    this->hovered = ict::NONE_ZONE;
+    this->hover = ict::NONE_ZONE;
     hdim = 15;
 }
 
@@ -28,52 +28,99 @@ CanvasItem::~CanvasItem() {
 
 }
 
+wxDouble CanvasItem::extGetLeft() const {
+    if(useGrid()) return round_btl(geometry.GetLeft());
+    else return geometry.GetLeft();
+}
+
+wxDouble CanvasItem::extGetTop() const {
+    if(useGrid()) return round_btl(geometry.GetTop());
+    else return geometry.GetTop();
+}
+
+wxDouble CanvasItem::extGetRight() const {
+    if(useGrid()) return round_btr(geometry.GetRight());
+    else return geometry.GetRight();
+}
+
+wxDouble CanvasItem::extGetBottom() const {
+    if(useGrid()) return round_btr(geometry.GetBottom());
+    else return geometry.GetBottom();
+}
+
+wxDouble CanvasItem::extGetWidth() const {
+    if(useGrid()) return extGetRight() - extGetLeft();
+    else return geometry.m_width;
+}
+
+wxDouble CanvasItem::extGetHeight() const {
+    if(useGrid()) return extGetBottom() - extGetTop();
+    else return geometry.m_height;
+}
+
+wxRect2DDouble CanvasItem::extGetRect() const {
+    return wxRect2DDouble(extGetLeft(), extGetTop(),
+                          extGetWidth(), extGetHeight());
+}
+
 wxDouble CanvasItem::getWidth(ict::ECContext ic, bool ext) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return geometry.extGetWidth();
+        if(ext) return extGetWidth();
         else return geometry.m_width;
     }
-    else return scaler->scaleX(getWidth(ict::VIRTUAL_CONTEXT), ict::IN_D);
+    else return scaler->scaleX(getWidth(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
 }
 
 wxDouble CanvasItem::getHeight(ict::ECContext ic, bool ext) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return geometry.extGetHeight();
+        if(ext) return extGetHeight();
         else return geometry.m_height;
     }
-    else return scaler->scaleY(getHeight(ict::VIRTUAL_CONTEXT), ict::IN_D);
+    else return scaler->scaleY(getHeight(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
 }
 
-wxDouble CanvasItem:: getRight(ict::ECContext ic, bool ext) const {
+wxDouble CanvasItem:: getRight(ict::ECContext ic, bool ext, bool ref) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_x + geometry.extGetRight();
-        else return getContainerReference(ic).m_x + geometry.GetRight();
+        wxDouble ret;
+        if(ext) ret = extGetRight();
+        else ret = geometry.GetRight();
+        if(ref) ret += getContainerReference(ic).m_x;
+        return ret;
     }
-    else return scaler->scaleX(getRight(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
+    else return scaler->scaleX(getRight(ict::VIRTUAL_CONTEXT, ext, ref), ict::IN_D);
 }
 
-wxDouble CanvasItem::getBottom(ict::ECContext ic, bool ext) const {
+wxDouble CanvasItem::getBottom(ict::ECContext ic, bool ext, bool ref) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_y + geometry.extGetBottom();
-        else return getContainerReference(ic).m_y + geometry.GetBottom();
+        wxDouble ret;
+        if(ext) ret = extGetBottom();
+        else ret = geometry.GetBottom();
+        if(ref) ret += getContainerReference(ic).m_y;
+        return ret;
     }
-    else return scaler->scaleY(getBottom(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
+    else return scaler->scaleY(getBottom(ict::VIRTUAL_CONTEXT, ext, ref), ict::IN_D);
 }
 
-wxDouble CanvasItem::getLeft(ict::ECContext ic, bool ext) const {
+wxDouble CanvasItem::getLeft(ict::ECContext ic, bool ext, bool ref) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_x + geometry.extGetLeft();
-        else return getContainerReference(ic).m_x + geometry.GetLeft();
+        wxDouble ret;
+        if(ext) ret = extGetLeft();
+        else ret = geometry.GetLeft();
+        if(ref) ret += getContainerReference(ic).m_x;
+        return ret;
     }
-    else return scaler->scaleX(getLeft(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
+    else return scaler->scaleX(getLeft(ict::VIRTUAL_CONTEXT, ext, ref), ict::IN_D);
 }
 
-wxDouble CanvasItem::getTop(ict::ECContext ic, bool ext) const {
+wxDouble CanvasItem::getTop(ict::ECContext ic, bool ext, bool ref) const {
     if (ic == ict::VIRTUAL_CONTEXT) {
-        if(ext) return getContainerReference(ic).m_y + geometry.extGetTop();
-        else return getContainerReference(ic).m_y + geometry.GetTop();
+        wxDouble ret;
+        if(ext) ret = extGetTop();
+        else ret = geometry.GetTop();
+        if(ref) ret += getContainerReference(ic).m_y;
+        return ret;
     }
-    else return scaler->scaleY(getTop(ict::VIRTUAL_CONTEXT, ext), ict::IN_D);
+    else return scaler->scaleY(getTop(ict::VIRTUAL_CONTEXT, ext, ref), ict::IN_D);
 }
 
 wxRect2DDouble CanvasItem::getHandleZone(int z) const {
@@ -98,26 +145,30 @@ wxRect2DDouble CanvasItem::getHandleZone(int z) const {
     } else return wxRect2DDouble(0, 0, 0, 0);
 }
 
-wxPoint2DDouble CanvasItem::relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c) {
+wxPoint2DDouble CanvasItem::relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c, bool ext, bool ref) {
     if(z == ict::RT_ZONE) {
-        return wxPoint2DDouble(p.m_x - getRight(c, false), p.m_y - getTop(c, false));
+        return wxPoint2DDouble(p.m_x - getRight(c, ext, ref), p.m_y - getTop(c, ext, ref));
     } else if(z == ict::LT_ZONE) {
-        return wxPoint2DDouble(p.m_x - getLeft(c, false), p.m_y - getTop(c, false));
+        return wxPoint2DDouble(p.m_x - getLeft(c, ext, ref), p.m_y - getTop(c, ext, ref));
     } else if(z == ict::RB_ZONE) {
-        return wxPoint2DDouble(p.m_x - getRight(c, false), p.m_y - getBottom(c, false));
+        return wxPoint2DDouble(p.m_x - getRight(c, ext, ref), p.m_y - getBottom(c, ext, ref));
     } else if(z == ict::LB_ZONE) {
-        return wxPoint2DDouble(p.m_x - getLeft(c, false), p.m_y - getBottom(c, false));
+        return wxPoint2DDouble(p.m_x - getLeft(c, ext, ref), p.m_y - getBottom(c, ext, ref));
     } else if(z == ict::T_ZONE) {
-        return wxPoint2DDouble(0, p.m_y - getTop(c, false));
+        return wxPoint2DDouble(0, p.m_y - getTop(c, ext, ref));
     } else if(z == ict::B_ZONE) {
-        return wxPoint2DDouble(0, p.m_y - getBottom(c, false));
+        return wxPoint2DDouble(0, p.m_y - getBottom(c, ext, ref));
     } else if(z == ict::R_ZONE) {
-        return wxPoint2DDouble(p.m_x - getRight(c, false), 0);
+        return wxPoint2DDouble(p.m_x - getRight(c, ext, ref), 0);
     } else if(z == ict::L_ZONE) {
-        return wxPoint2DDouble(p.m_x - getLeft(c, false), 0);
-    } else if(z == ict::IN_ZONE) {
-        return p - getPosition(c);
-    } else return p - getContainerReference(c);
+        return wxPoint2DDouble(p.m_x - getLeft(c, ext, ref), 0);
+    } else { // IN_ZONE
+        return p - getPosition(c, ext, ref);
+    }
+}
+
+wxPoint2DDouble CanvasItem::relativeToReference(const wxPoint2DDouble &p, ict::ECContext c) {
+    return p - getContainerReference(c);
 }
 
 wxPoint2DDouble CanvasItem::getContainerReference(ict::ECContext c) const {
@@ -127,17 +178,6 @@ wxPoint2DDouble CanvasItem::getContainerReference(ict::ECContext c) const {
 
 int CanvasItem::getHandler() const {
     return geometry.activatedZone();
-}
-
-bool CanvasItem::collides(const wxPoint2DDouble &p) {
-    if(locked || hidden) {
-        collision = ict::NONE_ZONE;
-        return false;
-    }
-    collision = inHandle(p);
-    if(!collision) return false;
-    if(container) container->notifyCollision(this);
-    return true;
 }
 
 int CanvasItem::inHandle(const wxPoint2DDouble &canvasPoint) const {
@@ -157,13 +197,14 @@ int CanvasItem::inHandle(const wxPoint2DDouble &canvasPoint) const {
 
 int CanvasItem::press(const wxPoint &canvasPoint) {
     if(locked) return ict::NONE_ZONE;
-    cPoint = canvasPoint;
-    int handler = inHandle(cPoint);
+    int handler = inHandle(canvasPoint);
     geometry.activateZone(handler);
     if(!handler) return handler;
-    relativePress = relativeToEdge(cPoint, handler, ict::CANVAS_CONTEXT);
-    relativePress = scaler->scalePoint(relativePress, ict::OUT_D);
-    if(container) container->notifyPressure(this);
+    lastPoint = relativeToReference(canvasPoint, ict::CANVAS_CONTEXT);
+    lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
+    rPressure = relativeToEdge(canvasPoint, handler, ict::CANVAS_CONTEXT, false);
+    rPressure = scaler->scalePoint(rPressure, ict::OUT_D);
+    lastPoint -= rPressure;
     return handler;
 }
 
@@ -171,29 +212,26 @@ void CanvasItem::release() {
     geometry.activateZone(ict::NONE_ZONE);
 }
 
-void CanvasItem::hoverCollision() {
-    hover(collision);
-}
-
-void CanvasItem::hover(int z) {
-    if(hovered != z) {
-        prevHover = hovered;
-        hovered = z;
-        if(container) container->notifyHover(this);
+bool CanvasItem::doHover(int z) {
+    if(hover != z) {
+        sHover = hover;
+        hover = z;
+        return hover != sHover;
     }
+    return false;
 }
 
-wxPoint2DDouble CanvasItem::getSize(ict::ECContext ic) const {
-    return wxPoint2DDouble(getWidth(ic), getHeight(ic));
+wxPoint2DDouble CanvasItem::getSize(ict::ECContext ic, bool ext) const {
+    return wxPoint2DDouble(getWidth(ic, ext), getHeight(ic, ext));
 }
 
-wxPoint2DDouble CanvasItem::getPosition(ict::ECContext ic) const {
-    return wxPoint2DDouble(getLeft(ic), getTop(ic));
+wxPoint2DDouble CanvasItem::getPosition(ict::ECContext ic, bool ext, bool ref) const {
+    return wxPoint2DDouble(getLeft(ic, ext, ref), getTop(ic, ext, ref));
 }
 
-wxRect2DDouble CanvasItem::getGeometry(ict::ECContext ic) const {
-    wxPoint2DDouble p(getPosition(ic));
-    wxPoint2DDouble s(getSize(ic));
+wxRect2DDouble CanvasItem::getGeometry(ict::ECContext ic, bool ext, bool ref) const {
+    wxPoint2DDouble p(getPosition(ic, ext, ref));
+    wxPoint2DDouble s(getSize(ic, ext));
     return wxRect2DDouble(p.m_x, p.m_y, s.m_x, s.m_y);
 }
 
@@ -207,19 +245,41 @@ bool CanvasItem::isRestricted() const {
     return geometry.isRestricted();
 }
 
-void CanvasItem::modify(const wxPoint &canvasPoint, bool force) {
+void CanvasItem::pushToRestriction(wxPoint2DDouble &p, int z) {
+    wxRect2DDouble aux = geometry.getRestriction();
+    if(z == ict::IN_ZONE) {
+        aux.m_width -= geometry.m_width;
+        aux.m_height -= geometry.m_height;
+    }
+    if(aux.GetLeft() > p.m_x) p.m_x = aux.GetLeft();
+    else if(aux.GetRight() < p.m_x) p.m_x = aux.GetRight();
+    if(aux.GetTop() > p.m_y) p.m_y = aux.GetTop();
+    else if(aux.GetBottom() < p.m_y) p.m_y = aux.GetBottom();
+}
+
+void CanvasItem::modify(const wxPoint &canvasPoint) {
     if(!geometry.activatedZone()) return;
-    if(canvasPoint == cPoint && !force) return;
-    cPoint = canvasPoint;
-    wxPoint2DDouble relativePoint = relativeToEdge(cPoint, ict::NONE_ZONE,
-                                                   ict::CANVAS_CONTEXT);
-    relativePoint = scaler->scalePoint(relativePoint, ict::OUT_D);
-    relativePoint -= relativePress;
-    geometry.setZoneTo(relativePoint);
-    hovered = geometry.activatedZone();
-    if(saved != getGeometry(ict::CANVAS_CONTEXT)) {
+    if(useGrid()) {
+        wxPoint2DDouble newPoint = relativeToReference(canvasPoint, ict::CANVAS_CONTEXT);
+        newPoint = scaler->scalePoint(newPoint, ict::OUT_D);
+        newPoint -= rPressure;
+        if(isRestricted()) pushToRestriction(newPoint, geometry.activatedZone());
+        lastPoint.m_x += trunc(newPoint.m_x - lastPoint.m_x);
+        lastPoint.m_y += trunc(newPoint.m_y - lastPoint.m_y);
+    } else {
+        lastPoint = relativeToReference(canvasPoint, ict::CANVAS_CONTEXT);
+        lastPoint = scaler->scalePoint(lastPoint, ict::OUT_D);
+        lastPoint -= rPressure;
+    }
+    virtualModify(lastPoint);
+}
+
+void CanvasItem::virtualModify(const wxPoint2DDouble &vp) {
+    geometry.setZoneTo(vp);
+    hover = geometry.activatedZone();
+    if(sGeometry != getGeometry(ict::CANVAS_CONTEXT)) {
         if(container) container->notifyGeometry(this);
-        saved = getGeometry(ict::CANVAS_CONTEXT);
+        sGeometry = getGeometry(ict::CANVAS_CONTEXT);
     }
 }
 
@@ -238,11 +298,11 @@ void CanvasItem::setAspectRatio(int xr, int yr) {
 void CanvasItem::useSavedMark() {
     if(!geometry.resizing()) return;
     geometry.useMark();
-    modify(cPoint, true);
+    virtualModify(lastPoint);
 }
 
 void CanvasItem::expandFromCenter(bool op) {
-    geometry.useInflate(op);
+    geometry.expandFromCenter(op);
     useSavedMark();
 }
 
@@ -252,21 +312,21 @@ void CanvasItem::fixedAspectRatio(bool op) {
 }
 
 bool CanvasItem::expandFromCenter() const {
-    return geometry.useInflate();
+    return geometry.expandFromCenter();
 }
 
 bool CanvasItem::fixedAspectRatio() const {
-    return geometry.isFixed();
+    return geometry.fixedAspectRatio();
 }
 
-wxRect2DDouble CanvasItem::getUpdateArea() const {
-    wxRect2DDouble updArea(saved.CreateUnion(getGeometry(ict::CANVAS_CONTEXT)));
+wxRect2DDouble CanvasItem::getAreaUpdate() const {
+    wxRect2DDouble updArea(sGeometry.CreateUnion(getGeometry(ict::CANVAS_CONTEXT)));
     inflateRect(&updArea, hdim);
     return updArea;
 }
 
 wxRect2DDouble CanvasItem::getHoverUpdate() const {
-    return getHandleZone(hovered).CreateUnion(getHandleZone(prevHover));
+    return getHandleZone(hover).CreateUnion(getHandleZone(sHover));
 }
 
 void CanvasItem::setVirtualSize(const wxPoint2DDouble &dim) {
@@ -295,9 +355,9 @@ void CanvasItem::drawOn(wxMemoryDC *pv) {
     wxRect2DDouble ddr(getGeometry(ict::CANVAS_CONTEXT));
     wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
     pv->DrawRectangle(dr);
-    if(hovered) {
+    if(hover) {
         pv->SetBrush(*wxYELLOW_BRUSH);
-        wxRect2DDouble ddr(getHandleZone(hovered));
+        wxRect2DDouble ddr(getHandleZone(hover));
         wxRect dr(ddr.m_x, ddr.m_y, ddr.m_width, ddr.m_height);
         pv->DrawRectangle(dr);
     }
@@ -355,9 +415,9 @@ bool CanvasItem::isHidden() const {
 }
 
 void CanvasItem::useGrid(bool op) {
-    geometry.useGrid(op);
+    geometry.looseRestriction(op);
 }
 
 bool CanvasItem::useGrid() const {
-    return geometry.useGrid();
+    return geometry.looseRestriction();
 }

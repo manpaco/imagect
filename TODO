@@ -1,0 +1,11 @@
++ Move grid implementation from SmartRect to CanvasItem.
+  |--> Done, BUT 'looseRestriction()' is necessary on SmartRect.
++ Improve CanvasItem event notification (probably extend CanvasItem from wxObject, and use wxEvent).
+  |--> Done, BUT 'extend' not implemented (I think it is not necessary).
++ Implement ZoomControl.
+- Implement Auto-scrolling.
+  |--> improve getAreaUpdate() function (CanvasItem)
+  |--> use wxGetMousePosition() to obtain mouse position in screen coordinates
+       and later convert to canvas coordinates. This new mouse position is used
+       in pressed item.
+- 'Center view' button.

@@ -10,19 +10,23 @@
 class wxScrollBar;
 class wxFlexGridSizer;
 class wxPanel;
+class wxCheckBox;
+class wxButton;
 class Scaler;
 class CanvasItem;
+class ZoomCtrl;
+class ZoomEvent;
 
 namespace ict {
 
     enum ItemOption {
-        IO_NONE = 0,
-        IO_LOCKED = 1,
-        IO_HIDDEN = 2,
-        IO_SELECTED = 3,
-        IO_RESTRICTED = 4,
-        IO_FIXEDASPECTRATIO = 5,
-        IO_EXPANDFROMCENTER = 6
+        IOPT_NONE = 0,
+        IOPT_LOCK = 1,
+        IOPT_HIDE = 2,
+        IOPT_SELECT = 3,
+        IOPT_RESTRICT = 4,
+        IOPT_FIXEDASPECTRATIO = 5,
+        IOPT_EXPANDFROMCENTER = 6
     };
 }
 
@@ -35,6 +39,7 @@ public:
     wxPoint2DDouble getReference(ict::ECContext c) const;
     void useGrid(bool);
     bool useGrid() const;
+    bool hasItems() const;
 
     ~ExtendedCanvas();
 
@@ -57,26 +62,30 @@ private:
     void notifySelection(CanvasItem *changed);
     void notifyPressure(CanvasItem *pressed);
     void notifyHover(CanvasItem *changed);
-    void notifyCollision(CanvasItem *target);
-    void gridToggle(wxMouseEvent &event);
+    void gridToggle(wxCommandEvent &event);
     void keyDown(wxKeyEvent &event);
     void keyUp(wxKeyEvent &event);
-    void toggleItemOption(CanvasItem *item, ict::ItemOption option);
+    void onZoomChange(ZoomEvent &event);
+    void toggleOption(CanvasItem *item, ict::ItemOption option);
     void checkModKeys();
+    void initScrollbars();
+    void setItemsGrid(bool state);
+    void centerView(wxCommandEvent &event);
 
     void adjustScrollbars();
     wxRect getItemsCoverage();
 
-    bool grid;
     bool shiftPressed, ctrlPressed;
     wxScrollBar *vBar, *hBar;
     wxPoint prevPosBars;
     wxFlexGridSizer *layout;
     wxWindow *canvas;
-    wxWindow *zoom;
+    ZoomCtrl *zoom;
+    wxCheckBox *gridBox;
+    wxButton *centerButton;
     Scaler *scaler;
     std::vector<CanvasItem *> zOrder;
-    CanvasItem *pressedItem, *selectedItem, *hoveredItem;
+    CanvasItem *pressedItem, *selectedItem;
     wxPoint2DDouble canvasReference;
 
     wxBitmap *canvasBuffer;

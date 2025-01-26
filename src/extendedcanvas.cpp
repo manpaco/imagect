@@ -14,33 +14,46 @@
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
 #include <wx/utils.h>
+#include <wx/checkbox.h>
+#include <wx/button.h>
+#include "zoomctrl.hpp"
+#include "zoomevent.hpp"
 
 ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(parent, id) {
-    layout = new wxFlexGridSizer(2, 2, 0, 0);
+    layout = new wxFlexGridSizer(3, 2, 0, 0);
     canvas = new wxWindow(this, wxID_ANY);
     canvas->SetBackgroundStyle(wxBG_STYLE_PAINT);
     canvasReference = wxPoint2DDouble(0, 0);
     vBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
     hBar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL);
+    zoom = new ZoomCtrl(this, ict::ZOOM_CT);
+    gridBox = new wxCheckBox(this, wxID_ANY, _("Use grid"));
+    centerButton = new wxButton(this, wxID_ANY, _("Center view"));
     scaler = new Scaler(1.0, 1.0);
     canvasBuffer = nullptr;
     pressedItem = nullptr;
     selectedItem = nullptr;
-    hoveredItem = nullptr;
-    grid = false;
     ctrlPressed = false;
     shiftPressed = false;
-    zoom = new wxWindow(this, wxID_ANY);
-    zoom->SetBackgroundColour(wxColour(*wxYELLOW));
     layout->AddGrowableCol(0);
     layout->AddGrowableRow(0);
     layout->Add(canvas, 1, wxEXPAND);
-    hBar->SetScrollbar(0, 50, 100, 50);
-    vBar->SetScrollbar(0, 50, 100, 50);
-    prevPosBars = wxPoint(0, 0);
+    initScrollbars();
     layout->Add(vBar, 1, wxEXPAND);
     layout->Add(hBar, 1, wxEXPAND);
-    layout->Add(zoom, 1, wxEXPAND);
+    layout->Add(new wxWindow(this, wxID_ANY), 1, wxEXPAND);
+    wxBoxSizer *vertToolBarSizer = new wxBoxSizer(wxVERTICAL);
+    vertToolBarSizer->AddSpacer(ict::BEST_SPACE);
+    wxBoxSizer *toolBarSizer = new wxBoxSizer(wxHORIZONTAL);
+    toolBarSizer->AddSpacer(ict::BEST_SPACE);
+    toolBarSizer->Add(zoom);
+    toolBarSizer->AddSpacer(ict::BEST_SPACE);
+    toolBarSizer->Add(centerButton);
+    toolBarSizer->AddStretchSpacer();
+    toolBarSizer->Add(gridBox, 0, wxALIGN_CENTER_VERTICAL);
+    vertToolBarSizer->Add(toolBarSizer, 0, wxEXPAND);
+    vertToolBarSizer->AddSpacer(ict::BEST_SPACE);
+    layout->Add(vertToolBarSizer, 0, wxEXPAND);
     SetSizer(layout);
     canvas->Bind(wxEVT_PAINT, &ExtendedCanvas::paintCanvas, this);
     canvas->Bind(wxEVT_MOTION, &ExtendedCanvas::mouseMotion, this);
@@ -50,9 +63,29 @@ ExtendedCanvas::ExtendedCanvas(wxWindow *parent, wxWindowID id) : wxWindow(paren
     canvas->Bind(wxEVT_MOUSEWHEEL, &ExtendedCanvas::mouseWheel, this);
     canvas->Bind(wxEVT_KEY_DOWN, &ExtendedCanvas::keyDown, this);
     canvas->Bind(wxEVT_KEY_UP, &ExtendedCanvas::keyUp, this);
+    zoom->Bind(EVT_ZOOM_CHANGE, &ExtendedCanvas::onZoomChange, this, ict::ZOOM_CT);
     hBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::horizontalScroll, this);
     vBar->Bind(wxEVT_SCROLL_CHANGED, &ExtendedCanvas::verticalScroll, this);
-    zoom->Bind(wxEVT_LEFT_DOWN, &ExtendedCanvas::gridToggle, this);
+    gridBox->Bind(wxEVT_CHECKBOX, &ExtendedCanvas::gridToggle, this);
+    centerButton->Bind(wxEVT_BUTTON, &ExtendedCanvas::centerView, this);
+}
+
+void ExtendedCanvas::centerView(wxCommandEvent &event) {
+
+}
+
+void ExtendedCanvas::onZoomChange(ZoomEvent &event) {
+    scaler->setNewFactor(event.getScaleFactor(), event.getScaleFactor());
+    wxPoint centre;
+    centre.x = canvas->GetSize().x / 2;
+    centre.y = canvas->GetSize().y / 2;
+    doMagnify(centre);
+}
+
+void ExtendedCanvas::initScrollbars() {
+    hBar->SetScrollbar(0, 50, 50, 50);
+    vBar->SetScrollbar(0, 50, 50, 50);
+    prevPosBars = wxPoint(0, 0);
 }
 
 void ExtendedCanvas::horizontalScroll(wxScrollEvent &event) {
@@ -64,26 +97,28 @@ void ExtendedCanvas::verticalScroll(wxScrollEvent &event) {
 }
 
 void
-ExtendedCanvas::toggleItemOption(CanvasItem *item, ict::ItemOption option) {
+ExtendedCanvas::toggleOption(CanvasItem *item, ict::ItemOption option) {
     if(!item) return;
     switch(option) {
-        case ict::IO_LOCKED:
+        case ict::IOPT_LOCK:
             item->lock(!item->isLocked());
             break;
-        case ict::IO_HIDDEN:
+        case ict::IOPT_HIDE:
             item->hide(!item->isHidden());
             break;
-        case ict::IO_SELECTED:
+        case ict::IOPT_SELECT:
             item->select(!item->isSelected());
             break;
-        case ict::IO_RESTRICTED:
+        case ict::IOPT_RESTRICT:
             item->restrict(!item->isRestricted());
             break;
-        case ict::IO_FIXEDASPECTRATIO:
+        case ict::IOPT_FIXEDASPECTRATIO:
             item->fixedAspectRatio(!item->fixedAspectRatio());
             break;
-        case ict::IO_EXPANDFROMCENTER:
+        case ict::IOPT_EXPANDFROMCENTER:
             item->expandFromCenter(!item->expandFromCenter());
+            break;
+        default:
             break;
     }
 }
@@ -92,11 +127,11 @@ void ExtendedCanvas::keyDown(wxKeyEvent &event) {
     switch(event.GetKeyCode()) {
         case WXK_CONTROL:
             ctrlPressed = true;
-            toggleItemOption(pressedItem, ict::IO_FIXEDASPECTRATIO);
+            toggleOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
             break;
         case WXK_SHIFT:
             shiftPressed = true;
-            toggleItemOption(pressedItem, ict::IO_EXPANDFROMCENTER);
+            toggleOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
             break;
     }
 
@@ -107,11 +142,11 @@ void ExtendedCanvas::keyUp(wxKeyEvent &event) {
     switch(event.GetKeyCode()) {
         case WXK_CONTROL:
             ctrlPressed = false;
-            toggleItemOption(pressedItem, ict::IO_FIXEDASPECTRATIO);
+            toggleOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
             break;
         case WXK_SHIFT:
             shiftPressed = false;
-            toggleItemOption(pressedItem, ict::IO_EXPANDFROMCENTER);
+            toggleOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
             break;
     }
 
@@ -120,28 +155,35 @@ void ExtendedCanvas::keyUp(wxKeyEvent &event) {
 
 void ExtendedCanvas::checkModKeys() {
     if(!pressedItem) return;
-    if(ctrlPressed) toggleItemOption(pressedItem, ict::IO_FIXEDASPECTRATIO);
-    if(shiftPressed) toggleItemOption(pressedItem, ict::IO_EXPANDFROMCENTER);
+    if(ctrlPressed) toggleOption(pressedItem, ict::IOPT_FIXEDASPECTRATIO);
+    if(shiftPressed) toggleOption(pressedItem, ict::IOPT_EXPANDFROMCENTER);
 }
 
-void ExtendedCanvas::gridToggle(wxMouseEvent &event) {
-    useGrid(!grid);
+void ExtendedCanvas::gridToggle(wxCommandEvent &event) {
+    setItemsGrid(event.IsChecked());
     event.Skip();
 }
 
 void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
+    if(pressedItem) {
+        event.Skip();
+        return;
+    }
     if(ctrlPressed) {
         wxDouble plus = event.GetWheelRotation();
-        plus /= 2000;
+        plus /= 1000;
         wxDouble sx;
         scaler->getNewFactor(&sx, nullptr);
         plus *= sx;
         scaler->plusFactor(plus, plus);
         doMagnify(event.GetPosition());
+        scaler->getNewFactor(&sx, nullptr);
+        zoom->setCustom(sx);
     } else {
         wxPoint motion(0, 0);
         if(event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL) {
-            motion.y = event.GetWheelRotation() / 5;
+            if(shiftPressed) motion.x = event.GetWheelRotation() / 5;
+            else motion.y = event.GetWheelRotation() / 5;
         } else {
             motion.x = event.GetWheelRotation() / 5;
         }
@@ -152,37 +194,48 @@ void ExtendedCanvas::mouseWheel(wxMouseEvent &event) {
 
 void ExtendedCanvas::resizeCanvas(wxSizeEvent &event) {
     if (canvasBuffer) delete canvasBuffer;
+    if(event.GetSize().x == 0 || event.GetSize().y == 0) return;
     canvasBuffer = new wxBitmap(event.GetSize().GetWidth(), event.GetSize().GetHeight());
     refreshCanvas();
+    adjustScrollbars();
 }
 
 void ExtendedCanvas::mouseMotion(wxMouseEvent &event) {
     if(pressedItem) pressedItem->modify(event.GetPosition());
-    else if(!hoverCanvas(event.GetPosition()))
-        if(hoveredItem) hoveredItem->hover(ict::NONE_ZONE);
+    else hoverCanvas(event.GetPosition());
     event.Skip();
 }
 
 bool ExtendedCanvas::hoverCanvas(const wxPoint p) {
+    int collision = ict::NONE_ZONE;
     for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
             it != zOrder.rend(); it++) {
-        if((*it)->collides(p)) return true;
+        if(!collision) {
+            collision = (*it)->inHandle(p);
+            if((*it)->doHover(collision)) notifyHover(*it);
+        } else if((*it)->doHover(ict::NONE_ZONE)) notifyHover(*it);
     }
-    return false;
+    return collision;
 }
 
 bool ExtendedCanvas::pressCanvas(const wxPoint p) {
     for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
             it != zOrder.rend(); it++) {
-        if((*it)->press(p)) return true;
+        if((*it)->press(p)) {
+            pressedItem = *it;
+            notifyPressure(pressedItem);
+            checkModKeys();
+            pressedItem->select(true);
+            return true;
+        }
     }
+    if(selectedItem) selectedItem->select(false);
     return false;
 }
 
 void ExtendedCanvas::mousePress(wxMouseEvent &event) {
     if(!canvas->HasCapture()) canvas->CaptureMouse();
-    if(!pressCanvas(event.GetPosition()))
-        if(selectedItem) selectedItem->select(false);
+    pressCanvas(event.GetPosition());
     event.Skip();
 }
 
@@ -190,6 +243,7 @@ void ExtendedCanvas::mouseRelease(wxMouseEvent &event) {
     if(canvas->HasCapture()) canvas->ReleaseMouse();
     if(pressedItem) {
         pressedItem->release();
+        notifyPressure(pressedItem);
         checkModKeys();
         pressedItem = nullptr;
     }
@@ -226,10 +280,11 @@ void ExtendedCanvas::addItem(CanvasItem *item) {
     if (getItem(item->getId())) return;
     item->setScaler(scaler);
     item->setContainer(this);
-    item->useGrid(grid);
+    item->useGrid(gridBox->IsChecked());
     zOrder.push_back(item);
     wxRect2DDouble fresh(item->getArea());
     refreshCanvasRect(wxRect(fresh.m_x, fresh.m_y, fresh.m_width, fresh.m_height));
+    adjustScrollbars();
 }
 
 void ExtendedCanvas::doMagnify(const wxPoint mousePosition) {
@@ -268,6 +323,10 @@ void ExtendedCanvas::doScroll(const wxPoint motion) {
 }
 
 void ExtendedCanvas::adjustScrollbars() {
+    if(!hasItems()) {
+        initScrollbars();
+        return;
+    }
     wxRect coverage(getItemsCoverage());
     wxRect slideWin(0, 0, 1, 1);
 
@@ -334,7 +393,7 @@ void ExtendedCanvas::refreshCanvas() {
 }
 
 void ExtendedCanvas::notifyGeometry(CanvasItem *changed) {
-    wxRect2DDouble ch(changed->getUpdateArea());
+    wxRect2DDouble ch(changed->getAreaUpdate());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh.Inflate(1, 1));
     adjustScrollbars();
@@ -344,12 +403,11 @@ void ExtendedCanvas::notifyGeometry(CanvasItem *changed) {
 void ExtendedCanvas::notifySelection(CanvasItem *changed) {
     if(!changed) return;
     if(selectedItem) {
-        if(*selectedItem != *changed) {
-            if(changed->isSelected()) {
-                selectedItem->select(false);
-                selectedItem = changed;
-            }
-        } else if(!changed->isSelected()) selectedItem = nullptr;
+        if(*selectedItem != *changed && changed->isSelected()) {
+            selectedItem->select(false);
+            selectedItem = changed;
+        } else if(*selectedItem == *changed && !changed->isSelected())
+            selectedItem = nullptr;
     } else if(changed->isSelected()) selectedItem = changed;
     wxRect2DDouble ch(changed->getArea());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
@@ -358,30 +416,14 @@ void ExtendedCanvas::notifySelection(CanvasItem *changed) {
 }
 
 void ExtendedCanvas::notifyPressure(CanvasItem *pressed) {
-    pressedItem = pressed;
-    pressedItem->select(true);
-    checkModKeys();
     // send pressure event
 }
 
 void ExtendedCanvas::notifyHover(CanvasItem *changed) {
-    if(!changed) return;
-    if(hoveredItem) {
-        if(*hoveredItem != *changed) {
-            if(changed->hovered) {
-                hoveredItem->hover(ict::NONE_ZONE);
-                hoveredItem = changed;
-            }
-        } else if(!changed->hovered) hoveredItem = nullptr;
-    } else if(changed->hovered) hoveredItem = changed;
     wxRect2DDouble ch(changed->getHoverUpdate());
     wxRect refresh(ch.m_x, ch.m_y, ch.m_width, ch.m_height);
     refreshCanvasRect(refresh);
     // send hover event
-}
-
-void ExtendedCanvas::notifyCollision(CanvasItem *target) {
-    target->hoverCollision();
 }
 
 wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {
@@ -389,18 +431,26 @@ wxPoint2DDouble ExtendedCanvas::getReference(ict::ECContext c) const {
     else return scaler->scalePoint(canvasReference, ict::IN_D);
 }
 
-void ExtendedCanvas::useGrid(bool op) {
-    if(grid == op) return;
-    grid = op;
+void ExtendedCanvas::setItemsGrid(bool state) {
     for(std::vector<CanvasItem *>::reverse_iterator it = zOrder.rbegin();
             it != zOrder.rend(); it++) {
-        (*it)->useGrid(grid);
+        (*it)->useGrid(state);
     }
     refreshCanvas();
 }
 
+void ExtendedCanvas::useGrid(bool state) {
+    if(gridBox->IsChecked() == state) return;
+    gridBox->SetValue(state);
+    setItemsGrid(state);
+}
+
 bool ExtendedCanvas::useGrid() const {
-    return grid;
+    return gridBox->IsChecked();
+}
+
+bool ExtendedCanvas::hasItems() const {
+    return !zOrder.empty();
 }
 
 ExtendedCanvas::~ExtendedCanvas() {

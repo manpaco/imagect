@@ -6,8 +6,6 @@
 #include "toolspanel.hpp"
 #include "filext.hpp"
 #include "exportdlg.hpp"
-#include "zoomctrl.hpp"
-#include "zoomevent.hpp"
 #include "wx/settings.h"
 #include "wx/button.h"
 #include "wx/sizer.h"
@@ -56,14 +54,12 @@ void MainFrame::initDimensions() {
     minSideSplitterSize =
         wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) / sideSplitterFactor;
     mainSplitter->SetMinimumPaneSize(minMainSplitterSize);
-    sideSplitter->SetMinimumPaneSize(minSideSplitterSize);
     SetMinClientSize(wxSize(minMainSplitterSize * (mainSplitterFactor - 1),
                             minSideSplitterSize * (sideSplitterFactor - 1)));
 }
 
 void MainFrame::allocateMem() {
     mainSplitter = new wxSplitterWindow(this, ict::MAIN_SPLITTER);
-    sideSplitter = new wxSplitterWindow(mainSplitter, ict::SIDE_SPLITTER);
     sCanvas = new ExtendedCanvas(mainSplitter, ict::SCVIEW);
     // sCanvas->useGrid(true);
     wxRect2DDouble res(0, 0, 200, 200);
@@ -77,12 +73,8 @@ void MainFrame::allocateMem() {
     // it2->fixedAspectRatio(true);
     // it2->expandFromCenter(true);
     sCanvas->addItem(it2);
-    tools = new ToolsPanel(sideSplitter, ict::TOOLS);
-    preview = new PreviewPanel(sideSplitter, ict::PREVIEW);
+    tools = new ToolsPanel(mainSplitter, ict::TOOLS);
     mainSizer = new wxBoxSizer(wxVERTICAL);
-    apply = new wxButton(this, ict::APPLY_BT, "Apply");
-    reset = new wxButton(this, ict::RESET_CROP_BT, "Reset crop area");
-    zoom = new ZoomCtrl(this, ict::ZOOM_CT);
 }
 
 void MainFrame::createMenuBar() {
@@ -96,39 +88,19 @@ void MainFrame::createMenuBar() {
     mFile->AppendSeparator();
     mFile->Append(wxID_EXIT);
 
-    mEdit = new wxMenu;
-    mEdit->Append(wxID_UNDO);
-    mEdit->Append(wxID_REDO);
-    mEdit->Append(wxID_APPLY);
-
     mHelp = new wxMenu;
     mHelp->Append(wxID_HELP);
     mHelp->AppendSeparator();
     mHelp->Append(wxID_ABOUT);
 
     topMenuBar->Append(mFile, "File");
-    topMenuBar->Append(mEdit, "Edit");
     topMenuBar->Append(mHelp, "More");
 
     SetMenuBar(topMenuBar);
 }
 
 void MainFrame::overlayPanels() {
-    sideSplitter->SplitHorizontally(preview, tools);
-    mainSplitter->SplitVertically(sideSplitter, sCanvas);
-    wxBoxSizer *buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
-    buttonsSizer->AddSpacer(ict::BEST_SPACE);
-    buttonsSizer->Add(apply);
-    buttonsSizer->AddSpacer(ict::BEST_SPACE);
-    buttonsSizer->Add(reset);
-    buttonsSizer->AddStretchSpacer();
-    buttonsSizer->Add(zoom);
-    buttonsSizer->AddSpacer(ict::BEST_SPACE);
-    mainSizer->AddSpacer(ict::BEST_SPACE);
-    mainSizer->Add(buttonsSizer, 0, wxEXPAND);
-    mainSizer->AddSpacer(ict::BEST_SPACE);
-    wxStaticLine *hLine = new wxStaticLine(this);
-    mainSizer->Add(hLine, 0, wxEXPAND);
+    mainSplitter->SplitVertically(tools, sCanvas);
     mainSizer->Add(mainSplitter, 1, wxEXPAND);
     SetSizerAndFit(mainSizer);
 }
@@ -137,7 +109,6 @@ void MainFrame::bindMenuBar() {
     Bind(wxEVT_MENU, &MainFrame::onOpen, this, wxID_OPEN);
     Bind(wxEVT_MENU, &MainFrame::onExport, this, ict::EXPORT_MI);
     Bind(wxEVT_MENU, &MainFrame::onQuit, this, wxID_EXIT);
-    Bind(wxEVT_MENU, &MainFrame::saveState, this, wxID_APPLY);
     Bind(wxEVT_MENU, &MainFrame::onClose, this, wxID_CLOSE);
     Bind(wxEVT_MENU, &MainFrame::onAbout, this, wxID_ABOUT);
 }
@@ -145,20 +116,17 @@ void MainFrame::bindMenuBar() {
 void MainFrame::bindElements() {
 //    sView->
 //        getCanvas()->Bind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
-    Bind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Bind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->
         Bind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this, ict::FIX_RATIO_CB);
     tools->
         Bind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this,
              ict::GROW_CHECK_CB);
-    zoom->Bind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
 void MainFrame::unbindElements() {
 //    sView->
 //        getCanvas()->Unbind(EVT_CROP_CHANGE, &MainFrame::onCropChange, this);
-    Unbind(wxEVT_BUTTON, &MainFrame::saveState, this, ict::APPLY_BT);
     Unbind(wxEVT_BUTTON, &MainFrame::resetCrop, this, ict::RESET_CROP_BT);
     tools->
         Unbind(wxEVT_CHECKBOX, &MainFrame::onFixRatio, this,
@@ -166,8 +134,6 @@ void MainFrame::unbindElements() {
     tools->
         Unbind(wxEVT_CHECKBOX, &MainFrame::onAllowGrow, this,
                ict::GROW_CHECK_CB);
-    zoom->
-        Unbind(EVT_ZOOM_CHANGE, &MainFrame::onZoomChange, this, ict::ZOOM_CT);
 }
 
 void MainFrame::onAbout(wxCommandEvent &event) {
@@ -267,17 +233,10 @@ void MainFrame::openImage(const wxString &p) {
 //    }
 }
 
-void MainFrame::onZoomChange(ZoomEvent &event) {
-//    sView->scaleFactor(event.getScaleFactor());
-}
-
 void MainFrame::initParams() {
 //    currentState = OptionsContainer();
     openedImg = false;
     exportedImg = false;
-    mEdit->Enable(wxID_APPLY, false);
-    mEdit->Enable(wxID_UNDO, false);
-    mEdit->Enable(wxID_REDO, false);
 }
 
 void MainFrame::clear() {
@@ -296,7 +255,6 @@ void MainFrame::clear() {
     tools->Enable(false);
     tools->collapseBlocks();
 //    sView->clear();
-    preview->clear();
 }
 
 void MainFrame::onFixRatio(wxCommandEvent &event) {
@@ -320,31 +278,3 @@ void MainFrame::onCropChange(CropEvent &event) {
     wxRect newGeometry(event.getOffset(), event.getSize());
     tools->cropGeometry(newGeometry);
 }
-
-void MainFrame::composePreview() {
-//    OptionsContainer aux(currentState);
-//    aux.cropSize =
-//        sView->getCanvas()->
-//            translateSize(aux.cropSize, ict::COMPRESS_T, ict::IN_D);
-//    aux.cropOff =
-//        sView->getCanvas()->
-//            translatePoint(aux.cropOff, ict::COMPRESS_T, ict::IN_D);
-//    Magick::Image newImg = composeState(*compImg, aux);
-//    wxBitmap newPreview(createImage(newImg));
-//    preview->updatePreview(newPreview);
-}
-
-void MainFrame::saveState(wxCommandEvent &event) {
-//    if(!tools->valid()) return;
-//    OptionsContainer toSave = tools->currentOpts();
-//    if(toSave.cropSize != currentState.cropSize) {
-//        wxSize ts(toSave.cropSize);
-//        if(!sView->getCanvas()->cropSize(&ts)) {
-//            tools->cropSize(ts);
-//            toSave.cropSize = ts;
-//        }
-//    }
-//    if(toSave == currentState) return;
-//    updateHistory(toSave);
-}
-

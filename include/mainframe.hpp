@@ -8,8 +8,6 @@ class wxBoxSizer;
 class wxButton;
 class wxSplitterWindow;
 class ScrolledView;
-class ZoomCtrl;
-class ZoomEvent;
 class ExtendedCanvas;
 
 #include "wx/frame.h"
@@ -40,7 +38,6 @@ class MainFrame: public wxFrame {
 
     private:
         // ------------------------ EVENT HANDLERS ----------------------------
-        void saveState(wxCommandEvent &);
         void onFixRatio(wxCommandEvent &);
         void onAllowGrow(wxCommandEvent &event);
         void onClose(wxCommandEvent &event);
@@ -50,7 +47,6 @@ class MainFrame: public wxFrame {
         void onQuitFrame(wxCloseEvent &event);
         void onAbout(wxCommandEvent &event);
         void resetCrop(wxCommandEvent &event);
-        void onZoomChange(ZoomEvent &event);
         void onCropChange(CropEvent &);
         // ---------------------- END EVENT HANDLERS --------------------------
 
@@ -62,11 +58,6 @@ class MainFrame: public wxFrame {
         void overlayPanels();
         void createMenuBar();
         void clear();
-
-        /**
-         * Compose current state on the compressed image.
-         */
-        void composePreview();
 
         /**
          * Show export dialog.
@@ -89,16 +80,10 @@ class MainFrame: public wxFrame {
         ExtendedCanvas *sCanvas = nullptr;
         ToolsPanel *tools = nullptr;
         wxSplitterWindow *mainSplitter = nullptr;
-        wxSplitterWindow *sideSplitter = nullptr;
-        PreviewPanel *preview = nullptr;
         wxBoxSizer *mainSizer = nullptr;
 
-        wxButton *apply;
-        wxButton *reset;
-        ZoomCtrl *zoom;
-
         wxMenuBar *topMenuBar;
-        wxMenu *mFile, *mEdit, *mHelp;
+        wxMenu *mFile, *mHelp;
 
         bool openedImg, exportedImg;
 

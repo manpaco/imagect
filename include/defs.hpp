@@ -2,7 +2,6 @@
 #define DEFS_H
 
 #include "wx/defs.h"
-#include <array>
 
 namespace ict {
 
@@ -12,9 +11,6 @@ const double MINUPP = 1 / MAXUPP;
 const unsigned int MIN_CROP = 1;
 const unsigned int MIN_STROKE = 0;
 const int BEST_SPACE = 5;
-const int zoomArraySize = 8;
-
-typedef std::array<float, zoomArraySize> ZoomArray;
 
 enum ControlID {
     WIDTH_TC = wxID_HIGHEST + 1,

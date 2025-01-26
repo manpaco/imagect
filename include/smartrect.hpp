@@ -14,11 +14,11 @@ inline double round_htz(const double &n) {
 inline double round_haz(const double &n) {
     return std::copysign(floor((fabs(n) + ROUND_CORRECTOR)), n);
 }
-inline double round_rb(const double &n) {
+inline double round_btr(const double &n) {
     if(n < 0) return round_htz(n);
     else return round_haz(n);
 }
-inline double round_lb(const double &n) {
+inline double round_btl(const double &n) {
     if(n > 0) return round_htz(n);
     else return round_haz(n);
 }
@@ -80,14 +80,6 @@ public:
     void setPosition(const wxPoint2DDouble &r);
     void setSize(const wxPoint2DDouble &r);
 
-    wxDouble extGetLeft() const;
-    wxDouble extGetTop() const;
-    wxDouble extGetRight() const;
-    wxDouble extGetBottom() const;
-    wxDouble extGetWidth() const;
-    wxDouble extGetHeight() const;
-    wxRect2DDouble extGetRect() const;
-
     void activateZone(const int z);
     void setZoneTo(const wxPoint2DDouble &p);
 
@@ -98,14 +90,15 @@ public:
     void fixedAspectRatio(const bool ar);
     void setAspectRatio(const wxDouble &ar);
     void setAspectRatio(const int x, const int y);
-    void useInflate(const bool i);
-    void useGrid(bool);
+    void expandFromCenter(const bool i);
+    void looseRestriction(bool);
 
-    bool isFixed() const;
-    bool useInflate() const;
+    bool fixedAspectRatio() const;
+    bool expandFromCenter() const;
     bool isRestricted() const;
+    wxRect2DDouble getRestriction(bool force = false) const;
     int getReflection() const;
-    bool useGrid() const;
+    bool looseRestriction() const;
     wxDouble getAspectRatio() const;
     int activatedZone() const;
     bool cornerActivated() const;
@@ -128,28 +121,17 @@ private:
     wxDouble topRestriction() const;
     wxDouble rightRestriction() const;
     wxDouble bottomRestriction() const;
-    wxDouble leftRestrictionLimit() const;
-    wxDouble topRestrictionLimit() const;
-    wxDouble rightRestrictionLimit() const;
-    wxDouble bottomRestrictionLimit() const;
-    wxRect2DDouble restrictionLimits() const;
 
     void checkMinimum();
-    void checkInflate();
+    void checkExpansion();
     void checkReflection();
     void checkAspectRatio(int want = BIGGER_RECT);
     void checkRestriction();
     void checkLimits(bool doBalance = false);
-    void checkGrid();
     void balance(int zone);
     int clampedZone() const;
 
-    /* ----------------------- SmartRect main structure -----------------------
-     * Internal getters are inherited from wxRect2DDouble.
-     * External getters are identified by "ext" prefix.
-     *
-     * When grid is enabled: external =/= internal, most of the time.
-     * When grid is disabled: external == internal, always. */
+    // ----------------------- SmartRect main structure -----------------------
 
     /* Restriction values */
     wxRect2DDouble restriction;
@@ -158,10 +140,10 @@ private:
     /* Aspect ratio value */
     wxDouble aspectRatio;
 
-    bool grid;
+    bool loose;
     bool fixed;
     bool restricted;
-    bool inflate;
+    bool expand;
 
     int reflection;
     int activeZone;

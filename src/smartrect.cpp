@@ -13,8 +13,8 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
     fixed = false;
     restricted = false;
     clamps = ict::NONE_CLAMPED;
-    inflate = false;
-    grid = false;
+    expand = false;
+    loose = false;
     reflection = ict::NONE_REFLEC;
     activeZone = ict::NONE_ZONE;
     restriction = *this;
@@ -22,58 +22,39 @@ SmartRect::SmartRect(const wxRect2DDouble &r) {
 }
 
 wxDouble SmartRect::leftRestriction() const {
-    if(useGrid()) return round_rb(restriction.GetLeft());
+    if(looseRestriction()) return round_btl(restriction.GetLeft()) - ROUND_CORRECTOR;
     else return restriction.GetLeft();
 }
 
 wxDouble SmartRect::topRestriction() const {
-    if(useGrid()) return round_rb(restriction.GetTop());
+    if(looseRestriction()) return round_btl(restriction.GetTop()) - ROUND_CORRECTOR;
     else return restriction.GetTop();
 }
 
 wxDouble SmartRect::rightRestriction() const {
-    if(useGrid()) return round_lb(restriction.GetRight());
+    if(looseRestriction()) return round_btr(restriction.GetRight()) + ROUND_CORRECTOR;
     else return restriction.GetRight();
 }
 
 wxDouble SmartRect::bottomRestriction() const {
-    if(useGrid()) return round_lb(restriction.GetBottom());
+    if(looseRestriction()) return round_btr(restriction.GetBottom()) + ROUND_CORRECTOR;
     else return restriction.GetBottom();
 }
 
-wxDouble SmartRect::leftRestrictionLimit() const {
-    if(useGrid()) return leftRestriction() - ROUND_CORRECTOR;
-    else return leftRestriction();
-}
-
-wxDouble SmartRect::topRestrictionLimit() const {
-    if(useGrid()) return topRestriction() - ROUND_CORRECTOR;
-    else return topRestriction();
-}
-
-wxDouble SmartRect::rightRestrictionLimit() const {
-    if(useGrid()) return rightRestriction() + ROUND_CORRECTOR;
-    else return rightRestriction();
-}
-
-wxDouble SmartRect::bottomRestrictionLimit() const {
-    if(useGrid()) return bottomRestriction() + ROUND_CORRECTOR;
-    else return bottomRestriction();
-}
-
-wxRect2DDouble SmartRect::restrictionLimits() const {
-    return wxRect2DDouble(leftRestrictionLimit(), topRestrictionLimit(),
-                          rightRestrictionLimit() - leftRestrictionLimit(),
-                          bottomRestriction() - topRestrictionLimit());
+wxRect2DDouble SmartRect::getRestriction(bool force) const {
+    if(force) return restriction;
+    else return wxRect2DDouble(leftRestriction(), topRestriction(),
+                          rightRestriction() - leftRestriction(),
+                          bottomRestriction() - topRestriction());
 }
 
 void SmartRect::setGeometry(const wxRect2DDouble &r) {
     if(!resting()) return;
     setPosition(r.GetPosition());
-    bool aux = inflate;
-    if(aux) inflate = !aux;
+    bool aux = expand;
+    if(aux) expand = !aux;
     setSize(wxPoint2DDouble(r.m_width, r.m_height));
-    inflate = aux;
+    expand = aux;
 }
 
 void SmartRect::setPosition(const wxPoint2DDouble &p) {
@@ -88,7 +69,7 @@ void SmartRect::setSize(const wxPoint2DDouble &s) {
     wxPoint2DDouble newp(s);
     newp.m_x = abs(newp.m_x);
     newp.m_y = abs(newp.m_y);
-    if(useInflate()) {
+    if(expandFromCenter()) {
         newp.m_x /= 2;
         newp.m_y /= 2;
         newp += GetCentre();
@@ -98,48 +79,13 @@ void SmartRect::setSize(const wxPoint2DDouble &s) {
     activateZone(ict::NONE_ZONE);
 }
 
-wxDouble SmartRect::extGetLeft() const {
-    if(useGrid()) return round_rb(GetLeft());
-    else return GetLeft();
-}
-
-wxDouble SmartRect::extGetTop() const {
-    if(useGrid()) return round_rb(GetTop());
-    else return GetTop();
-}
-
-wxDouble SmartRect::extGetRight() const {
-    if(useGrid()) return round_lb(GetRight());
-    else return GetRight();
-}
-
-wxDouble SmartRect::extGetBottom() const {
-    if(useGrid()) return round_lb(GetBottom());
-    else return GetBottom();
-}
-
-wxDouble SmartRect::extGetWidth() const {
-    if(useGrid()) return extGetRight() - extGetLeft();
-    else return m_width;
-}
-
-wxDouble SmartRect::extGetHeight() const {
-    if(useGrid()) return extGetBottom() - extGetTop();
-    else return m_height;
-}
-
-wxRect2DDouble SmartRect::extGetRect() const {
-    return wxRect2DDouble(extGetLeft(), extGetTop(),
-                          extGetWidth(), extGetHeight());
-}
-
-void SmartRect::useGrid(bool op) {
-    grid = op;
+void SmartRect::looseRestriction(bool op) {
+    loose = op;
     restrict(restricted);
 }
 
-bool SmartRect::useGrid() const {
-    return grid;
+bool SmartRect::looseRestriction() const {
+    return loose;
 }
 
 wxDouble SmartRect::getAspectRatio() const {
@@ -183,12 +129,11 @@ void SmartRect::setZoneTo(const wxPoint2DDouble &p) {
             break;
     }
     checkMinimum();
-    checkInflate();
+    checkExpansion();
     checkReflection();
     checkAspectRatio();
     checkRestriction();
-    checkGrid();
-    if(!isFixed()) setAspectRatio(m_width / m_height);
+    if(!fixedAspectRatio()) setAspectRatio(m_width / m_height);
 }
 
 int SmartRect::activatedZone() const {
@@ -224,48 +169,39 @@ bool SmartRect::creating() const {
     return activeZone == ict::NEW_ZONE;
 }
 
-void SmartRect::checkGrid() {
-    if(!useGrid() || !dragging()) return;
-    wxPoint2DDouble dp(GetPosition() - mark.GetPosition());
-    dp.m_x = trunc(dp.m_x);
-    dp.m_y = trunc(dp.m_y);
-    m_x = mark.GetPosition().m_x + dp.m_x;
-    m_y = mark.GetPosition().m_y + dp.m_y;
-}
-
 void SmartRect::checkLimits(bool doBalance) {
     if(!restricted) return;
     if(!dragging() && !resizing()) return;
     clamps = ict::NONE_CLAMPED;
-    bool exceed = GetLeft() < leftRestrictionLimit();
+    bool exceed = GetLeft() < leftRestriction();
     if(exceed) {
-        if(dragging()) MoveLeftTo(leftRestrictionLimit());
+        if(dragging()) MoveLeftTo(leftRestriction());
         else {
-            SetLeft(leftRestrictionLimit());
+            SetLeft(leftRestriction());
             clamps |= ict::L_CLAMPED;
         }
     }
-    exceed = GetTop() < topRestrictionLimit();
+    exceed = GetTop() < topRestriction();
     if(exceed) {
-        if(dragging()) MoveTopTo(topRestrictionLimit());
+        if(dragging()) MoveTopTo(topRestriction());
         else {
-            SetTop(topRestrictionLimit());
+            SetTop(topRestriction());
             clamps |= ict::T_CLAMPED;
         }
     }
-    exceed = GetRight() > rightRestrictionLimit();
+    exceed = GetRight() > rightRestriction();
     if(exceed) {
-        if(dragging()) MoveRightTo(rightRestrictionLimit());
+        if(dragging()) MoveRightTo(rightRestriction());
         else {
-            SetRight(rightRestrictionLimit());
+            SetRight(rightRestriction());
             clamps |= ict::R_CLAMPED;
         }
     }
-    exceed = GetBottom() > bottomRestrictionLimit();
+    exceed = GetBottom() > bottomRestriction();
     if(exceed) {
-        if(dragging()) MoveBottomTo(bottomRestrictionLimit());
+        if(dragging()) MoveBottomTo(bottomRestriction());
         else {
-            SetBottom(bottomRestrictionLimit());
+            SetBottom(bottomRestriction());
             clamps |= ict::B_CLAMPED;
         }
     }
@@ -283,7 +219,7 @@ void SmartRect::checkLimits(bool doBalance) {
         else clamps ^= ict::B_CLAMPED;
     }
     if(!doBalance) return;
-    if(useInflate()) {
+    if(expandFromCenter()) {
         balance(clampedZone());
         return;
     }
@@ -316,7 +252,7 @@ void SmartRect::checkMinimum() {
         case ict::R_ZONE:
         case ict::RT_ZONE:
         case ict::RB_ZONE:
-            if(!useInflate()) minx = mark.GetLeft();
+            if(!expandFromCenter()) minx = mark.GetLeft();
             else minx = mark.GetCentre().m_x;
             if(GetRight() > minx - ict::MINUPP &&
                 GetRight() < minx + ict::MINUPP)
@@ -325,7 +261,7 @@ void SmartRect::checkMinimum() {
         case ict::L_ZONE:
         case ict::LT_ZONE:
         case ict::LB_ZONE:
-            if(!useInflate()) minx = mark.GetRight();
+            if(!expandFromCenter()) minx = mark.GetRight();
             else minx = mark.GetCentre().m_x;
             if(GetLeft() < minx + ict::MINUPP &&
                 GetLeft() > minx - ict::MINUPP)
@@ -336,7 +272,7 @@ void SmartRect::checkMinimum() {
         case ict::T_ZONE:
         case ict::LT_ZONE:
         case ict::RT_ZONE:
-            if(!useInflate()) miny = GetBottom();
+            if(!expandFromCenter()) miny = GetBottom();
             else miny = mark.GetCentre().m_y;
             if(GetTop() < miny + ict::MINUPP &&
                 GetTop() > miny - ict::MINUPP)
@@ -345,7 +281,7 @@ void SmartRect::checkMinimum() {
         case ict::B_ZONE:
         case ict::LB_ZONE:
         case ict::RB_ZONE:
-            if(!useInflate()) miny = GetTop();
+            if(!expandFromCenter()) miny = GetTop();
             else miny = mark.GetCentre().m_y;
             if(GetBottom() > miny - ict::MINUPP &&
                 GetBottom() < miny + ict::MINUPP)
@@ -354,8 +290,8 @@ void SmartRect::checkMinimum() {
     }
 }
 
-void SmartRect::checkInflate() {
-    if(!useInflate()) return;
+void SmartRect::checkExpansion() {
+    if(!expandFromCenter()) return;
     balance(activeZone);
 }
 
@@ -403,7 +339,7 @@ void SmartRect::checkReflection() {
 }
 
 void SmartRect::checkAspectRatio(int want) {
-    if(!isFixed() || !resizing()) return;
+    if(!fixedAspectRatio() || !resizing()) return;
     wxDouble nw = m_width, nh = m_height;
     if(m_width / m_height != aspectRatio) {
         if(cornerActivated() || want == SMALLER_RECT) {
@@ -420,7 +356,7 @@ void SmartRect::checkAspectRatio(int want) {
             else nh = calcOrdi(nw);
         }
     }
-    if(useInflate()) {
+    if(expandFromCenter()) {
         m_width = nw;
         m_height = nh;
         SetCentre(mark.GetCentre());
@@ -471,7 +407,7 @@ void SmartRect::checkAspectRatio(int want) {
 }
 
 void SmartRect::checkRestriction() {
-    if(!restricted || restrictionLimits().Contains(*this)) return;
+    if(!restricted || getRestriction().Contains(*this)) return;
     checkLimits(true);
     if(resizing()) checkAspectRatio(SMALLER_RECT);
 }
@@ -517,16 +453,16 @@ void SmartRect::setAspectRatio(const int x, const int y) {
     aspectRatio = (wxDouble)x / y;
 }
 
-void SmartRect::useInflate(const bool ec) {
-    inflate = ec;
+void SmartRect::expandFromCenter(const bool ec) {
+    expand = ec;
 }
 
-bool SmartRect::isFixed() const {
+bool SmartRect::fixedAspectRatio() const {
     return fixed;
 }
 
-bool SmartRect::useInflate() const {
-    return inflate;
+bool SmartRect::expandFromCenter() const {
+    return expand;
 }
 
 bool SmartRect::isRestricted() const {

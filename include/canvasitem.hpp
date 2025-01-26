@@ -22,9 +22,9 @@ public:
     bool isLocked();
     void hide(bool opt);
     bool isHidden() const;
-    wxRect2DDouble getGeometry(ict::ECContext ic) const;
-    wxPoint2DDouble getPosition(ict::ECContext ic) const;
-    wxPoint2DDouble getSize(ict::ECContext ic) const;
+    wxRect2DDouble getGeometry(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxPoint2DDouble getPosition(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxPoint2DDouble getSize(ict::ECContext ic, bool ext = true) const;
     wxRect2DDouble getArea() const;
     wxRect2DDouble getHandleZone(int z) const;
     void setVirtualGeometry(const wxRect2DDouble &geo);
@@ -41,8 +41,6 @@ public:
     void setContainer(ExtendedCanvas *c);
     void expandFromCenter(bool op);
     bool expandFromCenter() const;
-    void useGrid(bool);
-    bool useGrid() const;
 
     /**
      * Enable or disable the fix aspect ratio.
@@ -61,13 +59,23 @@ public:
     ~CanvasItem();
 
 private:
+    wxDouble extGetLeft() const;
+    wxDouble extGetTop() const;
+    wxDouble extGetRight() const;
+    wxDouble extGetBottom() const;
+    wxDouble extGetWidth() const;
+    wxDouble extGetHeight() const;
+    wxRect2DDouble extGetRect() const;
+
     wxDouble getWidth(ict::ECContext ic, bool ext = true) const;
     wxDouble getHeight(ict::ECContext ic, bool ext = true) const;
-    wxDouble getRight(ict::ECContext ic, bool ext = true) const;
-    wxDouble getLeft(ict::ECContext ic, bool ext = true) const;
-    wxDouble getTop(ict::ECContext ic, bool ext = true) const;
-    wxDouble getBottom(ict::ECContext ic, bool ext = true) const;
+    wxDouble getRight(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxDouble getLeft(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxDouble getTop(ict::ECContext ic, bool ext = true, bool ref = true) const;
+    wxDouble getBottom(ict::ECContext ic, bool ext = true, bool ref = true) const;
 
+    void useGrid(bool);
+    bool useGrid() const;
     void useSavedMark();
 
     /**
@@ -76,7 +84,8 @@ private:
      * @param target Point used to move or resize.
      * @return true if crop rectangle changes, else false.
      */
-    void modify(const wxPoint &avp, bool force = false);
+    void modify(const wxPoint &p);
+    void virtualModify(const wxPoint2DDouble &vp);
 
     /**
      * Simulate pressure at a given point.
@@ -85,11 +94,9 @@ private:
      */
     int press(const wxPoint &avp);
 
-    void hoverCollision();
-    void hover(int z);
-    bool collides(const wxPoint2DDouble &);
+    bool doHover(int z);
 
-    wxRect2DDouble getUpdateArea() const;
+    wxRect2DDouble getAreaUpdate() const;
     wxRect2DDouble getHoverUpdate() const;
 
     /**
@@ -100,7 +107,8 @@ private:
     /**
      * Get offset from p to respective zone.
      */
-    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c);
+    wxPoint2DDouble relativeToEdge(const wxPoint2DDouble &p, int z, ict::ECContext c, bool ext = true, bool ref = true);
+    wxPoint2DDouble relativeToReference(const wxPoint2DDouble &p, ict::ECContext c);
 
     int inHandle(const wxPoint2DDouble &vp) const;
 
@@ -108,16 +116,17 @@ private:
 
     wxPoint2DDouble getContainerReference(ict::ECContext c) const;
 
+    void pushToRestriction(wxPoint2DDouble &p, int z);
+
     int id;
     bool selected;
     bool locked;
     bool hidden;
-    int hovered, prevHover, collision;
-    wxPoint2DDouble relativePress;
-    wxPoint cPoint;
+    int hover, sHover;
+    wxPoint2DDouble rPressure, lastPoint;
     Scaler *scaler;
     SmartRect geometry;
-    wxRect2DDouble saved;
+    wxRect2DDouble sGeometry;
     ExtendedCanvas *container;
 
     /* Minimum handle dimension */

@@ -13,14 +13,14 @@ Scaler::Scaler(wxDouble xf, wxDouble yf) {
 }
 
 void Scaler::setNewFactor(wxDouble xf, wxDouble yf) {
-    if (xf >= ict::MINUPP && xf <= ict::MAXUPP) {
-        this->xxOldFactor = this->xxFactor;
-        this->xxFactor = xf;
-    }
-    if (yf >= ict::MINUPP && xf <= ict::MAXUPP) {
-        this->yyOldFactor = this->yyFactor;
-        this->yyFactor = yf;
-    }
+    if(xf < ict::MINUPP) xf = ict::MINUPP;
+    else if(xf > ict::MAXUPP) xf = ict::MAXUPP;
+    this->xxOldFactor = this->xxFactor;
+    this->xxFactor = xf;
+    if(yf < ict::MINUPP) yf = ict::MINUPP;
+    else if(yf > ict::MAXUPP) yf = ict::MAXUPP;
+    this->yyOldFactor = this->yyFactor;
+    this->yyFactor = yf;
 }
 
 bool Scaler::hasTransfer() const {
