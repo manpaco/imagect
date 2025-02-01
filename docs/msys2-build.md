@@ -23,8 +23,10 @@ Globally required tools:
 ### Subsystems requirements
 
 - `${MINGW_PACKAGE_PREFIX}`-toolchain
+
+- `${MINGW_PACKAGE_PREFIX}`-cmake
     
-- `${MINGW_PACKAGE_PREFIX}`-wxwidgets3.x-msw
+- `${MINGW_PACKAGE_PREFIX}`-wxwidgets3.2-msw
 
 ## Steps
 
@@ -43,9 +45,8 @@ Now, create a build directory:
 
 Run setup process:
 
-    ../setup --msys2
+    cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug
 
 Finally run make:
 
     mingw32-make
-

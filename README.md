@@ -24,9 +24,9 @@ You also need some build tools:
 
 - git
 
-- make
+- cmake
 
-- A C++ compiler
+- C++ compiler (at least C++11 support)
 
 ### Steps
 
@@ -43,9 +43,9 @@ This project implement an out-of-source building process, so do mkdir and cd int
     cd imagect
     mkdir build && cd build
 
-Run setup scripts from build directory with options that you want:
+Run cmake from build directory with options that you want:
 
-    ../setup [--compile_flags] --linux
+    cmake .. -DCMAKE_BUILD_TYPE=Debug
 
 And finally run make:
 
